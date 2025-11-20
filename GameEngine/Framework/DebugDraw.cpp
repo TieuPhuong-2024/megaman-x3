@@ -134,7 +134,7 @@ void DebugDraw::drawCircle(GVector2 center, float radius, D3DXCOLOR color, int s
         float angle = 2.0f * D3DX_PI * i / segments;
         float x = center.x + radius * cos(angle);
         float y = center.y + radius * sin(angle);
-        points.push_back(D3DXVECTOR2(x, y));
+        points.emplace_back(x, y);
     }
 
     if (_line)
@@ -152,12 +152,12 @@ void DebugDraw::drawText(std::string text, GVector2 position, D3DXCOLOR color, i
     _font->DrawTextA(NULL, text.c_str(), -1, &rect, DT_NOCLIP, color);
 }
 
-void DebugDraw::drawBoundingBox(const RECT& bbox, D3DXCOLOR color)
+void DebugDraw::DrawBBoxInScreen(const RECT& bbox, D3DXCOLOR color)
 {
     drawRect(bbox, color);
 }
 
-void DebugDraw::drawBoundingBox(const RECT& bbox, Viewport* viewport, D3DXCOLOR color)
+void DebugDraw::DrawBBoxInWorld(const RECT& bbox, Viewport* viewport, D3DXCOLOR color)
 {
     if (!viewport) return;
 
@@ -169,14 +169,14 @@ void DebugDraw::drawBoundingBox(const RECT& bbox, Viewport* viewport, D3DXCOLOR 
     drawRect((float)topLeft.x, (float)topLeft.y, (float)bottomRight.x, (float)bottomRight.y, color);
 }
 
-void DebugDraw::drawCollisionBox(ICollidable* obj, D3DXCOLOR color)
+void DebugDraw::DrawCollisionBoxInSceen(ICollidable* obj, D3DXCOLOR color)
 {
     if (!obj) return;
     RECT bbox = obj->getBoundingBox();
     drawRect(bbox, color);
 }
 
-void DebugDraw::drawCollisionBox(ICollidable* obj, Viewport* viewport, D3DXCOLOR color)
+void DebugDraw::DrawCollisionBoxInWorld(ICollidable* obj, Viewport* viewport, D3DXCOLOR color)
 {
     if (!obj || !viewport) return;
     

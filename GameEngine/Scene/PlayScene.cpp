@@ -61,25 +61,11 @@ void PlayScene::draw(LPD3DXSPRITE spriteHandle)
 	if (debugDraw->isEnabled())
 	{
 		// Draw collision boxes with viewport transform
-		debugDraw->drawCollisionBox(_player, _viewport, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f)); // Green for player
-		
-		// Debug first wall only to avoid spam
-		static bool debugOnce = false;
-		if (!debugOnce && !_walls.empty()) {
-			CWall* wall = _walls[0];
-			RECT bbox = wall->getBoundingBox();
-			GVector2 vpPos = _viewport->getPositionWorld();
-			GVector3 topLeft = _viewport->getPositionInViewport(&GVector3((float)bbox.left, (float)bbox.top, 0));
-			GVector3 bottomRight = _viewport->getPositionInViewport(&GVector3((float)bbox.right, (float)bbox.bottom, 0));
-			printLog("[Draw] First Wall: bbox(L=%d,T=%d,R=%d,B=%d) VP(%.0f,%.0f) -> screen(%.0f,%.0f,%.0f,%.0f)\n",
-				bbox.left, bbox.top, bbox.right, bbox.bottom, vpPos.x, vpPos.y,
-				topLeft.x, topLeft.y, bottomRight.x, bottomRight.y);
-			debugOnce = true;
-		}
+		debugDraw->DrawCollisionBoxInWorld(_player, _viewport, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f)); // Green for player
 		
 		for (auto wall : _walls)
 		{
-			debugDraw->drawBoundingBox(wall->getBoundingBox(), _viewport, D3DXCOLOR(1.0f, 0.0f, 1.0f, 1.0f)); // Magenta for walls
+			debugDraw->DrawBBoxInWorld(wall->getBoundingBox(), _viewport, D3DXCOLOR(1.0f, 0.0f, 1.0f, 1.0f)); // Magenta for walls
 		}
 
 		// Draw some sample primitives

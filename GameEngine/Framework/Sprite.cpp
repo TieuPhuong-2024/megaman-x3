@@ -60,8 +60,6 @@ void Sprite::render(LPD3DXSPRITE spriteHandle)
 		_origin,
 		_zIndex
 	);
-
-	return;
 }
 
 void Sprite::render(LPD3DXSPRITE spriteHandle, Viewport* viewport)

@@ -149,7 +149,7 @@ void TileMap::loadWalls(xml_node& mapNode)
 			float tmxY = object.attribute("y").as_float();
 			float width = object.attribute("width").as_float();
 			float height = object.attribute("height").as_float();
-			
+
 			// Convert from TMX screen coords to world coords
 			// TMX: Y is top-left, measured down from top
 			// World: Y is bottom-left, measured up from bottom
