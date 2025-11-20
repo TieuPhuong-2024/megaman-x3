@@ -1,34 +1,22 @@
 #pragma once
 #include "BaseObject.h"
-#include <d3d9.h>
 #include <d3dx9.h>
 #include "../Framework/ICollidable.h"
-#include "../Framework/Viewport.h"
 
-class CWall : public BaseObject, public ICollidable
+class CWall : public BaseObject
 {
 public:
 	CWall(float x, float y, float width, float height, int id);
 	CWall();
 	~CWall();
 
-	void update(float deltaTime);
-	void draw(LPD3DXSPRITE spriteHandle, Viewport* viewport);
-
 	// ICollidable
-	RECT getBoundingBox() const override;
-	void onCollision(ICollidable* other) override;
-	void OnCollisionWith(CCollisionEvent* e) override;
-	GVector2 getPosition() override;
-	void setPosition(GVector2 pos) override;
-	void GetSpeed(float& vx, float& vy) override;
-	void SetPosition(float x, float y) override;
-	GVector2 getVelocity() override;
-	void setVelocity(GVector2 vel) override;
-	bool IsBlocking() override;
+	RECT getBoundingBox() const;
+	GVector2 getPosition();
+	void setPosition(GVector2 pos);
+	void SetPosition(float x, float y);
+	bool IsBlocking();
 
-	RECT GetBoundingBox() const { return _boundingBox; }
-	void SetBoundingBox(RECT bbox) { this->_boundingBox = bbox; }
 	float GetWidth() const { return _width; }
 	void SetWidth(float width) { _width = width; }
 	float GetHeight() const { return _height; }
@@ -40,8 +28,8 @@ public:
 	float GetId() const { return _id; }
 	void SetId(int id) { _id = id; }
 
+
 private:
-	RECT        _boundingBox;
 	float       _width;
 	float       _height;
 	float       _x;

@@ -1,9 +1,8 @@
 #include "CMegaman.h"
-#include "util.h"
 #include "Framework/SceneManager.h"
 #include "Framework/define.h"
 #include "Framework/DebugDraw.h"
-#include "States/PlayerState.h"
+#include "AssetLoader.h"
 
 CMegaman::CMegaman(HINSTANCE hInstance, LPCWSTR title) : CGame(hInstance, title, WINDOW_WIDTH, WINDOW_HEIGHT)
 {
@@ -17,7 +16,7 @@ void CMegaman::init()
 {
 	CGame::init();
 	DebugDraw::getInstance()->init(_pDeviceManager->getDevice());
-	SceneManager::getInstance()->addScene(new PlayScene);
+	SceneManager::getInstance()->addScene(new PlayScene());
 }
 
 void CMegaman::release()
@@ -54,10 +53,9 @@ void CMegaman::draw()
 void CMegaman::loadResource()
 {
 	// Load resource here
-	Utils::loadResource(_D3DXSprite);
-	Utils::loadResource(_D3DXSprite);
-	Utils::loadStage();
-	Utils::loadSound(s_hWindows->getWnd());
+	AssetLoader::GetInstance()->loadResource(_D3DXSprite);
+	AssetLoader::GetInstance()->loadStage();
+	AssetLoader::GetInstance()->loadSound(s_hWindows->getWnd());
 }
 
 void CMegaman::updateInput(float deltaTime)

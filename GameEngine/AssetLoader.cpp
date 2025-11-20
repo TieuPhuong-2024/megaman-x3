@@ -1,8 +1,18 @@
-#include "util.h"
+#include "AssetLoader.h"
 #include "Framework/SpriteManager.h"
 #include "Framework/StageManager.h"
 
-void Utils::loadResource(ID3DXSprite* sprite)
+AssetLoader* AssetLoader::_instance = nullptr;
+
+AssetLoader* AssetLoader::GetInstance()
+{
+	if (_instance == nullptr) {
+		_instance = new AssetLoader();
+	}
+	return _instance;
+}
+
+void AssetLoader::loadResource(ID3DXSprite* sprite)
 {
 	SpriteManager* spriteManager = SpriteManager::getInstance();
 
@@ -17,12 +27,12 @@ void Utils::loadResource(ID3DXSprite* sprite)
 
 }
 
-void Utils::loadSound(HWND hWnd)
+void AssetLoader::loadSound(HWND hWnd)
 {
 	// Load sound here
 }
 
-void Utils::loadStage()
+void AssetLoader::loadStage()
 {
 	StageManager* stage = StageManager::getInstance();
 	stage->getListStage()->insert(make_pair(eID::MAP_STAGE_MEGAMAN, "Resource/MAP_1.tmx"));

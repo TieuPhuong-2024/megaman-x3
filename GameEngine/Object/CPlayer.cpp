@@ -310,9 +310,6 @@ void CPlayer::eventKeyUp(KeyEventArg* e)
 
 void CPlayer::eventKeyDown(KeyEventArg* e)
 {
-	printLog("Key Down: %d\n", e->_key);
-	printLog("is Jumping: %d\n", _isJumping);
-
 	// Handle jump (DIK_X) with buffering and coyote time:
 	if (e->_key == DIK_X)
 	{

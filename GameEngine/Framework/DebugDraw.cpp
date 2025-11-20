@@ -157,6 +157,18 @@ void DebugDraw::drawBoundingBox(const RECT& bbox, D3DXCOLOR color)
     drawRect(bbox, color);
 }
 
+void DebugDraw::drawBoundingBox(const RECT& bbox, Viewport* viewport, D3DXCOLOR color)
+{
+    if (!viewport) return;
+
+    // Transform bounding box from world space to screen space
+    GVector3 topLeft = viewport->getPositionInViewport(&GVector3((float)bbox.left, (float)bbox.top, 0));
+    GVector3 bottomRight = viewport->getPositionInViewport(&GVector3((float)bbox.right, (float)bbox.bottom, 0));
+
+    // Draw transformed rect
+    drawRect((float)topLeft.x, (float)topLeft.y, (float)bottomRight.x, (float)bottomRight.y, color);
+}
+
 void DebugDraw::drawCollisionBox(ICollidable* obj, D3DXCOLOR color)
 {
     if (!obj) return;

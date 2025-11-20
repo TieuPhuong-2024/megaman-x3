@@ -1,4 +1,5 @@
 #include "TileMap.h"
+#include "../trace.h"
 
 TileMap::TileMap()
 {
@@ -104,10 +105,11 @@ TileMap* TileMap::LoadFromFile(const string& path, eID spriteId)
 
 	tileMap->getElementMatrixIndex(layer);
 
-	tileMap->loadWalls(map);
-
+	// Set frame dimensions BEFORE loading walls (walls need these for coordinate conversion)
 	tileMap->_frameWidth = tileMap->_tileSet->getSprite()->getFrameWidth();
 	tileMap->_frameHeight = tileMap->_tileSet->getSprite()->getFrameHeight();
+
+	tileMap->loadWalls(map);
 
 	return tileMap;
 }
@@ -134,14 +136,34 @@ void TileMap::loadWalls(xml_node& mapNode)
 	xml_node objectgroup = mapNode.find_child_by_attribute("objectgroup", "name", "Wall");
 	if (objectgroup)
 	{
+		// Get map height for coordinate conversion
+		float mapHeight = _mapSize.y * _frameHeight;
+		
 		for (xml_node object : objectgroup.children("object"))
 		{
 			CWall* wall = new CWall();
 			wall->SetId(object.attribute("id").as_int());
-			wall->SetX(object.attribute("x").as_float());
-			wall->SetY(object.attribute("y").as_float());
-			wall->SetWidth(object.attribute("width").as_float());
-			wall->SetHeight(object.attribute("height").as_float());
+			
+			// TMX uses screen coordinates (Y down from top-left)
+			float tmxX = object.attribute("x").as_float();
+			float tmxY = object.attribute("y").as_float();
+			float width = object.attribute("width").as_float();
+			float height = object.attribute("height").as_float();
+			
+			// Convert from TMX screen coords to world coords
+			// TMX: Y is top-left, measured down from top
+			// World: Y is bottom-left, measured up from bottom
+			// TMX bottom = tmxY + height, World bottom = mapHeight - (tmxY + height)
+			float worldX = tmxX;
+			float worldY = mapHeight - tmxY - height;
+			
+			printLog("[TileMap] Wall ID=%d TMX(x=%.1f,y=%.1f,w=%.1f,h=%.1f) -> World(x=%.1f,y=%.1f) mapH=%.0f\n",
+				wall->GetId(), tmxX, tmxY, width, height, worldX, worldY, mapHeight);
+			
+			wall->SetX(worldX);
+			wall->SetY(worldY);
+			wall->SetWidth(width);
+			wall->SetHeight(height);
 			_walls.push_back(wall);
 		}
 	}

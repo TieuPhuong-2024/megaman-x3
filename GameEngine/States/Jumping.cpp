@@ -35,7 +35,6 @@ void Jumping::update(float deltaTime)
 {
 	// If vertical velocity reaches zero or becomes negative, we've reached apex -> Falling
 	float vy = _movement->getVelocity().y;
-	printLog("Jumping vy: %f\n", vy);
 	if (vy <= 0.0f)
 	{
 		printLog("Transitioning to Falling\n");
