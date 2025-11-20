@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with TexturePacker https://www.codeandweb.com/texturepacker -->
+<!-- $TexturePacker:SmartUpdate:d8c783be887b84b390c426bf95e40d5b:7b2a9276085b26d5316b6088186f40cf:30b3ac6529b58264d49e133073d5a4f5$ -->
+<!--Format:
+n  => name of the sprite
+x  => sprite x pos in texture
+y  => sprite y pos in texture
+w  => sprite width (may be trimmed)
+h  => sprite height (may be trimmed)
+pX => x pos of the pivot point (relative to sprite width)
+pY => y pos of the pivot point (relative to sprite height)
+oX => sprite's x-corner offset (only available if trimmed)
+oY => sprite's y-corner offset (only available if trimmed)
+oW => sprite's original width (only available if trimmed)
+oH => sprite's original height (only available if trimmed)
+r => 'y' only set if sprite is rotated
+with polygon mode enabled:
+vertices   => points in sprite coordinate system (x0,y0,x1,y1,x2,y2, ...)
+verticesUV => points in sheet coordinate system (x0,y0,x1,y1,x2,y2, ...)
+triangles  => sprite triangulation, 3 vertex indices per triangle
+-->
+<TextureAtlas imagePath="XMan.png" width="702" height="127">
+    <sprite n="apearing_1" x="515" y="40" w="8" h="48" pX="0.5" pY="0.5"/>
+    <sprite n="apearing_2" x="669" y="81" w="22" h="29" pX="0.5" pY="0.5"/>
+    <sprite n="apearing_3" x="599" y="3" w="30" h="42" pX="0.5" pY="0.5"/>
+    <sprite n="apearing_4" x="134" y="40" w="30" h="39" pX="0.5" pY="0.5"/>
+    <sprite n="apearing_5" x="289" y="87" w="30" h="36" pX="0.5" pY="0.5"/>
+    <sprite n="apearing_6" x="379" y="78" w="30" h="34" pX="0.5" pY="0.5"/>
+    <sprite n="apearing_7" x="515" y="92" w="30" h="32" pX="0.5" pY="0.5"/>
+    <sprite n="apearing_8" x="447" y="78" w="30" h="34" pX="0.5" pY="0.5"/>
+    <sprite n="clinging_1" x="202" y="40" w="27" h="43" pX="0.5" pY="0.5"/>
+    <sprite n="clinging_2" x="256" y="41" w="28" h="42" pX="0.5" pY="0.5"/>
+    <sprite n="ClingingShoot_1" x="3" y="3" w="32" h="43" pX="0.5" pY="0.5"/>
+    <sprite n="ClingingShoot_2" x="3" y="50" w="32" h="42" pX="0.5" pY="0.5"/>
+    <sprite n="dashing_1" x="654" y="46" w="28" h="31" pX="0.5" pY="0.5"/>
+    <sprite n="dashing_2" x="3" y="96" w="38" h="26" pX="0.5" pY="0.5"/>
+    <sprite n="DashingShoot_1" x="92" y="3" w="38" h="31" pX="0.5" pY="0.5"/>
+    <sprite n="DashingShoot_2" x="39" y="3" w="49" h="26" pX="0.5" pY="0.5"/>
+    <sprite n="falling_1" x="107" y="38" w="23" h="41" pX="0.5" pY="0.5"/>
+    <sprite n="falling_2" x="288" y="41" w="27" h="42" pX="0.5" pY="0.5"/>
+    <sprite n="falling_3" x="348" y="41" w="24" h="38" pX="0.5" pY="0.5"/>
+    <sprite n="falling_4" x="561" y="48" w="30" h="32" pX="0.5" pY="0.5"/>
+    <sprite n="FallingShoot_1" x="564" y="3" w="31" h="41" pX="0.5" pY="0.5"/>
+    <sprite n="FallingShoot_2" x="39" y="33" w="31" h="42" pX="0.5" pY="0.5"/>
+    <sprite n="FallingShoot_3" x="154" y="83" w="30" h="38" pX="0.5" pY="0.5"/>
+    <sprite n="FallingShoot_4" x="217" y="3" w="36" h="32" pX="0.5" pY="0.5"/>
+    <sprite n="jumping_1" x="188" y="87" w="24" h="37" pX="0.5" pY="0.5"/>
+    <sprite n="jumping_2" x="135" y="83" w="15" h="41" pX="0.5" pY="0.5"/>
+    <sprite n="jumping_3" x="233" y="39" w="19" h="46" pX="0.5" pY="0.5"/>
+    <sprite n="JumpingShoot_1" x="74" y="38" w="29" h="37" pX="0.5" pY="0.5"/>
+    <sprite n="JumpingShoot_2" x="107" y="83" w="24" h="41" pX="0.5" pY="0.5"/>
+    <sprite n="JumpingShoot_3" x="45" y="79" w="27" h="44" pX="0.5" pY="0.5"/>
+    <sprite n="kicking_1" x="319" y="41" w="25" h="42" pX="0.5" pY="0.5"/>
+    <sprite n="kicking_2" x="168" y="40" w="30" h="39" pX="0.5" pY="0.5"/>
+    <sprite n="kicking_3" x="76" y="79" w="27" h="44" pX="0.5" pY="0.5"/>
+    <sprite n="KickingShoot_1" x="633" y="3" w="31" h="39" pX="0.5" pY="0.5"/>
+    <sprite n="KickingShoot_2" x="668" y="3" w="31" h="38" pX="0.5" pY="0.5"/>
+    <sprite n="KickingShoot_3" x="527" y="3" w="33" h="39" pX="0.5" pY="0.5"/>
+    <sprite n="StartRunning_1" x="481" y="40" w="30" h="34" pX="0.5" pY="0.5"/>
+    <sprite n="StartRunning_2" x="615" y="87" w="20" h="34" pX="0.5" pY="0.5"/>
+    <sprite n="running_1" x="413" y="78" w="30" h="34" pX="0.5" pY="0.5"/>
+    <sprite n="running_2" x="451" y="3" w="34" h="33" pX="0.5" pY="0.5"/>
+    <sprite n="running_3" x="582" y="87" w="29" h="33" pX="0.5" pY="0.5"/>
+    <sprite n="running_4" x="323" y="87" w="23" h="35" pX="0.5" pY="0.5"/>
+    <sprite n="running_5" x="376" y="40" w="32" h="34" pX="0.5" pY="0.5"/>
+    <sprite n="running_6" x="489" y="3" w="34" h="33" pX="0.5" pY="0.5"/>
+    <sprite n="running_7" x="639" y="87" w="26" h="33" pX="0.5" pY="0.5"/>
+    <sprite n="running_8" x="628" y="49" w="22" h="34" pX="0.5" pY="0.5"/>
+    <sprite n="running_9" x="350" y="83" w="25" h="35" pX="0.5" pY="0.5"/>
+    <sprite n="StartRunningShoot_1" x="257" y="3" w="35" h="34" pX="0.5" pY="0.5"/>
+    <sprite n="StartRunningShoot_2" x="595" y="49" w="29" h="34" pX="0.5" pY="0.5"/>
+    <sprite n="RunningShoot_1" x="374" y="3" w="35" h="33" pX="0.5" pY="0.5"/>
+    <sprite n="RunningShoot_2" x="253" y="89" w="32" h="35" pX="0.5" pY="0.5"/>
+    <sprite n="RunningShoot_3" x="335" y="3" w="35" h="34" pX="0.5" pY="0.5"/>
+    <sprite n="RunningShoot_4" x="134" y="3" w="38" h="33" pX="0.5" pY="0.5"/>
+    <sprite n="RunningShoot_5" x="413" y="3" w="34" h="33" pX="0.5" pY="0.5"/>
+    <sprite n="RunningShoot_6" x="412" y="40" w="31" h="34" pX="0.5" pY="0.5"/>
+    <sprite n="RunningShoot_7" x="216" y="89" w="33" h="35" pX="0.5" pY="0.5"/>
+    <sprite n="RunningShoot_8" x="296" y="3" w="35" h="34" pX="0.5" pY="0.5"/>
+    <sprite n="RunningShoot_9" x="176" y="3" w="37" h="33" pX="0.5" pY="0.5"/>
+    <sprite n="standing_1" x="481" y="78" w="30" h="34" pX="0.5" pY="0.5"/>
+    <sprite n="standing_2" x="527" y="46" w="30" h="34" pX="0.5" pY="0.5"/>
+    <sprite n="StandingShoot_1" x="447" y="40" w="30" h="34" pX="0.5" pY="0.5"/>
+    <sprite n="StandingShoot_2" x="549" y="84" w="29" h="34" pX="0.5" pY="0.5"/>
+</TextureAtlas>

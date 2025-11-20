@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TextureAtlas>
+  <Sprite n="running_1" x="50" y="67" w="20" h="34" pX="0.5" pY="0.5" />
+  <Sprite n="running_2" x="75" y="67" w="23" h="35" pX="0.5" pY="0.5" />
+  <Sprite n="running_3" x="105" y="67" w="32" h="34" pX="0.5" pY="0.5" />
+  <Sprite n="running_4" x="145" y="68" w="34" h="33" pX="0.5" pY="0.5" />
+  <Sprite n="running_5" x="190" y="68" w="26" h="33" pX="0.5" pY="0.5" />
+  <Sprite n="running_6" x="222" y="67" w="22" h="34" pX="0.5" pY="0.5" />
+  <Sprite n="running_7" x="248" y="67" w="25" h="35" pX="0.5" pY="0.5" />
+  <Sprite n="running_8" x="280" y="67" w="30" h="34" pX="0.5" pY="0.5" />
+  <Sprite n="running_9" x="318" y="68" w="34" h="33" pX="0.5" pY="0.5" />
+  <Sprite n="running_10" x="359" y="68" w="29" h="33" pX="0.5" pY="0.5" />
+  <Sprite n="prepare_run" x="5" y="67" w="30" h="34" pX="0.5" pY="0.5" />
+  <Sprite n="running_shoot_1" x="41" y="107" w="29" h="34" pX="0.5" pY="0.5" />
+  <Sprite n="running_shoot_2" x="76" y="107" w="32" h="35" pX="0.5" pY="0.5" />
+  <Sprite n="running_shoot_3" x="115" y="108" w="35" h="34" pX="0.5" pY="0.5" />
+  <Sprite n="running_shoot_4" x="159" y="108" w="38" h="33" pX="0.5" pY="0.5" />
+  <Sprite n="running_shoot_5" x="204" y="108" w="34" h="33" pX="0.5" pY="0.5" />
+  <Sprite n="running_shoot_6" x="246" y="107" w="31" h="34" pX="0.5" pY="0.5" />
+  <Sprite n="running_shoot_7" x="284" y="107" w="33" h="35" pX="0.5" pY="0.5" />
+  <Sprite n="running_shoot_8" x="326" y="107" w="35" h="34" pX="0.5" pY="0.5" />
+  <Sprite n="running_shoot_9" x="369" y="108" w="37" h="33" pX="0.5" pY="0.5" />
+  <Sprite n="running_shoot_10" x="413" y="108" w="35" h="33" pX="0.5" pY="0.5" />
+  <Sprite n="prepare_jump" x="6" y="148" w="24" h="37" pX="0.5" pY="0.5" />
+  <Sprite n="jumping_1" x="37" y="148" w="15" h="41" pX="0.5" pY="0.5" />
+  <Sprite n="jumping_2" x="56" y="146" w="19" h="46" pX="0.5" pY="0.5" />
+  <Sprite n="falling_1" x="80" y="150" w="23" h="41" pX="0.5" pY="0.5" />
+  <Sprite n="falling_2" x="108" y="150" w="27" h="42" pX="0.5" pY="0.5" />
+  <Sprite n="grounding_1" x="139" y="151" w="24" h="38" pX="0.5" pY="0.5" />
+  <Sprite n="grounding_2" x="166" y="153" w="30" h="32" pX="0.5" pY="0.5" />
+  <Sprite n="prepare_jump_shoot" x="201" y="148" w="29" h="37" pX="0.5" pY="0.5" />
+  <Sprite n="jumping_shoot_1" x="240" y="148" w="24" h="41" pX="0.5" pY="0.5" />
+  <Sprite n="jumping_shoot_2" x="271" y="146" w="27" h="46" pX="0.5" pY="0.5" />
+  <Sprite n="falling_shoot_1" x="304" y="150" w="31" h="41" pX="0.5" pY="0.5" />
+  <Sprite n="falling_shoot_2" x="341" y="150" w="31" h="42" pX="0.5" pY="0.5" />
+  <Sprite n="grounding_shoot_1" x="378" y="151" w="30" h="38" pX="0.5" pY="0.5" />
+  <Sprite n="grounding_shoot_2" x="413" y="153" w="36" h="32" pX="0.5" pY="0.5" />
+  <Sprite n="standing" x="226" y="29" w="30" h="34" pX="0.5" pY="0.5" />
+  <Sprite n="standing_relax_1" x="261" y="29" w="30" h="34" pX="0.5" pY="0.5" />
+  <Sprite n="standing_relax_2" x="295" y="29" w="30" h="34" pX="0.5" pY="0.5" />
+  <Sprite n="standing_relax_3" x="330" y="29" w="30" h="34" pX="0.5" pY="0.5" />
+  <Sprite n="standing_shoot_1" x="365" y="29" w="30" h="34" pX="0.5" pY="0.5" />
+  <Sprite n="standing_shoot_2" x="402" y="29" w="29" h="34" pX="0.5" pY="0.5" />
+</TextureAtlas>
