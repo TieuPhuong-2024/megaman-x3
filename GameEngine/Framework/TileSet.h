@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 #include <stdexcept>
 #include "Tile.h"
 #include "pugixml.hpp"
@@ -18,7 +19,7 @@ private:
 	std::string _filename;
 	int _columns;
 	int _rows;
-	std::vector<Tile*> _listTiles;
+	std::vector<std::unique_ptr<Tile>> _listTiles;
 	
 public:
 	TileSet(eID spriteId);

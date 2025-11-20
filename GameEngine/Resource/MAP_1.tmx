@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="24" height="15" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="13">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="24" height="15" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="16">
  <tileset firstgid="1" name="MAP_1" tilewidth="32" tileheight="32" tilecount="360" columns="24">
   <image source="MAP_1.png" width="770" height="509"/>
  </tileset>
@@ -368,12 +368,12 @@
   </data>
  </layer>
  <objectgroup color="#ff55ff" id="2" name="Wall">
-  <object id="2" x="0.030303" y="255.818" width="257.97" height="64.3277"/>
-  <object id="3" x="258.182" y="255.909" width="127.659" height="48.1534"/>
-  <object id="4" x="385.875" y="255.938" width="382.121" height="16.0547"/>
-  <object id="5" x="514.021" y="0.0444444" width="253.965" height="255.622"/>
-  <object id="6" x="1.99903" y="434.01" width="765.959" height="45.9029"/>
-  <object id="7" x="354" y="386.75" width="286.932" height="93.1739"/>
-  <object id="8" x="514.909" y="338.727" width="126.072" height="141.119"/>
+  <object id="2" name="Wall" x="0.030303" y="255.818" width="257.97" height="64.3277"/>
+  <object id="3" name="Wall" x="258.182" y="255.909" width="127.659" height="48.1534"/>
+  <object id="4" name="Wall" x="385.875" y="255.938" width="382.121" height="16.0547"/>
+  <object id="5" name="Wall" x="514.021" y="0.0444444" width="253.965" height="255.622"/>
+  <object id="6" name="Wall" x="1.99903" y="434.01" width="765.959" height="45.9029"/>
+  <object id="7" name="Wall" x="354" y="386.75" width="286.932" height="93.1739"/>
+  <object id="8" name="Wall" x="514.909" y="338.727" width="126.072" height="141.119"/>
  </objectgroup>
 </map>

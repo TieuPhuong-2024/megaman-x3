@@ -15,7 +15,7 @@ TileSet::TileSet(eID spriteId)
 
 void TileSet::draw(LPD3DXSPRITE spriteHandle, int id, GVector2 position, Viewport* viewport)
 {
-	for (auto tile : _listTiles)
+	for (auto& tile : _listTiles)
 	{
 		if (tile->getId() == id)
 		{
@@ -40,7 +40,7 @@ void TileSet::loadListTiles(pugi::xml_node& tileset)
 
 	while (tileCount--)
 	{
-		this->_listTiles.push_back(new Tile(this->_tileImage, srcRECT, firstTileId));
+		this->_listTiles.push_back(std::unique_ptr<Tile>(new Tile(this->_tileImage, srcRECT, firstTileId)));
 		firstTileId++;
 		if (srcRECT.right + tileWidth > imageWidth)
 		{

@@ -18,9 +18,6 @@ Animation::Animation(Sprite* spriteSheet, float timeAnimate, bool loop)
 	this->setLoop(loop);
 	_canFlashes = false;
 	_flashColor = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-
-	_blendAnimation = nullptr;
-	_blendFactor = 0.0f;
 }
 
 Animation::~Animation()
@@ -232,36 +229,8 @@ D3DXCOLOR Animation::getColorFlash()
 
 void Animation::draw(LPD3DXSPRITE spriteHandle, Viewport* viewport)
 {
-	if (_blendAnimation && _blendFactor > 0.0f)
-	{
-		// Lerp between current and blend animation
-		RECT blendedRect;
-		blendedRect.left = (LONG)(_currentRect.left * (1.0f - _blendFactor) + _blendAnimation->_currentRect.left * _blendFactor);
-		blendedRect.top = (LONG)(_currentRect.top * (1.0f - _blendFactor) + _blendAnimation->_currentRect.top * _blendFactor);
-		blendedRect.right = (LONG)(_currentRect.right * (1.0f - _blendFactor) + _blendAnimation->_currentRect.right * _blendFactor);
-		blendedRect.bottom = (LONG)(_currentRect.bottom * (1.0f - _blendFactor) + _blendAnimation->_currentRect.bottom * _blendFactor);
-
-		GVector2 blendedOrigin = _currentOrigin * (1.0f - _blendFactor) + _blendAnimation->_currentOrigin * _blendFactor;
-
-		_spriteSheet->setFrameRect(blendedRect);
-		_spriteSheet->setOrigin(blendedOrigin);
-	}
-	else
-	{
-		_spriteSheet->setFrameRect(_currentRect);
-		_spriteSheet->setOrigin(_currentOrigin);
-	}
+	_spriteSheet->setFrameRect(_currentRect);
+	_spriteSheet->setOrigin(_currentOrigin);
 	_spriteSheet->render(spriteHandle, viewport);
 }
 
-void Animation::setBlendAnimation(Animation* blendAnim, float blendFactor)
-{
-	_blendAnimation = blendAnim;
-	_blendFactor = blendFactor;
-}
-
-void Animation::clearBlend()
-{
-	_blendAnimation = nullptr;
-	_blendFactor = 0.0f;
-}

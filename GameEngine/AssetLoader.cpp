@@ -24,7 +24,6 @@ void AssetLoader::loadResource(ID3DXSprite* sprite)
 	spr = spriteManager->loadXMLDoc(sprite, L"Resource/MAP_1.tmx");
 	spr->setOrigin(VECTOR2ZERO);
 	spriteManager->getListSprite()->insert(make_pair(eID::MAP_STAGE_MEGAMAN, spr));
-
 }
 
 void AssetLoader::loadSound(HWND hWnd)

@@ -2,6 +2,7 @@
 #define __MAP_H__
 #include "TileSet.h"
 #include <vector>
+#include <memory>
 #include "../Object/CWall.h"
 using namespace std;
 
@@ -26,7 +27,7 @@ public:
 
 	void setColor(D3DXCOLOR color);
 
-	vector<CWall*> GetWalls() { return _walls; }
+	vector<CWall*> GetWalls() { auto res = _walls; _walls.clear(); return res; }
 
 private:
 
@@ -38,9 +39,9 @@ private:
 	// Kích thước map tính theo số ô Tile.
 	GVector2 _mapSize;
 
-	int** _mapIndex;
+	vector<vector<int>> _mapIndex;
 
-	TileSet* _tileSet;
+	unique_ptr<TileSet> _tileSet;
 
 	vector<CWall*> _walls;
 

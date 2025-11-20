@@ -152,7 +152,6 @@
     <ClCompile Include="CGame.cpp" />
     <ClCompile Include="CMegaman.cpp" />
     <ClCompile Include="Framework\Animation.cpp" />
-    <ClCompile Include="Framework\BlendTree.cpp" />
     <ClCompile Include="Framework\DeviceManager.cpp" />
     <ClCompile Include="Framework\dxaudio.cpp" />
     <ClCompile Include="Framework\Event.cpp" />
@@ -199,7 +198,6 @@
     <ClInclude Include="CGame.h" />
     <ClInclude Include="CMegaman.h" />
     <ClInclude Include="Framework\Animation.h" />
-    <ClInclude Include="Framework\BlendTree.h" />
     <ClInclude Include="Framework\DeviceManager.h" />
     <ClInclude Include="Framework\dxaudio.h" />
     <ClInclude Include="Framework\Event.h" />

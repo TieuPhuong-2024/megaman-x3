@@ -18,7 +18,6 @@ bool PlayScene::init()
 	_viewport = new Viewport(0, WINDOW_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT);
 	_player = new CPlayer;
 	_player->setPosition(GVector2(100.f, 50.f));
-	_player->setScale(2);
 	_tileMap = StageManager::getInstance()->getTileMap(eID::MAP_STAGE_MEGAMAN);
 
 	// Add to collision manager

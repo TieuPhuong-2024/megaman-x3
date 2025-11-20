@@ -55,18 +55,11 @@ public:
 	D3DXCOLOR getColorFlash();
 	bool isLastAnimation();
 
-	// Blending support
-	void setBlendAnimation(Animation* blendAnim, float blendFactor);
-	void clearBlend();
-
-	// Public accessors for blending (instead of friend)
 	RECT getCurrentRect() const { return _currentRect; }
 	GVector2 getCurrentOrigin() const { return _currentOrigin; }
 	Sprite* getSpriteSheet() const { return _spriteSheet; }
 
 private:
-	Animation* _blendAnimation;
-	float _blendFactor;
 	bool _isAll;
 	int _startFrame;
 	int _endFrame;

@@ -11,7 +11,7 @@ public:
 	~CWall();
 
 	// ICollidable
-	RECT getBoundingBox() const;
+	RECT getBoundingBox();
 	GVector2 getPosition();
 	void setPosition(GVector2 pos);
 	void SetPosition(float x, float y);

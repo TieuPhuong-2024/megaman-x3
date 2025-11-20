@@ -3,7 +3,6 @@
 #include "../Framework/Viewport.h"
 #include "../Framework/Sprite.h"
 #include "../Framework/Animation.h"
-#include "../Framework/BlendTree.h"
 #include "../Framework/ICollidable.h"
 
 class PlayerState;
@@ -25,9 +24,7 @@ public:
 	void updateInput(float deltaTime);
 	void draw(ID3DXSprite* spriteHandler, Viewport* viewport);
 	void setState(PlayerState* newState);
-	void setState(PlayerState* newState, float transitionTime);
 	void setState(eStatus status);
-	void setState(eStatus status, float transitionTime);
 
 	void eventKeyUp(KeyEventArg* e) override;
 	void eventKeyDown(KeyEventArg* e) override;
@@ -106,10 +103,6 @@ private:
 	// Collision
 	RECT _boundingBox;
 
-	// Transition blending
-	float						_transitionTime;
-	Animation*					_oldAnimation;
-	BlendTree*					_blendTree;
 	eStatus						_previousIndexState;
 
 public:

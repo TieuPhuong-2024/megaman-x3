@@ -23,7 +23,7 @@ void PlayerState::updateInput(float deltaTime)
 
 void PlayerState::setState(PlayerState* newState, float transitionTime)
 {
-	_player->setState(newState, transitionTime);
+	_player->setState(newState);
 }
 
 void PlayerState::setPlayer(CPlayer* player)

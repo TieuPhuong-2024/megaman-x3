@@ -110,10 +110,6 @@ CPlayer::CPlayer()
 	// Time shoot
 	_timeShoot = 0.f;
 
-	// Transition blending
-	_transitionTime = 0.0f;
-	_oldAnimation = nullptr;
-	_blendTree = nullptr;
 	_previousIndexState = eStatus::STAND;
 }
 
@@ -137,8 +133,6 @@ CPlayer::~CPlayer()
 	/* Delete the state of player */
 	SAFE_DELETE(_playerState);
 
-	/* Delete blend tree */
-	SAFE_DELETE(_blendTree);
 
 	_input->Detach(this);
 }
@@ -153,21 +147,6 @@ void CPlayer::update(float deltaTime)
 
 	/* Update sprite animation */
 	_spriteAnimation[_currentIndexState]->update(deltaTime);
-	if (_oldAnimation) _oldAnimation->update(deltaTime); // Update old during blend
-	if (_blendTree) _blendTree->update(deltaTime, 1.0f - (_transitionTime / 0.2f)); // Update blend tree
-
-	/* Handle transition blending */
-	if (_transitionTime > 0.0f)
-	{
-		_transitionTime -= deltaTime / 1000.0f; // Convert to seconds
-		if (_transitionTime <= 0.0f)
-		{
-			_transitionTime = 0.0f;
-			// Clean up blend tree
-			SAFE_DELETE(_blendTree);
-			_oldAnimation = nullptr;
-		}
-	}
 
 	/* Update player state */
 	_playerState->update(deltaTime);
@@ -216,7 +195,7 @@ void CPlayer::updateInput(float deltaTime)
 		_remainingJumps = (_remainingJumps > 0) ? (_remainingJumps - 1) : 0;
 		_jumpBufferTimer = 0.0f;
 		_coyoteTimer = 0.0f;
-		this->setState(new Jumping, 0.05f);
+		this->setState(new Jumping);
 	}
 
 	// Update input for the current state (e.g., Running, Jumping, etc.)
@@ -227,23 +206,11 @@ void CPlayer::draw(ID3DXSprite* spriteHandler, Viewport* viewport)
 {
 	// Flip sprite to coordinate-x
 	_sprite->setFlipX(_isFlipX);
-	// Draw sprite animation or blend tree
-	if (_blendTree)
-	{
-		_blendTree->draw(spriteHandler, viewport);
-	}
-	else
-	{
-		_spriteAnimation[_currentIndexState]->draw(spriteHandler, viewport);
-	}
+	// Draw sprite animation
+	_spriteAnimation[_currentIndexState]->draw(spriteHandler, viewport);
 }
 
 void CPlayer::setState(PlayerState* newState)
-{
-	setState(newState, 0.0f);
-}
-
-void CPlayer::setState(PlayerState* newState, float transitionTime)
 {
 	// Delete previous state
 	SAFE_DELETE(_playerState);
@@ -251,41 +218,15 @@ void CPlayer::setState(PlayerState* newState, float transitionTime)
 	_playerState = newState;
 	// Set current index of state for new index of state
 	_currentIndexState = newState->getState();
-	// Restart animation with transition
-	setState(_currentIndexState, transitionTime);
+	// Restart animation
+	setState(_currentIndexState);
 }
+
 
 void CPlayer::setState(eStatus status)
 {
-	setState(status, 0.0f); // No transition
-}
-
-void CPlayer::setState(eStatus status, float transitionTime)
-{
 	// Save previous
 	_previousIndexState = _currentIndexState;
-
-	// If transitioning, setup blend tree
-	if (transitionTime > 0.0f)
-	{
-		_oldAnimation = _spriteAnimation[_currentIndexState];
-		_transitionTime = transitionTime;
-		// Create blend tree between old and new animations
-		_blendTree = new BlendTree(_oldAnimation, _spriteAnimation[status]);
-	}
-	else
-	{
-		// Clear any ongoing blend
-		if (_blendTree)
-		{
-			SAFE_DELETE(_blendTree);
-		}
-		if (_oldAnimation)
-		{
-			_oldAnimation->clearBlend();
-			_oldAnimation = nullptr;
-		}
-	}
 
 	// Get index of previous state
 	auto index = _spriteAnimation[_currentIndexState]->getIndex();
@@ -298,6 +239,7 @@ void CPlayer::setState(eStatus status, float transitionTime)
 	// Restart animation
 	_spriteAnimation[status]->restart(index);
 }
+
 
 void CPlayer::eventKeyUp(KeyEventArg* e)
 {
@@ -326,7 +268,7 @@ void CPlayer::eventKeyDown(KeyEventArg* e)
 			_jumpBufferTimer = 0.0f;
 
 			// Transition into Jumping to (re)apply vertical velocity
-			this->setState(new Jumping, 0.05f);
+			this->setState(new Jumping);
 		}
 		else
 		{

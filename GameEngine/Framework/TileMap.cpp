@@ -3,11 +3,9 @@
 
 TileMap::TileMap()
 {
-	_mapIndex = NULL;
 	_checkPoint = -1;
 	_frameWidth = 0;
 	_frameHeight = 0;
-	_tileSet = NULL;
 }
 
 TileMap::~TileMap()
@@ -89,7 +87,7 @@ TileMap* TileMap::LoadFromFile(const string& path, eID spriteId)
 	
 
 	xml_node tileset = map.child("tileset");
-	tileMap->_tileSet = new TileSet(spriteId);
+	tileMap->_tileSet = make_unique<TileSet>(spriteId);
 	tileMap->_tileSet->loadListTiles(tileset);
 
 
@@ -97,11 +95,7 @@ TileMap* TileMap::LoadFromFile(const string& path, eID spriteId)
 	tileMap->_mapSize.x = layer.attribute("width").as_int();
 	tileMap->_mapSize.y = layer.attribute("height").as_int();
 
-	tileMap->_mapIndex = new int*[int(tileMap->_mapSize.y)];
-	for (int i = 0; i < tileMap->_mapSize.y; i++)
-	{
-		tileMap->_mapIndex[i] = new int[(int)tileMap->_mapSize.x];
-	}
+	tileMap->_mapIndex.assign(tileMap->_mapSize.y, vector<int>(tileMap->_mapSize.x, 0));
 
 	tileMap->getElementMatrixIndex(layer);
 
@@ -143,7 +137,7 @@ void TileMap::loadWalls(xml_node& mapNode)
 		{
 			CWall* wall = new CWall();
 			wall->SetId(object.attribute("id").as_int());
-			
+
 			// TMX uses screen coordinates (Y down from top-left)
 			float tmxX = object.attribute("x").as_float();
 			float tmxY = object.attribute("y").as_float();
@@ -156,10 +150,10 @@ void TileMap::loadWalls(xml_node& mapNode)
 			// TMX bottom = tmxY + height, World bottom = mapHeight - (tmxY + height)
 			float worldX = tmxX;
 			float worldY = mapHeight - tmxY - height;
-			
+
 			printLog("[TileMap] Wall ID=%d TMX(x=%.1f,y=%.1f,w=%.1f,h=%.1f) -> World(x=%.1f,y=%.1f) mapH=%.0f\n",
 				wall->GetId(), tmxX, tmxY, width, height, worldX, worldY, mapHeight);
-			
+
 			wall->SetX(worldX);
 			wall->SetY(worldY);
 			wall->SetWidth(width);
@@ -171,12 +165,12 @@ void TileMap::loadWalls(xml_node& mapNode)
 
 int TileMap::worldHeight()
 {
-	return _frameWidth * _mapSize.x;
+	return _frameHeight * _mapSize.y;
 }
 
 int TileMap::worldWidth()
 {
-	return _frameHeight * _mapSize.y;
+	return _frameWidth * _mapSize.x;
 }
 
 int TileMap::getCheckpoint()
