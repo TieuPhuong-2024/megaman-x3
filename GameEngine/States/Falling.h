@@ -4,7 +4,7 @@
 class Falling : public PlayerState
 {
 public:
-	Falling();
+	Falling(CPlayer* pla);
 	~Falling();
 	eStatus getState() override;
 	void update(float deltaTime) override;

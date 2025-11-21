@@ -7,18 +7,18 @@
 #define CLING_GRAVITY_Y -2.0f
 #define WALL_JUMP_VX 300.0f
 
-Clinging::Clinging()
+Clinging::Clinging(CPlayer* player) : PlayerState(player)
 {
 	// Reset timer
 	_clingTime = 0.0f;
 
 	// Reduce gravity so the player descends slowly while clinging.
-	_gravity->setgy(CLING_GRAVITY_Y);
-	_gravity->setStatus(eGravityStatus::FALLING__DOWN);
+	getGravity()->setgy(CLING_GRAVITY_Y);
+	getGravity()->setStatus(eGravityStatus::FALLING__DOWN);
 
 	// Lock horizontal movement while clinging.
-	_movement->setVx(CLING_HORIZONTAL_VELOCITY);
-	_movement->setAccelx(0.0f);
+	getMovement()->setVx(CLING_HORIZONTAL_VELOCITY);
+	getMovement()->setAccelx(0.0f);
 }
 
 Clinging::~Clinging()
@@ -37,18 +37,18 @@ void Clinging::update(float deltaTime)
 	_clingTime += deltaTime / 1000.0f;
 
 	// Ensure horizontal velocity remains locked while clinging
-	_movement->setVx(CLING_HORIZONTAL_VELOCITY);
-	_movement->setAccelx(0.0f);
+	getMovement()->setVx(CLING_HORIZONTAL_VELOCITY);
+	getMovement()->setAccelx(0.0f);
 
 	// Maintain reduced gravity while clinging
-	_gravity->setgy(CLING_GRAVITY_Y);
+	getGravity()->setgy(CLING_GRAVITY_Y);
 
 	// If we've exceed max cling time, drop into falling state
 	if (_clingTime >= _maxClingTime)
 	{
 		_clingTime = 0.0f;
 		// restore gravity behavior will be handled by Falling constructor
-		this->setState(new Falling);
+		this->setState(new Falling(getPlayer()));
 	}
 }
 
@@ -65,23 +65,23 @@ void Clinging::updateInput(float deltaTime)
 		// Determine the direction to push the player horizontally.
 		// If player is flipped (facing left), we assume they were clinging on left wall
 		// and need to jump to the right; otherwise jump to the left.
-		if (_player->getMoveDirection() == eMoveDirection::MOVE_LEFT || _player->getFlipX())
+		if (getPlayer()->getMoveDirection() == eMoveDirection::MOVE_LEFT || getPlayer()->getFlipX())
 		{
 			// push to the right
-			_player->setFlipX(false);
-			_movement->setVx(WALL_JUMP_VX);
-			_player->setMoveDirection(eMoveDirection::MOVE_RIGHT);
+			getPlayer()->setFlipX(false);
+			getMovement()->setVx(WALL_JUMP_VX);
+			getPlayer()->setMoveDirection(eMoveDirection::MOVE_RIGHT);
 		}
 		else
 		{
 			// push to the left
-			_player->setFlipX(true);
-			_movement->setVx(-WALL_JUMP_VX);
-			_player->setMoveDirection(eMoveDirection::MOVE_LEFT);
+			getPlayer()->setFlipX(true);
+			getMovement()->setVx(-WALL_JUMP_VX);
+			getPlayer()->setMoveDirection(eMoveDirection::MOVE_LEFT);
 		}
 
 		// Transition into Jumping which will set vertical velocity/acceleration.
-		this->setState(new Jumping);
+		this->setState(new Jumping(getPlayer()));
 		return;
 	}
 
@@ -89,7 +89,7 @@ void Clinging::updateInput(float deltaTime)
 	if (InputController::getInstance()->isKeyDown(DIK_DOWN))
 	{
 		_clingTime = 0.0f;
-		this->setState(new Falling);
+		this->setState(new Falling(getPlayer()));
 		return;
 	}
 
@@ -103,7 +103,7 @@ void Clinging::updateInput(float deltaTime)
 		// player regains normal mid-air control. More advanced behavior can transition
 		// to Running when grounded, etc.
 		_clingTime = 0.0f;
-		this->setState(new Falling);
+		this->setState(new Falling(getPlayer()));
 		return;
 	}
 

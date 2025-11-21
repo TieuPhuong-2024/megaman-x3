@@ -16,7 +16,7 @@
 class Clinging : public PlayerState
 {
 public:
-	Clinging();
+	Clinging(CPlayer* player);
 	~Clinging();
 
 	// Called every frame to update internal timers or apply modified physics.

@@ -3,6 +3,14 @@
 #include "Standing.h"
 #include "../trace.h"
 
+Dashing::Dashing(CPlayer* player) : PlayerState(player)
+{
+}
+
+Dashing::~Dashing()
+{
+}
+
 eStatus Dashing::getState()
 {
 	return eStatus::DASH;
@@ -19,44 +27,45 @@ void Dashing::update(float deltaTime)
 
 	// Determine dash direction:
 	// Prefer explicit move direction; otherwise infer from current velocity
-	auto moveDir = _player->getMoveDirection();
-	auto currentVel = _movement->getVelocity();
+	auto moveDir = getPlayer()->getMoveDirection();
+	auto currentVel = getMovement()->getVelocity();
 
 	if (moveDir == eMoveDirection::MOVE_LEFT)
 	{
-		_player->setFlipX(true);
-		_movement->setVx(-DASH_SPEED);
-		_movement->setAccelx(0.0f); // lock horizontal accel during dash
+		getPlayer()->setFlipX(true);
+		getMovement()->setVx(-DASH_SPEED);
+		getMovement()->setAccelx(0.0f); // lock horizontal accel during dash
 	}
 	else if (moveDir == eMoveDirection::MOVE_RIGHT)
 	{
-		_player->setFlipX(false);
-		_movement->setVx(DASH_SPEED);
-		_movement->setAccelx(0.0f);
+		getPlayer()->setFlipX(false);
+		getMovement()->setVx(DASH_SPEED);
+		getMovement()->setAccelx(0.0f);
 	}
 	else
 	{
 		// Fallback: infer direction from current velocity
 		if (currentVel.x < 0)
 		{
-			_player->setFlipX(true);
-			_movement->setVx(-DASH_SPEED);
-			_movement->setAccelx(0.0f);
+			getPlayer()->setFlipX(true);
+			getMovement()->setVx(-DASH_SPEED);
+			getMovement()->setAccelx(0.0f);
 		}
 		else
 		{
-			_player->setFlipX(false);
-			_movement->setVx(DASH_SPEED);
-			_movement->setAccelx(0.0f);
+			getPlayer()->setFlipX(false);
+			getMovement()->setVx(DASH_SPEED);
+			getMovement()->setAccelx(0.0f);
 		}
 	}
 
 	// End dash after duration
 	if (_timeDash >= DASH_DURATION)
 	{
+		GAMELOG("Dashing ended after %.2f seconds", _timeDash);
 		_timeDash = 0.0f;
 		// After dashing, go to standing to give player control back.
-		this->setState(new Standing);
+		this->setState(new Standing(getPlayer()));
 	}
 }
 
@@ -72,7 +81,7 @@ void Dashing::updateInput(float deltaTime)
 	if (InputController::getInstance()->isKeyDown(DIK_X))
 	{
 		_timeDash = 0.0f; // reset dash timer
-		this->setState(new Jumping);
+		this->setState(new Jumping(getPlayer()));
 		return;
 	}
 

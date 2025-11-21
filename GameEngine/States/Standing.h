@@ -4,8 +4,7 @@
 class Standing : public PlayerState
 {
 public:
-	Standing();
-	static Standing* create();
+	Standing(CPlayer* player);
 
 	void update(float deltaTime) override;
 	void updateInput(float deltaTime) override;

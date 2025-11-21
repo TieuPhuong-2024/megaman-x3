@@ -11,28 +11,25 @@ class Gravity;
 class PlayerState
 {
 public:
-	PlayerState();
+	PlayerState(CPlayer* player);
 	~PlayerState();
 
 	virtual void update(float deltaTime);
 	virtual void updateInput(float deltaTime);
 	virtual eStatus getState() = 0;
 
-protected:
+	// Request a state change on the player
+	void setState(PlayerState* newState, float transitionTime = 0.0f);
+
+	// Provide read access to the player for states and other systems
+	CPlayer* getPlayer();
+	Movement* getMovement() { return _movement; }
+	Gravity* getGravity() { return _gravity; }
+private:
 	// The player instance shared across states
-	static CPlayer* _player;
+	CPlayer* _player;
 
 	// Cached component pointers for convenience (populated in ctor)
 	Movement*		_movement;
 	Gravity*		_gravity;
-
-public:
-	// Request a state change on the player
-	void setState(PlayerState* newState, float transitionTime = 0.0f);
-
-	// Set the player instance used by states (kept static for existing design)
-	static void setPlayer(CPlayer* player);
-
-	// Provide read access to the player for states and other systems
-	static CPlayer* getPlayer();
 };

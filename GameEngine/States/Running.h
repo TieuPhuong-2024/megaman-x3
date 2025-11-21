@@ -4,7 +4,7 @@
 class Running : public PlayerState
 {
 public:
-	Running();
+	Running(CPlayer* player);
 	void update(float deltaTime) override;
 	void updateInput(float deltaTime) override;
 	eStatus getState() override;

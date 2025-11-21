@@ -9,15 +9,15 @@
 #define MAX_FALL_SPEED  -800.f
 
 
-Falling::Falling()
+Falling::Falling(CPlayer* player) : PlayerState(player)
 {
-	_gravity->setStatus(eGravityStatus::FALLING__DOWN);
-	_gravity->setgy(GRAVITY);
+	getGravity()->setStatus(eGravityStatus::FALLING__DOWN);
+	getGravity()->setgy(GRAVITY);
 
 	// Ensure a baseline downward velocity when entering falling state
-	if (_movement->getVelocity().y > VELOCITY_Y)
+	if (getMovement()->getVelocity().y > VELOCITY_Y)
 	{
-		_movement->setVy(VELOCITY_Y);
+		getMovement()->setVy(VELOCITY_Y);
 	}
 }
 
@@ -34,17 +34,17 @@ void Falling::update(float deltaTime)
 {
 	// Landing detection: rely on collision system to trigger transition to Standing
 	// If gravity is shallowed (from collision), transition to standing
-	if (_gravity->getStatus() == eGravityStatus::SHALLOWED)
+	if (getGravity()->getStatus() == eGravityStatus::SHALLOWED)
 	{
-		this->setState(new Standing, 0.1f); // Smooth landing transition
+		this->setState(new Standing(getPlayer()), 0.1f); // Smooth landing transition
 		return;
 	}
 
 	// Clamp maximum fall speed to avoid excessively fast falling
-	auto vy = _movement->getVelocity().y;
+	auto vy = getMovement()->getVelocity().y;
 	if (vy < MAX_FALL_SPEED)
 	{
-		_movement->setVy(MAX_FALL_SPEED);
+		getMovement()->setVy(MAX_FALL_SPEED);
 	}
 }
 
@@ -54,30 +54,30 @@ void Falling::updateInput(float deltaTime)
 	// the ability to steer mid-air without making air control too strong.
 	if (InputController::getInstance()->isKeyDown(DIK_LEFTARROW))
 	{
-		_player->setFlipX(true);
-		_player->setMoveDirection(eMoveDirection::MOVE_LEFT);
-		_movement->setAccelx(-ACCELERATE_X);
-		_movement->setVx(-VELOCITY_X);
+		getPlayer()->setFlipX(true);
+		getPlayer()->setMoveDirection(eMoveDirection::MOVE_LEFT);
+		getMovement()->setAccelx(-ACCELERATE_X);
+		getMovement()->setVx(-VELOCITY_X);
 	}
 	else if (InputController::getInstance()->isKeyDown(DIK_RIGHTARROW))
 	{
-		_player->setFlipX(false);
-		_player->setMoveDirection(eMoveDirection::MOVE_RIGHT);
-		_movement->setAccelx(ACCELERATE_X);
-		_movement->setVx(VELOCITY_X);
+		getPlayer()->setFlipX(false);
+		getPlayer()->setMoveDirection(eMoveDirection::MOVE_RIGHT);
+		getMovement()->setAccelx(ACCELERATE_X);
+		getMovement()->setVx(VELOCITY_X);
 	}
 	else
 	{
 		// No horizontal input: give limited air friction (handled inside Movement update)
-		_player->setMoveDirection(eMoveDirection::NONE);
-		_movement->setAccelx(0.0f);
+		getPlayer()->setMoveDirection(eMoveDirection::NONE);
+		getMovement()->setAccelx(0.0f);
 	}
 
 	// Maintain a minimum downward velocity baseline so the player doesn't float.
-	auto currentVy = _movement->getVelocity().y;
+	auto currentVy = getMovement()->getVelocity().y;
 	if (currentVy > VELOCITY_Y)
 	{
-		_movement->setVy(VELOCITY_Y);
+		getMovement()->setVy(VELOCITY_Y);
 	}
 
 	// Note:

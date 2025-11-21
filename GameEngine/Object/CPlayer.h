@@ -29,6 +29,9 @@ public:
 	void eventKeyUp(KeyEventArg* e) override;
 	void eventKeyDown(KeyEventArg* e) override;
 
+	void setInputController(InputController* input);
+	InputController* getInputController();
+
 	// Jump-related public API (exposed for states and other systems)
 	// Attempt to perform a jump (honors jump buffer, coyote time, and remaining jumps).
 	void tryJump();
@@ -61,8 +64,6 @@ private:
 	InputController*			_input;
 
 	PlayerState*				_playerState;
-
-	eStatus						_status;
 
 	bool						_isFlipX;
 
@@ -101,9 +102,7 @@ private:
 	// --- End jump / air control extended state ---
 
 	// Collision
-	RECT _boundingBox;
-
-	eStatus						_previousIndexState;
+	RECT 						_boundingBox;
 
 public:
 	void setPosition(GVector2 position);

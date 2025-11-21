@@ -5,14 +5,14 @@
 #include "../Framework/define.h"
 #include "../Framework/InputController.h"
 
-Kicking::Kicking()
+Kicking::Kicking(CPlayer* player) : PlayerState(player)
 {
 	_timeKick = 0.0f;
 	_impulseApplied = false;
 
 	// Lock horizontal acceleration during the kick and clear horizontal accel so
 	// the impulse can control the brief movement.
-	_movement->setAccelx(0.0f);
+	getMovement()->setAccelx(0.0f);
 
 	// If the player was moving, we will apply a small impulse in that direction
 	// when update runs for the first time. Do not apply it in the constructor
@@ -23,11 +23,6 @@ Kicking::~Kicking()
 {
 	// Nothing special to clean up here. Movement/Gravity will be adjusted by
 	// the next state (Standing/Jumping/Falling) when transitioned.
-}
-
-Kicking* Kicking::create()
-{
-	return new Kicking();
 }
 
 eStatus Kicking::getState()
@@ -46,35 +41,35 @@ void Kicking::update(float deltaTime)
 		_impulseApplied = true;
 
 		// Prefer explicit player move direction if available
-		auto dir = _player->getMoveDirection();
+		auto dir = getPlayer()->getMoveDirection();
 		if (dir == eMoveDirection::MOVE_LEFT)
 		{
-			_movement->setVx(-_kickImpulseVx);
+			getMovement()->setVx(-_kickImpulseVx);
 		}
 		else if (dir == eMoveDirection::MOVE_RIGHT)
 		{
-			_movement->setVx(_kickImpulseVx);
+			getMovement()->setVx(_kickImpulseVx);
 		}
 		else
 		{
 			// Fallback: infer from current velocity
-			auto currentVel = _movement->getVelocity();
+			auto currentVel = getMovement()->getVelocity();
 			if (currentVel.x < 0.0f)
-				_movement->setVx(-_kickImpulseVx);
+				getMovement()->setVx(-_kickImpulseVx);
 			else
-				_movement->setVx(_kickImpulseVx);
+				getMovement()->setVx(_kickImpulseVx);
 		}
 	}
 
 	// Keep horizontal acceleration locked while kicking
-	_movement->setAccelx(0.0f);
+	getMovement()->setAccelx(0.0f);
 
 	// End kick after duration and return control to the player (Standing)
 	if (_timeKick >= _kickDuration)
 	{
 		_timeKick = 0.0f;
 		_impulseApplied = false;
-		this->setState(new Standing);
+		this->setState(new Standing(getPlayer()));
 	}
 }
 
@@ -86,7 +81,7 @@ void Kicking::updateInput(float deltaTime)
 	{
 		_timeKick = 0.0f;
 		_impulseApplied = false;
-		this->setState(new Jumping);
+		this->setState(new Jumping(getPlayer()));
 		return;
 	}
 

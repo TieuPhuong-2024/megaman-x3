@@ -18,7 +18,7 @@
 class Kicking : public PlayerState
 {
 public:
-	Kicking();
+	Kicking(CPlayer* player);
 	~Kicking();
 
 	// Called each frame to update state internal timers and effects.
@@ -31,9 +31,6 @@ public:
 
 	// Return the enum status representing this state.
 	eStatus getState() override;
-
-	// Factory helper (optional, follows pattern used in other states)
-	static Kicking* create();
 
 private:
 	// Accumulated time (seconds) since the kick started.

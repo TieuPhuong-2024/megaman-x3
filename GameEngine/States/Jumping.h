@@ -4,7 +4,7 @@
 class Jumping : public PlayerState
 {
 public:
-	Jumping();
+	Jumping(CPlayer* player);
 	~Jumping();
 	eStatus getState() override;
 	void update(float deltaTime) override;

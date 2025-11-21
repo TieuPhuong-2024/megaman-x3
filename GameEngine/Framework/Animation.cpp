@@ -1,4 +1,5 @@
 ﻿#include "Animation.h"
+#include "../trace.h"
 
 Animation::Animation(Sprite* spriteSheet, float timeAnimate, bool loop)
 {
@@ -41,16 +42,26 @@ void Animation::setIndex(int index)
 
 	_index = index;
 
-	if (_index > _endFrame)
+	if (_index < _startFrame)
 		_index = _startFrame;
+
+	if (_index > _endFrame)
+	{
+		if (_isLoop)
+		{
+			_index = _startFrame;
+		}
+		else
+		{
+			_index = _endFrame;
+			this->stop();
+		}
+	}
 
 	_currentRect = _frameRectList[_index];
 	_currentOrigin = _frameOriginList[_index];
 
-	if (!_isLoop && _index == _endFrame)
-	{
-		this->stop();
-	}
+	GAMELOG("Animation frame set to: %d", _index);
 }
 
 void Animation::update(float dt)

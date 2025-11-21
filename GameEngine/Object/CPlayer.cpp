@@ -74,8 +74,8 @@ CPlayer::CPlayer()
 	_currentIndexState = eStatus::STAND;
 
 	// Setting status for player
-	PlayerState::setPlayer(this);
-	setState(new Standing);
+	_playerState = new Standing(this);
+	setState(new Standing(this));
 
 	// Don't reverse
 	_isFlipX = false;
@@ -109,8 +109,6 @@ CPlayer::CPlayer()
 
 	// Time shoot
 	_timeShoot = 0.f;
-
-	_previousIndexState = eStatus::STAND;
 }
 
 CPlayer::~CPlayer()
@@ -134,7 +132,7 @@ CPlayer::~CPlayer()
 	SAFE_DELETE(_playerState);
 
 
-	_input->Detach(this);
+		_input->Detach(this);
 }
 
 void CPlayer::update(float deltaTime)
@@ -148,6 +146,8 @@ void CPlayer::update(float deltaTime)
 	/* Update sprite animation */
 	_spriteAnimation[_currentIndexState]->update(deltaTime);
 
+	GAMELOG("Player update: state=%d, anim_index=%d", static_cast<int>(_currentIndexState), _spriteAnimation[_currentIndexState]->getIndex());
+
 	/* Update player state */
 	_playerState->update(deltaTime);
 }
@@ -159,8 +159,8 @@ void CPlayer::updateInput(float deltaTime)
 	{
 		_allowShoot = true;
 		_timeShoot = 0.f;
-		_status = eStatus(static_cast<int>(_currentIndexState) & ~static_cast<int>(eStatus::SHOOT));
-		this->setState(_status);
+		_currentIndexState = eStatus(static_cast<int>(_currentIndexState) & ~static_cast<int>(eStatus::SHOOT));
+		this->setState(_currentIndexState);
 	}
 
 	// Update jump-related timers (deltaTime is milliseconds in this project)
@@ -195,7 +195,7 @@ void CPlayer::updateInput(float deltaTime)
 		_remainingJumps = (_remainingJumps > 0) ? (_remainingJumps - 1) : 0;
 		_jumpBufferTimer = 0.0f;
 		_coyoteTimer = 0.0f;
-		this->setState(new Jumping);
+		this->setState(new Jumping(this));
 	}
 
 	// Update input for the current state (e.g., Running, Jumping, etc.)
@@ -218,6 +218,7 @@ void CPlayer::setState(PlayerState* newState)
 	_playerState = newState;
 	// Set current index of state for new index of state
 	_currentIndexState = newState->getState();
+	GAMELOG("Player state changed to: %d", static_cast<int>(_currentIndexState));
 	// Restart animation
 	setState(_currentIndexState);
 }
@@ -225,15 +226,13 @@ void CPlayer::setState(PlayerState* newState)
 
 void CPlayer::setState(eStatus status)
 {
-	// Save previous
-	_previousIndexState = _currentIndexState;
-
 	// Get index of previous state
 	auto index = _spriteAnimation[_currentIndexState]->getIndex();
 	// Get time animation of previous state
 	auto timeAnimate = _spriteAnimation[_currentIndexState]->getTimeAnimate();
 	// Set current index of state for new index of state
 	_currentIndexState = status;
+	GAMELOG("Player animation state set to: %d", static_cast<int>(status));
 	// Set time animate
 	_spriteAnimation[status]->setTimeAnimate(timeAnimate);
 	// Restart animation
@@ -246,7 +245,12 @@ void CPlayer::eventKeyUp(KeyEventArg* e)
 	if ((_isJumping) && (e->_key == DIK_X))
 	{
 		_isJumping = false;
-		this->setState(new Falling);
+		this->setState(new Falling(this));
+	}
+
+	if ((e->_key == DIK_C) && (_currentIndexState == eStatus::DASH))
+	{
+		this->setState(new Standing(this));
 	}
 }
 
@@ -268,7 +272,7 @@ void CPlayer::eventKeyDown(KeyEventArg* e)
 			_jumpBufferTimer = 0.0f;
 
 			// Transition into Jumping to (re)apply vertical velocity
-			this->setState(new Jumping);
+			this->setState(new Jumping(this));
 		}
 		else
 		{
@@ -284,7 +288,8 @@ void CPlayer::eventKeyDown(KeyEventArg* e)
 			(_currentIndexState == eStatus::STAND_SHOOT) ||
 			(_currentIndexState == eStatus::RUN_SHOOT))
 		{
-			this->setState(new Dashing);
+			GAMELOG("Dashing state triggered by key down C");
+			this->setState(new Dashing(this));
 		}
 	}
 
@@ -292,8 +297,8 @@ void CPlayer::eventKeyDown(KeyEventArg* e)
 	{
 		_timeShoot = 0.f;
 		_allowShoot = false;
-		_status = eStatus(static_cast<int>(_currentIndexState) | static_cast<int>(eStatus::SHOOT));
-		this->setState(_status);
+		_currentIndexState = eStatus(static_cast<int>(_currentIndexState) | static_cast<int>(eStatus::SHOOT));
+		this->setState(_currentIndexState);
 	}
 
 	// (Thêm / chèn vào trong CPlayer::eventKeyDown)
@@ -304,7 +309,7 @@ void CPlayer::eventKeyDown(KeyEventArg* e)
             (_currentIndexState == eStatus::STAND_SHOOT) ||
             (_currentIndexState == eStatus::RUN_SHOOT))
         {
-            this->setState(new Kicking());
+            this->setState(new Kicking(this));
         }
     }
 

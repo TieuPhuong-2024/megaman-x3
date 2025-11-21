@@ -1,9 +1,7 @@
 #include "PlayerState.h"
 #include "../Framework/IComponent.h"
 
-CPlayer* PlayerState::_player = nullptr;
-
-PlayerState::PlayerState()
+PlayerState::PlayerState(CPlayer* player) : _player(player)
 {
 	_movement = (Movement*)_player->getComponent("Movement");
 	_gravity = (Gravity*)_player->getComponent("Gravity");
@@ -26,12 +24,7 @@ void PlayerState::setState(PlayerState* newState, float transitionTime)
 	_player->setState(newState);
 }
 
-void PlayerState::setPlayer(CPlayer* player)
+CPlayer *PlayerState::getPlayer()
 {
-	_player = player;
-}
-
-CPlayer* PlayerState::getPlayer()
-{
-	return _player;
+    return _player;
 }
