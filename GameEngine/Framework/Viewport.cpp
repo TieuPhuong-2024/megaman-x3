@@ -16,6 +16,7 @@ Viewport::Viewport(float x, float y, float width, float height)
 	_positionWorld.y = y;
 	_width = width;
 	_height = height;
+	_zoom = 1.0f;
 }
 
 Viewport::~Viewport()
@@ -31,6 +32,18 @@ void Viewport::setPositionWorld(GVector2 position)
 GVector2 Viewport::getPositionWorld()
 {
 	return _positionWorld;
+}
+
+void Viewport::setZoom(float zoom)
+{
+	_zoom = zoom;
+	if (_zoom < 0.1f) _zoom = 0.1f; // min zoom
+	if (_zoom > 5.0f) _zoom = 5.0f; // max zoom
+}
+
+float Viewport::getZoom()
+{
+	return _zoom;
 }
 
 float Viewport::getWidth()
@@ -49,9 +62,10 @@ GVector3 Viewport::getPositionInViewport(GVector3* position)
 	D3DXVECTOR4 posViewport;
 
 	D3DXMatrixIdentity(&mt);
-	mt._22 = -1.0f;
-	mt._41 = (-1) * _positionWorld.x;
-	mt._42 = _positionWorld.y;
+	mt._11 = _zoom;
+	mt._22 = -_zoom;
+	mt._41 = (-_zoom) * _positionWorld.x;
+	mt._42 = _zoom * _positionWorld.y;
 
 	D3DXVec3Transform(&posViewport, position, &mt);
 

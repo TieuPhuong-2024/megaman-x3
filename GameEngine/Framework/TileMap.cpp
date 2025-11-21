@@ -141,15 +141,15 @@ void TileMap::loadWalls(xml_node& mapNode)
 			// TMX uses screen coordinates (Y down from top-left)
 			float tmxX = object.attribute("x").as_float();
 			float tmxY = object.attribute("y").as_float();
-			float width = object.attribute("width").as_float();
-			float height = object.attribute("height").as_float();
+			float width = object.attribute("width").as_float() * 2;
+			float height = object.attribute("height").as_float() * 2;
 
 			// Convert from TMX screen coords to world coords
 			// TMX: Y is top-left, measured down from top
 			// World: Y is bottom-left, measured up from bottom
 			// TMX bottom = tmxY + height, World bottom = mapHeight - (tmxY + height)
-			float worldX = tmxX;
-			float worldY = mapHeight - tmxY - height;
+			float worldX = tmxX * 2;	
+			float worldY = mapHeight - tmxY * 2 - height;
 
 			printLog("[TileMap] Wall ID=%d TMX(x=%.1f,y=%.1f,w=%.1f,h=%.1f) -> World(x=%.1f,y=%.1f) mapH=%.0f\n",
 				wall->GetId(), tmxX, tmxY, width, height, worldX, worldY, mapHeight);

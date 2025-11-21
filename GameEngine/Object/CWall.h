@@ -3,7 +3,7 @@
 #include <d3dx9.h>
 #include "../Framework/ICollidable.h"
 
-class CWall : public BaseObject
+class CWall : public BaseObject, public ICollidable
 {
 public:
 	CWall(float x, float y, float width, float height, int id);
@@ -11,11 +11,16 @@ public:
 	~CWall();
 
 	// ICollidable
-	RECT getBoundingBox();
-	GVector2 getPosition();
-	void setPosition(GVector2 pos);
-	void SetPosition(float x, float y);
-	bool IsBlocking();
+	RECT getBoundingBox() const override;
+	void onCollision(ICollidable* other) override;
+	void OnCollisionWith(CCollisionEvent* e) override;
+	GVector2 getPosition() override;
+	void setPosition(GVector2 pos) override;
+	void GetSpeed(float& vx, float& vy) override;
+	void SetPosition(float x, float y) override;
+	GVector2 getVelocity() override;
+	void setVelocity(GVector2 vel) override;
+	bool IsBlocking() override;
 
 	float GetWidth() const { return _width; }
 	void SetWidth(float width) { _width = width; }

@@ -18,6 +18,7 @@ bool PlayScene::init()
 	_viewport = new Viewport(0, WINDOW_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT);
 	_player = new CPlayer;
 	_player->setPosition(GVector2(100.f, 50.f));
+	_player->setScale(2.0f);
 	_tileMap = StageManager::getInstance()->getTileMap(eID::MAP_STAGE_MEGAMAN);
 
 	// Add to collision manager
@@ -26,6 +27,11 @@ bool PlayScene::init()
 	// Add walls from tilemap
 	_walls = _tileMap->GetWalls();
 
+	// Add walls to collision manager
+	for (auto wall : _walls) {
+		CollisionManager::getInstance()->addObject(wall);
+	}
+
 	return true;
 }
 
@@ -33,6 +39,19 @@ void PlayScene::updateInput(float dt)
 {
 	// Update input for player
 	_player->updateInput(dt);
+
+	// Handle zoom
+	InputController* input = InputController::getInstance();
+	if (input->isKeyPressed(DIK_EQUALS) || input->isKeyPressed(DIK_ADD)) // + key
+	{
+		float currentZoom = _viewport->getZoom();
+		_viewport->setZoom(currentZoom * 1.1f);
+	}
+	if (input->isKeyPressed(DIK_MINUS)) // - key
+	{
+		float currentZoom = _viewport->getZoom();
+		_viewport->setZoom(currentZoom / 1.1f);
+	}
 }
 
 void PlayScene::update(float dt)

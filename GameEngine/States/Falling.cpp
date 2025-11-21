@@ -32,14 +32,10 @@ eStatus Falling::getState()
 
 void Falling::update(float deltaTime)
 {
-	// Landing detection: check for ground collision (replace with proper collision system)
-	// For now, use Y position or gravity status
-	bool isGrounded = (_player->getPosition().y <= 50) || (_gravity->getStatus() == eGravityStatus::SHALLOWED);
-	// TODO: Implement raycast or collision detection: isGrounded = collisionSystem->raycastDown(_player->getPosition());
-
-	if (isGrounded)
+	// Landing detection: rely on collision system to trigger transition to Standing
+	// If gravity is shallowed (from collision), transition to standing
+	if (_gravity->getStatus() == eGravityStatus::SHALLOWED)
 	{
-		_gravity->setStatus(eGravityStatus::SHALLOWED);
 		this->setState(new Standing, 0.1f); // Smooth landing transition
 		return;
 	}

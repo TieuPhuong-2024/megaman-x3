@@ -17,6 +17,9 @@ public:
 	void setPositionWorld(GVector2 position);
 	GVector2 getPositionWorld();
 
+	void setZoom(float zoom);
+	float getZoom();
+
 	float getWidth();
 	float getHeight();
 
@@ -32,6 +35,7 @@ private:
 	GVector2 _positionWorld;
 	float _width;
 	float _height;
+	float _zoom;
 };
 
 #endif // !__VIEWPORT_H__

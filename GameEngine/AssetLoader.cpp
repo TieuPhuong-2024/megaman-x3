@@ -23,6 +23,7 @@ void AssetLoader::loadResource(ID3DXSprite* sprite)
 	spr = new Sprite(sprite, L"Resource/MAP_1.png");
 	spr = spriteManager->loadXMLDoc(sprite, L"Resource/MAP_1.tmx");
 	spr->setOrigin(VECTOR2ZERO);
+	spr->setScale(GVector2(2.0f, 2.0f));
 	spriteManager->getListSprite()->insert(make_pair(eID::MAP_STAGE_MEGAMAN, spr));
 }
 
