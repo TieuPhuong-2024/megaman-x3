@@ -1,0 +1,15 @@
+{
+    "files.associations": {
+        "string": "cpp",
+        "stdexcept": "cpp",
+        "cmath": "cpp",
+        "map": "cpp",
+        "utility": "cpp",
+        "cstdlib": "cpp",
+        "xiosbase": "cpp",
+        "algorithm": "cpp",
+        "exception": "cpp",
+        "memory": "cpp",
+        "vector": "cpp"
+    }
+}

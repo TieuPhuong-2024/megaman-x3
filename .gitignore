@@ -275,7 +275,10 @@ _ReSharper*/
 *.sln.iml
 
 # VS Code
-.vscode/
+.vscode/*
+!.vscode/c_cpp_properties.json
+!.vscode/launch.json
+!.vscode/tasks.json
 
 # Windows
 Thumbs.db
