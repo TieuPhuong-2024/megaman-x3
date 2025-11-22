@@ -1,15 +1,16 @@
 #include "Jumping.h"
 #include "Falling.h"
 #include "../trace.h"
+#include <memory>
 
-#define VELOCITY_X		250.f
-#define ACCELERATE_X	78.48f
-#define VELOCITY_Y		250.f
-#define ACCELERATE_Y	250.f
-#define MAX_AIR_VX		350.f
-#define AIR_FRICTION	600.0f
+#define VELOCITY_X 250.f
+#define ACCELERATE_X 78.48f
+#define VELOCITY_Y 250.f
+#define ACCELERATE_Y 250.f
+#define MAX_AIR_VX 350.f
+#define AIR_FRICTION 600.0f
 
-Jumping::Jumping(CPlayer* player) : PlayerState(player)
+Jumping::Jumping(CPlayer *player) : PlayerState(player)
 {
 	// Initialize upward velocity once when the jump begins.
 	getMovement()->setAccely(0.0f);
@@ -37,21 +38,23 @@ void Jumping::update(float deltaTime)
 	if (vy <= 0.0f)
 	{
 		printLog("Transitioning to Falling\n");
-		this->setState(new Falling(getPlayer()), 0.1f); // Smooth transition
+		this->setState(std::make_unique<Falling>(getPlayer()), 0.1f); // Smooth transition
 		return;
 	}
 
 	// Clamp horizontal speed to a reasonable max while airborne
 	auto vx = getMovement()->getVelocity().x;
-	if (vx > MAX_AIR_VX) getMovement()->setVx(MAX_AIR_VX);
-	if (vx < -MAX_AIR_VX) getMovement()->setVx(-MAX_AIR_VX);
+	if (vx > MAX_AIR_VX)
+		getMovement()->setVx(MAX_AIR_VX);
+	if (vx < -MAX_AIR_VX)
+		getMovement()->setVx(-MAX_AIR_VX);
 }
 
 void Jumping::updateInput(float deltaTime)
 {
 	// Allow air control: change horizontal acceleration/velocity based on input.
 	// Do NOT reset vertical velocity here (it's set once in constructor).
-	if (InputController::getInstance()->isKeyDown(DIK_LEFTARROW))
+	if (InputController::getInstance().isKeyDown(DIK_LEFTARROW))
 	{
 		getPlayer()->setFlipX(true);
 		getPlayer()->setMoveDirection(eMoveDirection::MOVE_LEFT);
@@ -59,7 +62,7 @@ void Jumping::updateInput(float deltaTime)
 		// Provide immediate control by nudging velocity, but do not override vertical velocity.
 		getMovement()->setVx(max(-MAX_AIR_VX, getMovement()->getVelocity().x - VELOCITY_X * 0.1f));
 	}
-	else if (InputController::getInstance()->isKeyDown(DIK_RIGHTARROW))
+	else if (InputController::getInstance().isKeyDown(DIK_RIGHTARROW))
 	{
 		getPlayer()->setFlipX(false);
 		getPlayer()->setMoveDirection(eMoveDirection::MOVE_RIGHT);
@@ -75,12 +78,14 @@ void Jumping::updateInput(float deltaTime)
 		if (vx > 0.0f)
 		{
 			vx -= decel;
-			if (vx < 0.0f) vx = 0.0f;
+			if (vx < 0.0f)
+				vx = 0.0f;
 		}
 		else if (vx < 0.0f)
 		{
 			vx += decel;
-			if (vx > 0.0f) vx = 0.0f;
+			if (vx > 0.0f)
+				vx = 0.0f;
 		}
 		getMovement()->setVx(vx);
 		getMovement()->setAccelx(0.0f);

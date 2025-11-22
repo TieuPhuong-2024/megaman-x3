@@ -31,13 +31,12 @@ void SceneManager::release()
 	if (!_scenes.empty())
 	{
 		_scenes.back()->release();
-		SAFE_DELETE(_scenes.back());
 	}
 }
 
-void SceneManager::addScene(Scene* scene)
+void SceneManager::addScene(std::unique_ptr<Scene> scene)
 {
-	_scenes.push_back(scene);
+	_scenes.push_back(std::move(scene));
 	_scenes.back()->init();
 }
 
@@ -46,15 +45,14 @@ void SceneManager::removeScene()
 	if (!_scenes.empty())
 	{
 		_scenes.back()->release();
-		delete _scenes.back();
 		_scenes.pop_back();
 	}
 }
 
-void SceneManager::replaceScene(Scene* scene)
+void SceneManager::replaceScene(std::unique_ptr<Scene> scene)
 {
 	this->removeScene();
-	this->addScene(scene);
+	this->addScene(std::move(scene));
 }
 
 void SceneManager::clearScenes()
@@ -62,15 +60,14 @@ void SceneManager::clearScenes()
 	while (!_scenes.empty())
 	{
 		_scenes.back()->release();
-		delete _scenes.back();
 		_scenes.pop_back();
 	}
 }
 
-Scene* SceneManager::getCurrentScene()
+Scene *SceneManager::getCurrentScene()
 {
 	if (!_scenes.empty())
-		return _scenes.back();
+		return _scenes.back().get();
 
 	return nullptr;
 }

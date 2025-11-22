@@ -2,15 +2,16 @@
 #define __SCENE_MANAGER_H__
 
 #include <vector>
+#include <memory>
 #include "define.h"
 #include "Scene.h"
-
 
 class SceneManager
 {
 public:
 	~SceneManager() = default;
-	static SceneManager& getInstance() {
+	static SceneManager &getInstance()
+	{
 		static SceneManager instance;
 		return instance;
 	}
@@ -21,18 +22,18 @@ public:
 	void draw(LPD3DXSPRITE spriteHandle);
 	void release();
 
-	void addScene(Scene* scene);
+	void addScene(std::unique_ptr<Scene> scene);
 	void removeScene();
-	void replaceScene(Scene* scene);
+	void replaceScene(std::unique_ptr<Scene> scene);
 	void clearScenes();
-	Scene* getCurrentScene();
+	Scene *getCurrentScene();
 
 private:
 	SceneManager() = default;
-	SceneManager(const SceneManager&) = delete;
-	void operator=(const SceneManager&) = delete;
+	SceneManager(const SceneManager &) = delete;
+	void operator=(const SceneManager &) = delete;
 
-	std::vector<Scene*> _scenes;
+	std::vector<std::unique_ptr<Scene>> _scenes;
 };
 
 #endif // !__SCENE_MANAGER_H__

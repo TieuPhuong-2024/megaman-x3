@@ -2,13 +2,14 @@
 
 Scene::Scene()
 {
+	_viewport = std::make_unique<Viewport>();
 }
 
 Scene::~Scene()
 {
 }
 
-Viewport* Scene::getViewport()
+Viewport *Scene::getViewport()
 {
-	return _viewport;
+	return _viewport.get();
 }

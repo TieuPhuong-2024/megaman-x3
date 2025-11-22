@@ -1,16 +1,17 @@
 #include "CGame.h"
+#include <memory>
 
 #include "Scene/PlayScene.h"
 
-Graphics* CGame::s_hWindows = nullptr;
+std::unique_ptr<Graphics> CGame::s_hWindows = nullptr;
 bool CGame::s_bIsExited = false;
 
 CGame::CGame(HINSTANCE hInstance, LPCWSTR strName, int width, int height, int fps, int isFullScreen)
+: _pInput(InputController::getInstance())
 {
-	s_hWindows = new Graphics(hInstance, strName, width, height, fps, isFullScreen);
+	s_hWindows = std::make_unique<Graphics>(hInstance, strName, width, height, fps, isFullScreen);
 	_pDeviceManager = DeviceManager::getInstance();
 	_pGameTime = GameTime::getInstance();
-	_pInput = InputController::getInstance();
 	_D3DXSprite = nullptr;
 	_deltaTime = 0;
 	_oldTime = 0;
@@ -19,7 +20,7 @@ CGame::CGame(HINSTANCE hInstance, LPCWSTR strName, int width, int height, int fp
 
 void CGame::init()
 {
-	if (s_hWindows == nullptr)
+	if (!s_hWindows)
 	{
 		throw;
 	}
@@ -28,9 +29,9 @@ void CGame::init()
 	s_hWindows->initWindow();
 	_pGameTime->init();
 	_pDeviceManager->Init(*s_hWindows);
-	_pInput->init(s_hWindows->getWnd(), s_hWindows->getHINSTANCE());
+	_pInput.init(s_hWindows->getWnd(), s_hWindows->getHINSTANCE());
 
-	this->_frameRate = 1000.0f / s_hWindows->getFrameRate(); //1000/30 = 33 millisecond
+	this->_frameRate = 1000.0f / s_hWindows->getFrameRate(); // 1000/30 = 33 millisecond
 
 	D3DXCreateSprite(_pDeviceManager->getDevice(), &_D3DXSprite);
 	this->loadResource();
@@ -78,11 +79,11 @@ void CGame::run()
 		if (_deltaTime >= _frameRate)
 		{
 			_oldTime += _frameRate;
-			_pInput->update();
+			_pInput.update();
 			this->render();
 		}
 		else
-			Sleep(_frameRate - _deltaTime); //sleep every frame for high performance
+			Sleep(_frameRate - _deltaTime); // sleep every frame for high performance
 	}
 }
 
@@ -120,9 +121,9 @@ void CGame::exit()
 	s_bIsExited = true;
 }
 
-Graphics* CGame::getWindows()
+Graphics *CGame::getWindows()
 {
-	return s_hWindows;
+	return s_hWindows.get();
 }
 
 LRESULT CGame::wWinProc(HWND wnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -132,7 +133,8 @@ LRESULT CGame::wWinProc(HWND wnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
-	default: return DefWindowProc(wnd, uMsg, wParam, lParam);
+	default:
+		return DefWindowProc(wnd, uMsg, wParam, lParam);
 	}
 	return 0;
 }

@@ -13,29 +13,28 @@ using namespace pugi;
 class TileSet
 {
 private:
-	Sprite* _tileImage;
-	int _widthtile; // kích thước tile
+	std::shared_ptr<Sprite> _tileImage;
+	int _widthtile;	 // kích thước tile
 	int _heighttile; // kích thước tile
 	std::string _filename;
 	int _columns;
 	int _rows;
 	std::vector<std::unique_ptr<Tile>> _listTiles;
-	
+
 public:
 	TileSet(eID spriteId);
 
 	int getWidthtile() const;
-	void setWidthtile(const int& value);
+	void setWidthtile(const int &value);
 	int getHeighttile() const;
-	void setHeighttile(const int& value);
+	void setHeighttile(const int &value);
 
-	void loadListTiles(pugi::xml_node& node);
-	Sprite* getSprite();
-	
+	void loadListTiles(pugi::xml_node &node);
+	Sprite *getSprite();
+
 	void setColor(D3DXCOLOR color);
-	
-	void draw(LPD3DXSPRITE spriteHandle, int id, GVector2 position, Viewport* viewport);
+
+	void draw(LPD3DXSPRITE spriteHandle, int id, GVector2 position, Viewport *viewport);
 };
 
-
-#endif	//#ifndef __TILESET__
+#endif // #ifndef __TILESET__

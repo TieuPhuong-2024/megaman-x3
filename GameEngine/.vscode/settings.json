@@ -10,6 +10,17 @@
         "algorithm": "cpp",
         "exception": "cpp",
         "memory": "cpp",
-        "vector": "cpp"
+        "vector": "cpp",
+        "xstring": "cpp",
+        "fstream": "cpp",
+        "xtree": "cpp",
+        "atomic": "cpp",
+        "mutex": "cpp",
+        "system_error": "cpp",
+        "thread": "cpp",
+        "xhash": "cpp",
+        "xlocale": "cpp",
+        "xmemory": "cpp",
+        "xutility": "cpp"
     }
 }

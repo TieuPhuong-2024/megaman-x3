@@ -2,12 +2,13 @@
 #include "Running.h"
 #include "Jumping.h"
 #include "Falling.h"
+#include <memory>
 
 #define VELOCITY_X 250.f
 #define ACCELERATE_X 9.81f
 #define EPSILON 1.0f
 
-Standing::Standing(CPlayer* player) : PlayerState(player)
+Standing::Standing(CPlayer *player) : PlayerState(player)
 {
 	// Ensure player is stationary while standing
 	getMovement()->setVelocity(VECTOR2ZERO);
@@ -22,14 +23,14 @@ void Standing::update(float deltaTime)
 	// If gravity indicates we're falling (walked off an edge or similar), transition
 	if (getGravity()->getStatus() == eGravityStatus::FALLING__DOWN)
 	{
-		this->setState(new Falling(getPlayer()));
+		this->setState(std::make_unique<Falling>(getPlayer()));
 		return;
 	}
 
 	// If horizontal velocity is significant (external forces), transition to Running
 	if (fabs(getMovement()->getVelocity().x) > EPSILON)
 	{
-		this->setState(new Running(getPlayer()));
+		this->setState(std::make_unique<Running>(getPlayer()));
 		return;
 	}
 
@@ -46,29 +47,29 @@ void Standing::updateInput(float deltaTime)
 	getPlayer()->setMoveDirection(eMoveDirection::NONE);
 
 	// Horizontal movement: transition to Running and apply velocity/acceleration
-	if (InputController::getInstance()->isKeyDown(DIK_LEFTARROW))
+	if (InputController::getInstance().isKeyDown(DIK_LEFTARROW))
 	{
 		getPlayer()->setFlipX(true);
 		getPlayer()->setMoveDirection(eMoveDirection::MOVE_LEFT);
 		getMovement()->setVx(-VELOCITY_X);
 		getMovement()->setAccelx(-ACCELERATE_X);
-		this->setState(new Running(getPlayer()));
+		this->setState(std::make_unique<Running>(getPlayer()));
 		return;
 	}
-	else if (InputController::getInstance()->isKeyDown(DIK_RIGHTARROW))
+	else if (InputController::getInstance().isKeyDown(DIK_RIGHTARROW))
 	{
 		getPlayer()->setFlipX(false);
 		getPlayer()->setMoveDirection(eMoveDirection::MOVE_RIGHT);
 		getMovement()->setVx(VELOCITY_X);
 		getMovement()->setAccelx(ACCELERATE_X);
-		this->setState(new Running(getPlayer()));
+		this->setState(std::make_unique<Running>(getPlayer()));
 		return;
 	}
 
 	// If gravity indicates falling (e.g., stepped off a platform), transition
 	if (getGravity()->getStatus() == eGravityStatus::FALLING__DOWN)
 	{
-		this->setState(new Falling(getPlayer()));
+		this->setState(std::make_unique<Falling>(getPlayer()));
 		return;
 	}
 

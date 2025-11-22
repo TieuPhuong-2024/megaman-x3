@@ -1,15 +1,15 @@
 #include "Falling.h"
 #include "Standing.h"
 #include "Clinging.h"
+#include <memory>
 
-#define GRAVITY			-150.f
-#define VELOCITY_X		200.f
-#define ACCELERATE_X	9.81f
-#define VELOCITY_Y		-250.f
-#define MAX_FALL_SPEED  -800.f
+#define GRAVITY -150.f
+#define VELOCITY_X 200.f
+#define ACCELERATE_X 9.81f
+#define VELOCITY_Y -250.f
+#define MAX_FALL_SPEED -800.f
 
-
-Falling::Falling(CPlayer* player) : PlayerState(player)
+Falling::Falling(CPlayer *player) : PlayerState(player)
 {
 	getGravity()->setStatus(eGravityStatus::FALLING__DOWN);
 	getGravity()->setgy(GRAVITY);
@@ -36,7 +36,7 @@ void Falling::update(float deltaTime)
 	// If gravity is shallowed (from collision), transition to standing
 	if (getGravity()->getStatus() == eGravityStatus::SHALLOWED)
 	{
-		this->setState(new Standing(getPlayer()), 0.1f); // Smooth landing transition
+		this->setState(std::make_unique<Standing>(getPlayer()), 0.1f); // Smooth landing transition
 		return;
 	}
 
@@ -52,14 +52,14 @@ void Falling::updateInput(float deltaTime)
 {
 	// Allow horizontal control while falling (air control). This gives the player
 	// the ability to steer mid-air without making air control too strong.
-	if (InputController::getInstance()->isKeyDown(DIK_LEFTARROW))
+	if (InputController::getInstance().isKeyDown(DIK_LEFTARROW))
 	{
 		getPlayer()->setFlipX(true);
 		getPlayer()->setMoveDirection(eMoveDirection::MOVE_LEFT);
 		getMovement()->setAccelx(-ACCELERATE_X);
 		getMovement()->setVx(-VELOCITY_X);
 	}
-	else if (InputController::getInstance()->isKeyDown(DIK_RIGHTARROW))
+	else if (InputController::getInstance().isKeyDown(DIK_RIGHTARROW))
 	{
 		getPlayer()->setFlipX(false);
 		getPlayer()->setMoveDirection(eMoveDirection::MOVE_RIGHT);

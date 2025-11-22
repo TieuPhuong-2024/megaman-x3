@@ -2,12 +2,13 @@
 #include "Jumping.h"
 #include "Falling.h"
 #include "../trace.h"
+#include <memory>
 
 #define CLING_HORIZONTAL_VELOCITY 0.0f
 #define CLING_GRAVITY_Y -2.0f
 #define WALL_JUMP_VX 300.0f
 
-Clinging::Clinging(CPlayer* player) : PlayerState(player)
+Clinging::Clinging(CPlayer *player) : PlayerState(player)
 {
 	// Reset timer
 	_clingTime = 0.0f;
@@ -48,7 +49,7 @@ void Clinging::update(float deltaTime)
 	{
 		_clingTime = 0.0f;
 		// restore gravity behavior will be handled by Falling constructor
-		this->setState(new Falling(getPlayer()));
+		this->setState(std::make_unique<Falling>(getPlayer()));
 	}
 }
 
@@ -58,7 +59,7 @@ void Clinging::updateInput(float deltaTime)
 	// We implement a simple wall-jump by giving an initial horizontal push
 	// away from the wall and then transitioning into the Jumping state so
 	// vertical velocity/acceleration are handled consistently there.
-	if (InputController::getInstance()->isKeyDown(DIK_X))
+	if (InputController::getInstance().isKeyDown(DIK_X))
 	{
 		_clingTime = 0.0f;
 
@@ -81,29 +82,29 @@ void Clinging::updateInput(float deltaTime)
 		}
 
 		// Transition into Jumping which will set vertical velocity/acceleration.
-		this->setState(new Jumping(getPlayer()));
+		this->setState(std::make_unique<Jumping>(getPlayer()));
 		return;
 	}
 
 	// Allow player to drop off the wall if they press down (optional):
-	if (InputController::getInstance()->isKeyDown(DIK_DOWN))
+	if (InputController::getInstance().isKeyDown(DIK_DOWN))
 	{
 		_clingTime = 0.0f;
-		this->setState(new Falling(getPlayer()));
+		this->setState(std::make_unique<Falling>(getPlayer()));
 		return;
 	}
 
 	// If player moves away from the wall (press the direction away from wall),
 	// we should exit clinging and allow running/falling logic to resume.
-	if (InputController::getInstance()->isKeyDown(DIK_LEFTARROW) ||
-		InputController::getInstance()->isKeyDown(DIK_RIGHTARROW))
+	if (InputController::getInstance().isKeyDown(DIK_LEFTARROW) ||
+		InputController::getInstance().isKeyDown(DIK_RIGHTARROW))
 	{
 		// If they press the direction away from the wall, stop clinging.
 		// Simple heuristic: if any horizontal key is pressed, drop to Falling so the
 		// player regains normal mid-air control. More advanced behavior can transition
 		// to Running when grounded, etc.
 		_clingTime = 0.0f;
-		this->setState(new Falling(getPlayer()));
+		this->setState(std::make_unique<Falling>(getPlayer()));
 		return;
 	}
 

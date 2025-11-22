@@ -4,8 +4,9 @@
 #include "../trace.h"
 #include "../Framework/define.h"
 #include "../Framework/InputController.h"
+#include <memory>
 
-Kicking::Kicking(CPlayer* player) : PlayerState(player)
+Kicking::Kicking(CPlayer *player) : PlayerState(player)
 {
 	_timeKick = 0.0f;
 	_impulseApplied = false;
@@ -69,7 +70,7 @@ void Kicking::update(float deltaTime)
 	{
 		_timeKick = 0.0f;
 		_impulseApplied = false;
-		this->setState(new Standing(getPlayer()));
+		this->setState(std::make_unique<Standing>(getPlayer()));
 	}
 }
 
@@ -77,11 +78,11 @@ void Kicking::updateInput(float deltaTime)
 {
 	// Allow jump input to transition out of the kick early.
 	// This keeps the player responsive if they choose to jump during the kick.
-	if (InputController::getInstance()->isKeyDown(DIK_X))
+	if (InputController::getInstance().isKeyDown(DIK_X))
 	{
 		_timeKick = 0.0f;
 		_impulseApplied = false;
-		this->setState(new Jumping(getPlayer()));
+		this->setState(std::make_unique<Jumping>(getPlayer()));
 		return;
 	}
 

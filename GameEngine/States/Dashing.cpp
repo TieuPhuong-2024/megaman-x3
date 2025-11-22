@@ -2,8 +2,9 @@
 #include "Jumping.h"
 #include "Standing.h"
 #include "../trace.h"
+#include <memory>
 
-Dashing::Dashing(CPlayer* player) : PlayerState(player)
+Dashing::Dashing(CPlayer *player) : PlayerState(player)
 {
 }
 
@@ -65,7 +66,7 @@ void Dashing::update(float deltaTime)
 		GAMELOG("Dashing ended after %.2f seconds", _timeDash);
 		_timeDash = 0.0f;
 		// After dashing, go to standing to give player control back.
-		this->setState(new Standing(getPlayer()));
+		this->setState(std::make_unique<Standing>(getPlayer()));
 	}
 }
 
@@ -78,10 +79,10 @@ void Dashing::updateInput(float deltaTime)
 
 	// If player presses jump while dashing, transition to Jumping immediately.
 	// (Jumping state will handle reset of vertical accel/velocity.)
-	if (InputController::getInstance()->isKeyDown(DIK_X))
+	if (InputController::getInstance().isKeyDown(DIK_X))
 	{
 		_timeDash = 0.0f; // reset dash timer
-		this->setState(new Jumping(getPlayer()));
+		this->setState(std::make_unique<Jumping>(getPlayer()));
 		return;
 	}
 

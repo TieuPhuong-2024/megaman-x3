@@ -10,61 +10,61 @@
 #include <algorithm>
 
 CPlayer::CPlayer()
+	: _input(InputController::getInstance())
 {
-	_input = InputController::getInstance();
-	_input->Attach(this);
+	_input.Attach(this);
 
-	_sprite = SpriteManager::getInstance()->getSprite(eID::XMAN);
-	_sprite->setFrameRect(SpriteManager::getInstance()->getSourceRect(eID::XMAN, "stand_1"));
+	_sprite = SpriteManager::getInstance().getSprite(eID::XMAN);
+	_sprite->setFrameRect(SpriteManager::getInstance().getSourceRect(eID::XMAN, "stand_1"));
 	_sprite->setZIndex(1.0f);
 
-	Movement *movement = new Movement(VECTOR2ZERO, VECTOR2ZERO, _sprite);
-	_component.insert(make_pair("Movement", movement));
+	auto movement = std::make_unique<Movement>(VECTOR2ZERO, VECTOR2ZERO, _sprite.get());
+	_component.insert(make_pair("Movement", std::move(movement)));
 
-	Gravity *gravity = new Gravity(VECTOR2ZERO, movement);
-	_component.insert(make_pair("Gravity", gravity));
+	auto gravity = std::make_unique<Gravity>(VECTOR2ZERO, movement.get());
+	_component.insert(make_pair("Gravity", std::move(gravity)));
 
-	_spriteAnimation[eStatus::STAND] = new Animation(_sprite, 0.15f);
+	_spriteAnimation[eStatus::STAND] = std::make_unique<Animation>(_sprite.get(), 0.15f);
 	_spriteAnimation[eStatus::STAND]->addFrameRect(eID::XMAN, "standing_1", "standing_2", NULL);
 
-	_spriteAnimation[eStatus::STAND_SHOOT] = new Animation(_sprite, 0.15f);
+	_spriteAnimation[eStatus::STAND_SHOOT] = std::make_unique<Animation>(_sprite.get(), 0.15f);
 	_spriteAnimation[eStatus::STAND_SHOOT]->addFrameRect(eID::XMAN, "StandingShoot_1", "StandingShoot_2", NULL);
 
-	_spriteAnimation[eStatus::RUN] = new Animation(_sprite, 0.05f);
+	_spriteAnimation[eStatus::RUN] = std::make_unique<Animation>(_sprite.get(), 0.05f);
 	_spriteAnimation[eStatus::RUN]->addFrameRect(eID::XMAN, "StartRunning_1", "StartRunning_2",
 												 "running_1", "running_2", "running_3", "running_4", "running_5",
 												 "running_6", "running_7", "running_8", "running_9", NULL);
 	_spriteAnimation[eStatus::RUN]->animateFromTo(3, 10);
 
-	_spriteAnimation[eStatus::RUN_SHOOT] = new Animation(_sprite, 0.05f);
+	_spriteAnimation[eStatus::RUN_SHOOT] = std::make_unique<Animation>(_sprite.get(), 0.05f);
 	_spriteAnimation[eStatus::RUN_SHOOT]->addFrameRect(eID::XMAN,
 													   "RunningShoot_1", "RunningShoot_2", "RunningShoot_3",
 													   "RunningShoot_4", "RunningShoot_5", "RunningShoot_6",
 													   "RunningShoot_7", "RunningShoot_8", "RunningShoot_9", NULL);
 
-	_spriteAnimation[eStatus::JUMP] = new Animation(_sprite, 0.1f);
+	_spriteAnimation[eStatus::JUMP] = std::make_unique<Animation>(_sprite.get(), 0.1f);
 	_spriteAnimation[eStatus::JUMP]->setLoop(false);
 	_spriteAnimation[eStatus::JUMP]->addFrameRect(eID::XMAN, "jumping_1", "jumping_2", "jumping_3", NULL);
 
-	_spriteAnimation[eStatus::JUMP_SHOOT] = new Animation(_sprite, 0.1f);
+	_spriteAnimation[eStatus::JUMP_SHOOT] = std::make_unique<Animation>(_sprite.get(), 0.1f);
 	_spriteAnimation[eStatus::JUMP_SHOOT]->setLoop(false);
 	_spriteAnimation[eStatus::JUMP_SHOOT]->addFrameRect(eID::XMAN, "JumpingShoot_1", "JumpingShoot_2", "JumpingShoot_3",
 														NULL);
 
-	_spriteAnimation[eStatus::FALL] = new Animation(_sprite, 0.1f);
+	_spriteAnimation[eStatus::FALL] = std::make_unique<Animation>(_sprite.get(), 0.1f);
 	_spriteAnimation[eStatus::FALL]->setLoop(false);
 	_spriteAnimation[eStatus::FALL]->addFrameRect(eID::XMAN, "falling_1", "falling_2", "falling_3", "falling_4", NULL);
 
-	_spriteAnimation[eStatus::FALL_SHOOT] = new Animation(_sprite, 0.1f);
+	_spriteAnimation[eStatus::FALL_SHOOT] = std::make_unique<Animation>(_sprite.get(), 0.1f);
 	_spriteAnimation[eStatus::FALL_SHOOT]->setLoop(false);
 	_spriteAnimation[eStatus::FALL_SHOOT]->addFrameRect(eID::XMAN, "FallingShoot_1", "FallingShoot_2", "FallingShoot_3",
 														"FallingShoot_4", NULL);
 
-	_spriteAnimation[eStatus::DASH] = new Animation(_sprite, 0.1f);
+	_spriteAnimation[eStatus::DASH] = std::make_unique<Animation>(_sprite.get(), 0.1f);
 	_spriteAnimation[eStatus::DASH]->setLoop(false);
 	_spriteAnimation[eStatus::DASH]->addFrameRect(eID::XMAN, "dashing_1", "dashing_2", NULL);
 
-	_spriteAnimation[eStatus::DASH_SHOOT] = new Animation(_sprite, 0.1f);
+	_spriteAnimation[eStatus::DASH_SHOOT] = std::make_unique<Animation>(_sprite.get(), 0.1f);
 	_spriteAnimation[eStatus::DASH_SHOOT]->setLoop(false);
 	_spriteAnimation[eStatus::DASH_SHOOT]->addFrameRect(eID::XMAN, "DashShoot_1", "DashShoot_2", NULL);
 
@@ -72,8 +72,8 @@ CPlayer::CPlayer()
 	_currentIndexState = eStatus::STAND;
 
 	// Setting status for player
-	_playerState = new Standing(this);
-	setState(new Standing(this));
+	_playerState = std::make_unique<Standing>(this);
+	setState(std::make_unique<Standing>(this));
 
 	// Don't reverse
 	_isFlipX = false;
@@ -111,25 +111,7 @@ CPlayer::CPlayer()
 
 CPlayer::~CPlayer()
 {
-	/* Delete sprite */
-	SAFE_DELETE(_sprite);
-
-	/* Delete sprite animation */
-	for (auto &it : _spriteAnimation)
-	{
-		delete it.second;
-	}
-
-	/* Delete component */
-	for (auto &it : _component)
-	{
-		delete it.second;
-	}
-
-	/* Delete the state of player */
-	SAFE_DELETE(_playerState);
-
-	_input->Detach(this);
+	_input.Detach(this);
 }
 
 void CPlayer::update(float deltaTime)
@@ -192,7 +174,7 @@ void CPlayer::updateInput(float deltaTime)
 		_remainingJumps = (_remainingJumps > 0) ? (_remainingJumps - 1) : 0;
 		_jumpBufferTimer = 0.0f;
 		_coyoteTimer = 0.0f;
-		this->setState(new Jumping(this));
+		this->setState(std::make_unique<Jumping>(this));
 	}
 
 	// Update input for the current state (e.g., Running, Jumping, etc.)
@@ -207,14 +189,12 @@ void CPlayer::draw(ID3DXSprite *spriteHandler, Viewport *viewport)
 	_spriteAnimation[_currentIndexState]->draw(spriteHandler, viewport);
 }
 
-void CPlayer::setState(PlayerState *newState)
+void CPlayer::setState(std::unique_ptr<PlayerState> newState)
 {
-	// Delete previous state
-	SAFE_DELETE(_playerState);
 	// Set new state
-	_playerState = newState;
+	_playerState = std::move(newState);
 	// Set current index of state for new index of state
-	_currentIndexState = newState->getState();
+	_currentIndexState = _playerState->getState();
 	GAMELOG("Player state changed to: %d", static_cast<int>(_currentIndexState));
 	// Restart animation
 	setState(_currentIndexState);
@@ -240,12 +220,12 @@ void CPlayer::eventKeyUp(KeyEventArg *e)
 	if ((_isJumping) && (e->_key == DIK_X))
 	{
 		_isJumping = false;
-		this->setState(new Falling(this));
+		this->setState(std::make_unique<Falling>(this));
 	}
 
 	if ((e->_key == DIK_C) && (_currentIndexState == eStatus::DASH))
 	{
-		this->setState(new Standing(this));
+		this->setState(std::make_unique<Standing>(this));
 	}
 }
 
@@ -267,7 +247,7 @@ void CPlayer::eventKeyDown(KeyEventArg *e)
 			_jumpBufferTimer = 0.0f;
 
 			// Transition into Jumping to (re)apply vertical velocity
-			this->setState(new Jumping(this));
+			this->setState(std::make_unique<Jumping>(this));
 		}
 		else
 		{
@@ -284,7 +264,7 @@ void CPlayer::eventKeyDown(KeyEventArg *e)
 			(_currentIndexState == eStatus::RUN_SHOOT))
 		{
 			GAMELOG("Dashing state triggered by key down C");
-			this->setState(new Dashing(this));
+			this->setState(std::make_unique<Dashing>(this));
 		}
 	}
 
@@ -304,7 +284,7 @@ void CPlayer::eventKeyDown(KeyEventArg *e)
 			(_currentIndexState == eStatus::STAND_SHOOT) ||
 			(_currentIndexState == eStatus::RUN_SHOOT))
 		{
-			this->setState(new Kicking(this));
+			this->setState(std::make_unique<Kicking>(this));
 		}
 	}
 }
@@ -326,7 +306,7 @@ void CPlayer::setScale(float scale)
 
 IComponent *CPlayer::getComponent(string name)
 {
-	return _component[name];
+	return _component[name].get();
 }
 
 void CPlayer::setFlipX(bool isFlip)
@@ -389,7 +369,7 @@ void CPlayer::onCollision(ICollidable *other)
 			}
 			// Stop horizontal velocity
 			setVelocity(GVector2(0, getVelocity().y));
-			this->setState(new Standing(this));
+			this->setState(std::make_unique<Standing>(this));
 		}
 		else
 		{

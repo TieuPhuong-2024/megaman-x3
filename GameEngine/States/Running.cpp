@@ -3,15 +3,16 @@
 #include "Dashing.h"
 #include "Kicking.h"
 #include "../trace.h"
+#include <memory>
 
-#define MAX_VELOCITY_LEFT	-350.0f
-#define MAX_VELOCITY_RIGHT	350.0f
-#define VELOCITY_X			250.f
-#define ACCELERATE_X		9.81f
-#define FRICTION			800.0f
-#define EPSILON				5.0f
+#define MAX_VELOCITY_LEFT -350.0f
+#define MAX_VELOCITY_RIGHT 350.0f
+#define VELOCITY_X 250.f
+#define ACCELERATE_X 9.81f
+#define FRICTION 800.0f
+#define EPSILON 5.0f
 
-Running::Running(CPlayer* player) : PlayerState(player)
+Running::Running(CPlayer *player) : PlayerState(player)
 {
 }
 
@@ -41,12 +42,14 @@ void Running::update(float deltaTime)
 			if (vx > 0.0f)
 			{
 				vx -= decel;
-				if (vx < 0.0f) vx = 0.0f;
+				if (vx < 0.0f)
+					vx = 0.0f;
 			}
 			else
 			{
 				vx += decel;
-				if (vx > 0.0f) vx = 0.0f;
+				if (vx > 0.0f)
+					vx = 0.0f;
 			}
 			getMovement()->setVx(vx);
 
@@ -54,7 +57,7 @@ void Running::update(float deltaTime)
 			if (fabs(vx) <= EPSILON)
 			{
 				getMovement()->setVx(0.0f);
-				this->setState(new Standing(getPlayer()));
+				this->setState(std::make_unique<Standing>(getPlayer()));
 				return;
 			}
 		}
@@ -62,7 +65,7 @@ void Running::update(float deltaTime)
 		{
 			// Already nearly stopped: go to standing
 			getMovement()->setVx(0.0f);
-			this->setState(new Standing(getPlayer()));
+			this->setState(std::make_unique<Standing>(getPlayer()));
 			return;
 		}
 	}
@@ -71,14 +74,14 @@ void Running::update(float deltaTime)
 void Running::updateInput(float deltaTime)
 {
 	// Handle horizontal input for running (maintain velocity & accel)
-	if (InputController::getInstance()->isKeyDown(DIK_LEFTARROW))
+	if (InputController::getInstance().isKeyDown(DIK_LEFTARROW))
 	{
 		getPlayer()->setFlipX(true);
 		getPlayer()->setMoveDirection(eMoveDirection::MOVE_LEFT);
 		getMovement()->setVx(-VELOCITY_X);
 		getMovement()->setAccelx(-ACCELERATE_X);
 	}
-	else if (InputController::getInstance()->isKeyDown(DIK_RIGHTARROW))
+	else if (InputController::getInstance().isKeyDown(DIK_RIGHTARROW))
 	{
 		getPlayer()->setFlipX(false);
 		getPlayer()->setMoveDirection(eMoveDirection::MOVE_RIGHT);

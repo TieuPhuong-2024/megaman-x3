@@ -6,7 +6,7 @@
 #include "../Object/CWall.h"
 #include "../trace.h"
 
-PlayScene::PlayScene() : _player(nullptr), _tileMap(nullptr)
+PlayScene::PlayScene() : _tileMap(nullptr)
 {
 }
 
@@ -16,8 +16,8 @@ PlayScene::~PlayScene()
 
 bool PlayScene::init()
 {
-	_viewport = new Viewport(0, WINDOW_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT);
-	_player = new CPlayer;
+	_viewport = std::make_unique<Viewport>(0, WINDOW_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT);
+	_player = std::make_unique<CPlayer>();
 	_player->setPosition(GVector2(100.f, 200.f));
 	_player->setScale(2.0f);
 	_tileMap = StageManager::getInstance().getTileMap(eID::MAP_STAGE_MEGAMAN);
@@ -34,13 +34,13 @@ void PlayScene::updateInput(float dt)
 	_player->updateInput(dt);
 
 	// Handle zoom
-	InputController* input = InputController::getInstance();
-	if (input->isKeyPressed(DIK_EQUALS) || input->isKeyPressed(DIK_ADD)) // + key
+	InputController &input = InputController::getInstance();
+	if (input.isKeyPressed(DIK_EQUALS) || input.isKeyPressed(DIK_ADD)) // + key
 	{
 		float currentZoom = _viewport->getZoom();
 		_viewport->setZoom(currentZoom * 1.1f);
 	}
-	if (input->isKeyPressed(DIK_MINUS)) // - key
+	if (input.isKeyPressed(DIK_MINUS)) // - key
 	{
 		float currentZoom = _viewport->getZoom();
 		_viewport->setZoom(currentZoom / 1.1f);
@@ -56,10 +56,12 @@ void PlayScene::update(float dt)
 	_player->update(dt);
 
 	// Simple AABB collision check between player and walls
-	for (auto wall : _walls) {
-		if (aabbOverlap(_player->getBoundingBox(), wall->getBoundingBox())) {
+	for (const auto &wall : _walls)
+	{
+		if (aabbOverlap(_player->getBoundingBox(), wall->getBoundingBox()))
+		{
 			GAMELOG("Collision detected between player and wall at position (%.2f, %.2f)", wall->getPosition().x, wall->getPosition().y);
-			_player->onCollision(wall);
+			_player->onCollision(wall.get());
 		}
 	}
 }
@@ -67,21 +69,21 @@ void PlayScene::update(float dt)
 void PlayScene::draw(LPD3DXSPRITE spriteHandle)
 {
 	// Draw tile map
-	_tileMap->draw(spriteHandle, _viewport);
+	_tileMap->draw(spriteHandle, _viewport.get());
 
 	// Draw player
-	_player->draw(spriteHandle, _viewport);
+	_player->draw(spriteHandle, _viewport.get());
 
 	// Debug drawing
-	auto& debugDraw = DebugDraw::getInstance();
+	auto &debugDraw = DebugDraw::getInstance();
 	if (debugDraw.isEnabled())
 	{
 		// Draw collision boxes with viewport transform
-		debugDraw.DrawCollisionBoxInWorld(_player, _viewport, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f)); // Green for player
-		
-		for (auto wall : _walls)
+		debugDraw.DrawCollisionBoxInWorld(_player.get(), _viewport.get(), D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f)); // Green for player
+
+		for (const auto &wall : _walls)
 		{
-			debugDraw.DrawBBoxInWorld(wall->getBoundingBox(), _viewport, D3DXCOLOR(1.0f, 0.0f, 1.0f, 1.0f)); // Magenta for walls
+			debugDraw.DrawBBoxInWorld(wall->getBoundingBox(), _viewport.get(), D3DXCOLOR(1.0f, 0.0f, 1.0f, 1.0f)); // Magenta for walls
 		}
 
 		// Draw some sample primitives
@@ -91,14 +93,9 @@ void PlayScene::draw(LPD3DXSPRITE spriteHandle)
 
 void PlayScene::release()
 {
-	SAFE_DELETE(_viewport);
-	SAFE_DELETE(_player);
 	_tileMap->release();
 
-	// Clean up test walls
-	for (auto wall : _walls) {
-		SAFE_DELETE(wall);
-	}
+	// Clean up walls
 	_walls.clear();
 }
 

@@ -3,6 +3,7 @@
 #include "Framework/define.h"
 #include "Framework/DebugDraw.h"
 #include "AssetLoader.h"
+#include <memory>
 
 CMegaman::CMegaman(HINSTANCE hInstance, LPCWSTR title) : CGame(hInstance, title, WINDOW_WIDTH, WINDOW_HEIGHT)
 {
@@ -16,7 +17,7 @@ void CMegaman::init()
 {
 	CGame::init();
 	DebugDraw::getInstance().init(_pDeviceManager->getDevice());
-	SceneManager::getInstance().addScene(new PlayScene());
+	SceneManager::getInstance().addScene(std::make_unique<PlayScene>());
 }
 
 void CMegaman::release()
@@ -53,7 +54,7 @@ void CMegaman::draw()
 void CMegaman::loadResource()
 {
 	// Load resource here
-	auto& assetLoader = AssetLoader::GetInstance();
+	auto &assetLoader = AssetLoader::GetInstance();
 	assetLoader.loadResource(_D3DXSprite);
 	assetLoader.loadStage();
 	assetLoader.loadSound(s_hWindows->getWnd());
@@ -62,7 +63,7 @@ void CMegaman::loadResource()
 void CMegaman::updateInput(float deltaTime)
 {
 	// Toggle debug draw with F1
-	if (_pInput->isKeyPressed(DIK_F1))
+	if (_pInput.isKeyPressed(DIK_F1))
 	{
 		DebugDraw::getInstance().toggle();
 	}

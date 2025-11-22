@@ -3,6 +3,7 @@
 
 #include "define.h"
 #include "Viewport.h"
+#include <memory>
 
 class Scene
 {
@@ -16,12 +17,12 @@ public:
 	void virtual draw(LPD3DXSPRITE spriteHandle) = 0;
 	void virtual release() = 0;
 
-	Viewport*  getViewport();
-protected:
-	Viewport* _viewport;
-private:
+	Viewport *getViewport();
 
+protected:
+	std::unique_ptr<Viewport> _viewport;
+
+private:
 };
 
 #endif // !__SCENE_H__
-

@@ -5,7 +5,7 @@
 
 TileSet::TileSet(eID spriteId)
 {
-	Sprite* sp = SpriteManager::getInstance()->getSprite(spriteId);
+	auto sp = SpriteManager::getInstance().getSprite(spriteId);
 	this->_tileImage = sp;
 	this->_heighttile = sp->getFrameHeight();
 	this->_widthtile = sp->getFrameWidth();
@@ -13,9 +13,9 @@ TileSet::TileSet(eID spriteId)
 	_rows = 0;
 }
 
-void TileSet::draw(LPD3DXSPRITE spriteHandle, int id, GVector2 position, Viewport* viewport)
+void TileSet::draw(LPD3DXSPRITE spriteHandle, int id, GVector2 position, Viewport *viewport)
 {
-	for (auto& tile : _listTiles)
+	for (auto &tile : _listTiles)
 	{
 		if (tile->getId() == id)
 		{
@@ -25,7 +25,7 @@ void TileSet::draw(LPD3DXSPRITE spriteHandle, int id, GVector2 position, Viewpor
 	}
 }
 
-void TileSet::loadListTiles(pugi::xml_node& tileset)
+void TileSet::loadListTiles(pugi::xml_node &tileset)
 {
 	auto image = tileset.child("image");
 	auto imageWidth = image.attribute("width").as_int();
@@ -35,12 +35,12 @@ void TileSet::loadListTiles(pugi::xml_node& tileset)
 	auto tileHeight = tileset.attribute("tileheight").as_int();
 	auto tileCount = tileset.attribute("tilecount").as_int();
 
-	Tile* tile = nullptr;
-	RECT srcRECT = { 0, 0, tileWidth, tileHeight };
+	Tile *tile = nullptr;
+	RECT srcRECT = {0, 0, tileWidth, tileHeight};
 
 	while (tileCount--)
 	{
-		this->_listTiles.push_back(std::unique_ptr<Tile>(new Tile(this->_tileImage, srcRECT, firstTileId)));
+		this->_listTiles.push_back(std::unique_ptr<Tile>(new Tile(this->_tileImage.get(), srcRECT, firstTileId)));
 		firstTileId++;
 		if (srcRECT.right + tileWidth > imageWidth)
 		{
@@ -64,8 +64,7 @@ void TileSet::setColor(D3DXCOLOR color)
 	_tileImage->setColor(color);
 }
 
-
-void TileSet::setWidthtile(const int& value)
+void TileSet::setWidthtile(const int &value)
 {
 	this->_widthtile = value;
 }
@@ -75,12 +74,12 @@ int TileSet::getHeighttile() const
 	return this->_heighttile;
 }
 
-void TileSet::setHeighttile(const int& value)
+void TileSet::setHeighttile(const int &value)
 {
 	this->_heighttile = value;
 }
 
-Sprite* TileSet::getSprite()
+Sprite *TileSet::getSprite()
 {
-	return this->_tileImage;
+	return this->_tileImage.get();
 }

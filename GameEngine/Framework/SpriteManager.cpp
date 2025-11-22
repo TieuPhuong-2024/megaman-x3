@@ -3,25 +3,80 @@
 #include <string>
 #include "pugixml.hpp"
 
-SpriteManager* SpriteManager::s_instance = nullptr;
-
-SpriteManager::SpriteManager(void)
+// Thread-safe Singleton implementation
+SpriteManager &SpriteManager::getInstance()
 {
-	// do nothing.
+	static SpriteManager instance;
+	return instance;
 }
 
-SpriteManager::~SpriteManager(void)
+// Constructor is defaulted in header
+
+// Destructor với cleanup tự động
+SpriteManager::~SpriteManager()
 {
-	for (auto spr = _listSprite.begin(); spr != _listSprite.end(); ++spr)
+	clearAllSprites();
+}
+
+// Quản lý Sprite với shared_ptr
+void SpriteManager::addSprite(eID id, std::shared_ptr<Sprite> sprite)
+{
+	if (!sprite)
 	{
-		spr->second->release(); // release image
-		delete spr->second; // delete sprite
+		return; // Không thêm sprite nullptr
 	}
-	if (_listSprite.empty() == false)
-		_listSprite.clear(); // remove all from MAP
+
+	// Kiểm tra sprite cũ
+	auto it = _listSprite.find(id);
+	if (it != _listSprite.end())
+	{
+		// Sprite cũ sẽ tự động bị giải phóng khi shared_ptr mất tham chiếu
+		_listSprite.erase(it);
+	}
+
+	_listSprite[id] = sprite;
 }
 
-Sprite* SpriteManager::loadXMLDoc(LPD3DXSPRITE spritehandle, LPCWSTR path)
+std::shared_ptr<Sprite> SpriteManager::getSprite(eID id) const
+{
+	auto it = _listSprite.find(id);
+	return (it != _listSprite.end()) ? it->second : nullptr;
+}
+
+bool SpriteManager::hasSprite(eID id) const
+{
+	return _listSprite.find(id) != _listSprite.end();
+}
+
+void SpriteManager::removeSprite(eID id, bool releaseTexture)
+{
+	auto it = _listSprite.find(id);
+	if (it != _listSprite.end())
+	{
+		if (releaseTexture && it->second)
+		{
+			it->second->release();
+		}
+		_listSprite.erase(it);
+		// shared_ptr tự động cleanup khi ra khỏi scope
+	}
+}
+
+void SpriteManager::clearAllSprites()
+{
+	// Giải phóng texture trước khi xóa
+	for (auto &pair : _listSprite)
+	{
+		if (pair.second)
+		{
+			pair.second->release();
+		}
+	}
+	_listSprite.clear();
+}
+
+// Load từ file
+std::shared_ptr<Sprite> SpriteManager::loadXMLDoc(LPD3DXSPRITE spritehandle, LPCWSTR path)
 {
 	pugi::xml_document doc;
 	pugi::xml_parse_result result = doc.load_file(path, pugi::parse_default | pugi::parse_pi);
@@ -30,6 +85,7 @@ Sprite* SpriteManager::loadXMLDoc(LPD3DXSPRITE spritehandle, LPCWSTR path)
 		OutputDebugString(L"Cannot loading file");
 		return nullptr;
 	}
+
 	auto tileset_node = doc.child("map").child("tileset");
 	int tilecount = tileset_node.attribute("tilecount").as_int();
 	int columns = tileset_node.attribute("columns").as_int();
@@ -42,77 +98,8 @@ Sprite* SpriteManager::loadXMLDoc(LPD3DXSPRITE spritehandle, LPCWSTR path)
 	strpath = strpath.substr(0, index);
 	strpath += L"/" + L_filename;
 
-	return new Sprite(spritehandle, (LPWSTR) strpath.c_str(), tilecount, columns);
-}
-
-Sprite* SpriteManager::getSprite(eID id)
-{
-	Sprite* it = this->_listSprite.find(id)->second;
-	return new Sprite(*it); // get the copy version of Sprite
-}
-
-RECT SpriteManager::getSourceRect(eID id, std::string name)
-{
-	return _sourceRectList[id][name];
-}
-
-GVector2 SpriteManager::getOrigin(eID id, std::string name)
-{
-	return _originList[id][name];
-}
-
-void SpriteManager::loadSpriteInfo(eID id, const char* fileInfoPath)
-{
-	FILE* file;
-	fopen_s(&file, fileInfoPath, "r");
-
-	if (file)
-	{
-		while (!feof(file))
-		{
-			RECT rect;
-			char name[100];
-			fgets(name, 100, file);
-
-			fscanf_s(file, "%s %d %d %d %d", name, 100, &rect.left, &rect.top, &rect.right, &rect.bottom);
-
-			_sourceRectList[id][std::string(name)] = rect;
-		}
-		fclose(file);
-	}
-}
-
-void SpriteManager::releaseSprite(eID id)
-{
-	Sprite* it = this->_listSprite.find(id)->second;
-	delete it; // delete the sprite only, don't release image
-	this->_listSprite.erase(id); // erase functions only remove the pointer from MAP, don't delete it.
-}
-
-void SpriteManager::releaseTexture(eID id)
-{
-	Sprite* spr = this->_listSprite.find(id)->second;
-	spr->release(); // release image
-	delete spr;
-	this->_listSprite.erase(id); // erase functions only remove the pointer from MAP, don't delete it.
-}
-
-SpriteManager* SpriteManager::getInstance()
-{
-	if (s_instance == nullptr)
-		s_instance = new SpriteManager();
-	return s_instance;
-}
-
-void SpriteManager::release()
-{
-	delete s_instance; // _instance is static attribute, only static function can delete it.
-	s_instance = nullptr;
-}
-
-std::map<eID, Sprite*>* SpriteManager::getListSprite()
-{
-	return &_listSprite;
+	// Tạo shared_ptr cho Sprite mới
+	return std::shared_ptr<Sprite>(new Sprite(spritehandle, (LPWSTR)strpath.c_str(), tilecount, columns));
 }
 
 void SpriteManager::loadXML(eID id, LPCWSTR XMLPath)
@@ -143,4 +130,35 @@ void SpriteManager::loadXML(eID id, LPCWSTR XMLPath)
 		_sourceRectList[id][std::string(nameTile)] = r;
 		_originList[id][std::string(nameTile)] = origin;
 	}
+}
+
+// Sprite metadata
+RECT SpriteManager::getSourceRect(eID id, std::string name) const
+{
+	auto it = _sourceRectList.find(id);
+	if (it != _sourceRectList.end())
+	{
+		auto rectIt = it->second.find(name);
+		if (rectIt != it->second.end())
+		{
+			return rectIt->second;
+		}
+	}
+	// Return empty RECT nếu không tìm thấy
+	return RECT{0, 0, 0, 0};
+}
+
+GVector2 SpriteManager::getOrigin(eID id, std::string name) const
+{
+	auto it = _originList.find(id);
+	if (it != _originList.end())
+	{
+		auto originIt = it->second.find(name);
+		if (originIt != it->second.end())
+		{
+			return originIt->second;
+		}
+	}
+	// Return zero vector nếu không tìm thấy
+	return GVector2(0.0f, 0.0f);
 }

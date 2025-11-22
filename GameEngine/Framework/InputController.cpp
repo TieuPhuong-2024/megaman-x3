@@ -16,38 +16,23 @@ InputController::~InputController()
 		this->_keyboard->Release();
 }
 
-
-InputController* InputController::_instance = nullptr;
-
-InputController* InputController::getInstance()
-{
-	if (_instance == nullptr)
-	{
-		_instance = new InputController();
-	}
-	return _instance;
-}
-
 void InputController::release()
 {
-	delete _instance;
-	_instance = nullptr;
 }
 
 bool InputController::init(HWND hWnd, HINSTANCE hInstance)
 {
 	this->_hWnd = hWnd;
-	HRESULT rs
-		= DirectInput8Create(
-			hInstance,
-			DIRECTINPUT_VERSION,
-			IID_IDirectInput8,
-			reinterpret_cast<void**>(&_input),
-			nullptr);
+	HRESULT rs = DirectInput8Create(
+		hInstance,
+		DIRECTINPUT_VERSION,
+		IID_IDirectInput8,
+		reinterpret_cast<void **>(&_input),
+		nullptr);
 	if (rs != DI_OK)
 		return false;
 
-	rs = _input->CreateDevice(GUID_SysKeyboard, reinterpret_cast<LPDIRECTINPUTDEVICEW*>(&_keyboard), nullptr);
+	rs = _input->CreateDevice(GUID_SysKeyboard, reinterpret_cast<LPDIRECTINPUTDEVICEW *>(&_keyboard), nullptr);
 	if (rs != DI_OK)
 		return false;
 
@@ -102,13 +87,13 @@ void InputController::update()
 		int keyState = _keyEvents[i].dwData;
 		if ((keyState & 0x80) > 0)
 		{
-			KeyEventArg* arg = new KeyEventArg(keycode);
+			KeyEventArg *arg = new KeyEventArg(keycode);
 			NotifyKeyPress(arg);
 			delete arg;
 		}
 		else
 		{
-			KeyEventArg* arg = new KeyEventArg(keycode);
+			KeyEventArg *arg = new KeyEventArg(keycode);
 			NotifyKeyRelease(arg);
 			delete arg;
 		}
@@ -137,14 +122,14 @@ bool InputController::isKeyRelease(int keycode)
 	return !isKeyDown(keycode) && (_previousKeyBuffer[keycode]);
 }
 
-void InputController::Attach(IObserver* observer)
+void InputController::Attach(IObserver *observer)
 {
 	auto it = std::find(_observers.begin(), _observers.end(), observer);
 	if (it == _observers.end())
 		_observers.push_back(observer);
 }
 
-void InputController::Detach(IObserver* observer)
+void InputController::Detach(IObserver *observer)
 {
 	// Remove observer
 	auto it = std::find(_observers.begin(), _observers.end(), observer);
@@ -153,7 +138,7 @@ void InputController::Detach(IObserver* observer)
 	_observers.erase(it);
 }
 
-void InputController::NotifyKeyPress(KeyEventArg* e)
+void InputController::NotifyKeyPress(KeyEventArg *e)
 {
 	for (auto ob : _observers)
 	{
@@ -161,11 +146,11 @@ void InputController::NotifyKeyPress(KeyEventArg* e)
 	}
 }
 
-void InputController::NotifyKeyRelease(KeyEventArg* e)
+void InputController::NotifyKeyRelease(KeyEventArg *e)
 {
 	for (auto ob : _observers)
 	{
-		auto keyRelease = (IObserverKeyUp*)ob;
+		auto keyRelease = (IObserverKeyUp *)ob;
 		keyRelease->eventKeyUp(e);
 	}
 }

@@ -1,7 +1,7 @@
 ﻿#include "Animation.h"
 #include "../trace.h"
 
-Animation::Animation(Sprite* spriteSheet, float timeAnimate, bool loop)
+Animation::Animation(Sprite *spriteSheet, float timeAnimate, bool loop)
 {
 	_spriteSheet = spriteSheet;
 	_timeAnimate = timeAnimate;
@@ -144,10 +144,10 @@ void Animation::addFrameRect(RECT rect)
 	_endFrame = _totalFrames - 1;
 }
 
-void Animation::addFrameRect(eID id, const char* firstRectName, ...)
+void Animation::addFrameRect(eID id, const char *firstRectName, ...)
 {
 	va_list vl;
-	const char* name;
+	const char *name;
 
 	va_start(vl, firstRectName);
 
@@ -155,9 +155,9 @@ void Animation::addFrameRect(eID id, const char* firstRectName, ...)
 
 	while (name != NULL)
 	{
-		this->addFrameRect(SpriteManager::getInstance()->getSourceRect(id, name));
-		this->addFrameOrigin(SpriteManager::getInstance()->getOrigin(id, name));
-		name = va_arg(vl, const char*);
+		this->addFrameRect(SpriteManager::getInstance().getSourceRect(id, name));
+		this->addFrameOrigin(SpriteManager::getInstance().getOrigin(id, name));
+		name = va_arg(vl, const char *);
 	}
 
 	va_end(vl);
@@ -238,10 +238,9 @@ D3DXCOLOR Animation::getColorFlash()
 	return _flashColor;
 }
 
-void Animation::draw(LPD3DXSPRITE spriteHandle, Viewport* viewport)
+void Animation::draw(LPD3DXSPRITE spriteHandle, Viewport *viewport)
 {
 	_spriteSheet->setFrameRect(_currentRect);
 	_spriteSheet->setOrigin(_currentOrigin);
 	_spriteSheet->render(spriteHandle, viewport);
 }
-

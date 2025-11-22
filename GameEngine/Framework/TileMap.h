@@ -9,11 +9,10 @@ using namespace std;
 class TileMap
 {
 public:
-
-	void draw(LPD3DXSPRITE, Viewport*);
+	void draw(LPD3DXSPRITE, Viewport *);
 	void release();
 
-	static TileMap* LoadFromFile(const string& path, eID spriteId);
+	static TileMap *LoadFromFile(const string &path, eID spriteId);
 
 	GVector2 getWorldSize();
 
@@ -27,10 +26,9 @@ public:
 
 	void setColor(D3DXCOLOR color);
 
-	vector<CWall*> GetWalls() { auto res = _walls; _walls.clear(); return res; }
+	std::vector<std::unique_ptr<CWall>> GetWalls() { return std::move(_walls); }
 
 private:
-
 	int _frameWidth;
 	int _frameHeight;
 
@@ -43,10 +41,10 @@ private:
 
 	unique_ptr<TileSet> _tileSet;
 
-	vector<CWall*> _walls;
+	std::vector<std::unique_ptr<CWall>> _walls;
 
-	void getElementMatrixIndex(xml_node& node);
-	void loadWalls(xml_node& mapNode);
+	void getElementMatrixIndex(xml_node &node);
+	void loadWalls(xml_node &mapNode);
 };
 
 #endif // !__MAP_H__
