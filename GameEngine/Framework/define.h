@@ -110,5 +110,13 @@ if(p) \
 
 #endif // !SAFE_DELETE
 
+// Simple AABB collision check
+inline bool aabbOverlap(const RECT& a, const RECT& b)
+{
+    return (a.left < b.right &&
+			a.right > b.left &&
+			a.top > b.bottom &&
+			a.bottom < b.top);
+}
 
 #endif // !__GAMEUIT_FRAMEWORK__

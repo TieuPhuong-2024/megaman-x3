@@ -2,6 +2,7 @@
 #include "../Framework/StageManager.h"
 #include "../Framework/CollisionManager.h"
 #include "../Framework/DebugDraw.h"
+#include "../Framework/define.h"
 #include "../Object/CWall.h"
 #include "../trace.h"
 
@@ -17,20 +18,12 @@ bool PlayScene::init()
 {
 	_viewport = new Viewport(0, WINDOW_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT);
 	_player = new CPlayer;
-	_player->setPosition(GVector2(100.f, 50.f));
+	_player->setPosition(GVector2(100.f, 200.f));
 	_player->setScale(2.0f);
 	_tileMap = StageManager::getInstance()->getTileMap(eID::MAP_STAGE_MEGAMAN);
 
-	// Add to collision manager
-	CollisionManager::getInstance()->addObject(_player);
-
 	// Add walls from tilemap
 	_walls = _tileMap->GetWalls();
-
-	// Add walls to collision manager
-	for (auto wall : _walls) {
-		CollisionManager::getInstance()->addObject(wall);
-	}
 
 	return true;
 }
@@ -62,8 +55,13 @@ void PlayScene::update(float dt)
 	// Update player
 	_player->update(dt);
 
-	// Update collisions
-	CollisionManager::getInstance()->update();
+	// Simple AABB collision check between player and walls
+	for (auto wall : _walls) {
+		if (aabbOverlap(_player->getBoundingBox(), wall->getBoundingBox())) {
+			GAMELOG("Collision detected between player and wall at position (%.2f, %.2f)", wall->getPosition().x, wall->getPosition().y);
+			_player->onCollision(wall);
+		}
+	}
 }
 
 void PlayScene::draw(LPD3DXSPRITE spriteHandle)

@@ -7,6 +7,7 @@
 #include "../States/Jumping.h"
 #include "CWall.h"
 #include "../Framework/CollisionManager.h"
+#include <algorithm>
 
 CPlayer::CPlayer()
 {
@@ -17,10 +18,10 @@ CPlayer::CPlayer()
 	_sprite->setFrameRect(SpriteManager::getInstance()->getSourceRect(eID::XMAN, "stand_1"));
 	_sprite->setZIndex(1.0f);
 
-	Movement* movement = new Movement(VECTOR2ZERO, VECTOR2ZERO, _sprite);
+	Movement *movement = new Movement(VECTOR2ZERO, VECTOR2ZERO, _sprite);
 	_component.insert(make_pair("Movement", movement));
 
-	Gravity* gravity = new Gravity(VECTOR2ZERO, movement);
+	Gravity *gravity = new Gravity(VECTOR2ZERO, movement);
 	_component.insert(make_pair("Gravity", gravity));
 
 	_spriteAnimation[eStatus::STAND] = new Animation(_sprite, 0.15f);
@@ -29,19 +30,17 @@ CPlayer::CPlayer()
 	_spriteAnimation[eStatus::STAND_SHOOT] = new Animation(_sprite, 0.15f);
 	_spriteAnimation[eStatus::STAND_SHOOT]->addFrameRect(eID::XMAN, "StandingShoot_1", "StandingShoot_2", NULL);
 
-
 	_spriteAnimation[eStatus::RUN] = new Animation(_sprite, 0.05f);
 	_spriteAnimation[eStatus::RUN]->addFrameRect(eID::XMAN, "StartRunning_1", "StartRunning_2",
-	                                             "running_1", "running_2", "running_3", "running_4", "running_5",
-	                                             "running_6", "running_7", "running_8", "running_9", NULL);
+												 "running_1", "running_2", "running_3", "running_4", "running_5",
+												 "running_6", "running_7", "running_8", "running_9", NULL);
 	_spriteAnimation[eStatus::RUN]->animateFromTo(3, 10);
 
 	_spriteAnimation[eStatus::RUN_SHOOT] = new Animation(_sprite, 0.05f);
 	_spriteAnimation[eStatus::RUN_SHOOT]->addFrameRect(eID::XMAN,
-	                                                   "RunningShoot_1", "RunningShoot_2", "RunningShoot_3",
-	                                                   "RunningShoot_4", "RunningShoot_5", "RunningShoot_6",
-	                                                   "RunningShoot_7", "RunningShoot_8", "RunningShoot_9", NULL);
-
+													   "RunningShoot_1", "RunningShoot_2", "RunningShoot_3",
+													   "RunningShoot_4", "RunningShoot_5", "RunningShoot_6",
+													   "RunningShoot_7", "RunningShoot_8", "RunningShoot_9", NULL);
 
 	_spriteAnimation[eStatus::JUMP] = new Animation(_sprite, 0.1f);
 	_spriteAnimation[eStatus::JUMP]->setLoop(false);
@@ -50,8 +49,7 @@ CPlayer::CPlayer()
 	_spriteAnimation[eStatus::JUMP_SHOOT] = new Animation(_sprite, 0.1f);
 	_spriteAnimation[eStatus::JUMP_SHOOT]->setLoop(false);
 	_spriteAnimation[eStatus::JUMP_SHOOT]->addFrameRect(eID::XMAN, "JumpingShoot_1", "JumpingShoot_2", "JumpingShoot_3",
-	                                                    NULL);
-
+														NULL);
 
 	_spriteAnimation[eStatus::FALL] = new Animation(_sprite, 0.1f);
 	_spriteAnimation[eStatus::FALL]->setLoop(false);
@@ -60,7 +58,7 @@ CPlayer::CPlayer()
 	_spriteAnimation[eStatus::FALL_SHOOT] = new Animation(_sprite, 0.1f);
 	_spriteAnimation[eStatus::FALL_SHOOT]->setLoop(false);
 	_spriteAnimation[eStatus::FALL_SHOOT]->addFrameRect(eID::XMAN, "FallingShoot_1", "FallingShoot_2", "FallingShoot_3",
-	                                                    "FallingShoot_4", NULL);
+														"FallingShoot_4", NULL);
 
 	_spriteAnimation[eStatus::DASH] = new Animation(_sprite, 0.1f);
 	_spriteAnimation[eStatus::DASH]->setLoop(false);
@@ -117,13 +115,13 @@ CPlayer::~CPlayer()
 	SAFE_DELETE(_sprite);
 
 	/* Delete sprite animation */
-	for (auto & it : _spriteAnimation)
+	for (auto &it : _spriteAnimation)
 	{
 		delete it.second;
 	}
 
 	/* Delete component */
-	for (auto & it : _component)
+	for (auto &it : _component)
 	{
 		delete it.second;
 	}
@@ -131,14 +129,13 @@ CPlayer::~CPlayer()
 	/* Delete the state of player */
 	SAFE_DELETE(_playerState);
 
-
-		_input->Detach(this);
+	_input->Detach(this);
 }
 
 void CPlayer::update(float deltaTime)
 {
 	/* Update component */
-	for (auto & it : _component)
+	for (auto &it : _component)
 	{
 		it.second->update(deltaTime);
 	}
@@ -202,7 +199,7 @@ void CPlayer::updateInput(float deltaTime)
 	_playerState->updateInput(deltaTime);
 }
 
-void CPlayer::draw(ID3DXSprite* spriteHandler, Viewport* viewport)
+void CPlayer::draw(ID3DXSprite *spriteHandler, Viewport *viewport)
 {
 	// Flip sprite to coordinate-x
 	_sprite->setFlipX(_isFlipX);
@@ -210,7 +207,7 @@ void CPlayer::draw(ID3DXSprite* spriteHandler, Viewport* viewport)
 	_spriteAnimation[_currentIndexState]->draw(spriteHandler, viewport);
 }
 
-void CPlayer::setState(PlayerState* newState)
+void CPlayer::setState(PlayerState *newState)
 {
 	// Delete previous state
 	SAFE_DELETE(_playerState);
@@ -222,7 +219,6 @@ void CPlayer::setState(PlayerState* newState)
 	// Restart animation
 	setState(_currentIndexState);
 }
-
 
 void CPlayer::setState(eStatus status)
 {
@@ -239,8 +235,7 @@ void CPlayer::setState(eStatus status)
 	_spriteAnimation[status]->restart(index);
 }
 
-
-void CPlayer::eventKeyUp(KeyEventArg* e)
+void CPlayer::eventKeyUp(KeyEventArg *e)
 {
 	if ((_isJumping) && (e->_key == DIK_X))
 	{
@@ -254,7 +249,7 @@ void CPlayer::eventKeyUp(KeyEventArg* e)
 	}
 }
 
-void CPlayer::eventKeyDown(KeyEventArg* e)
+void CPlayer::eventKeyDown(KeyEventArg *e)
 {
 	// Handle jump (DIK_X) with buffering and coyote time:
 	if (e->_key == DIK_X)
@@ -302,17 +297,16 @@ void CPlayer::eventKeyDown(KeyEventArg* e)
 	}
 
 	// (Thêm / chèn vào trong CPlayer::eventKeyDown)
-    if ((e->_key == DIK_V))
-    {
-        if ((_currentIndexState == eStatus::STAND) ||
-            (_currentIndexState == eStatus::RUN) ||
-            (_currentIndexState == eStatus::STAND_SHOOT) ||
-            (_currentIndexState == eStatus::RUN_SHOOT))
-        {
-            this->setState(new Kicking(this));
-        }
-    }
-
+	if ((e->_key == DIK_V))
+	{
+		if ((_currentIndexState == eStatus::STAND) ||
+			(_currentIndexState == eStatus::RUN) ||
+			(_currentIndexState == eStatus::STAND_SHOOT) ||
+			(_currentIndexState == eStatus::RUN_SHOOT))
+		{
+			this->setState(new Kicking(this));
+		}
+	}
 }
 
 void CPlayer::setPosition(GVector2 position)
@@ -330,7 +324,7 @@ void CPlayer::setScale(float scale)
 	_sprite->setScale(scale);
 }
 
-IComponent* CPlayer::getComponent(string name)
+IComponent *CPlayer::getComponent(string name)
 {
 	return _component[name];
 }
@@ -360,42 +354,83 @@ eMoveDirection CPlayer::getMoveDirection()
 RECT CPlayer::getBoundingBox() const
 {
 	// Use sprite's bounding box which accounts for scale, rotation, and origin
-	return const_cast<CPlayer*>(this)->_sprite->getBounding();
+	return _sprite->getBounding();
 }
 
-void CPlayer::onCollision(ICollidable* other)
+void CPlayer::onCollision(ICollidable *other)
 {
 	// Handle collision with wall or other
-	// For now, stop movement if colliding with wall
 	// Assume other is CWall
-	if (dynamic_cast<CWall*>(other))
+	if (dynamic_cast<CWall *>(other))
 	{
-		// Stop velocity
-		setVelocity(VECTOR2ZERO);
-		// Or adjust position to not overlap
+		// Get bounding boxes
+		RECT playerBox = getBoundingBox();
+		RECT wallBox = other->getBoundingBox();
+
+		// Calculate overlaps
+		float overlapX = min(playerBox.right - wallBox.left, wallBox.right - playerBox.left);
+		float overlapY = min(playerBox.top - wallBox.bottom, wallBox.top - playerBox.bottom);
+		GAMELOG("[Colliding] Overlap X: %.2f, Overlap Y: %.2f", overlapX, overlapY);
+
+		// Adjust position to resolve overlap
+		GVector2 pos = getPosition();
+		if (overlapX < overlapY)
+		{
+			// Push horizontally to resolve overlap
+			if (playerBox.left < wallBox.left)
+			{
+				GAMELOG("[Colliding] Pushing player left by %.2f", overlapX);
+				pos.x -= overlapX; // Push left
+			}
+			else
+			{
+				GAMELOG("[Colliding] Pushing player right by %.2f", overlapX);
+				pos.x += overlapX; // Push right
+			}
+			// Stop horizontal velocity
+			setVelocity(GVector2(0, getVelocity().y));
+			this->setState(new Standing(this));
+		}
+		else
+		{
+			// Push vertically to resolve overlap
+			if (playerBox.top < wallBox.top)
+			{
+				GAMELOG("[Colliding] Pushing player up by %.2f", overlapY);
+				pos.y -= overlapY; // Push up
+			}
+			else
+			{
+				GAMELOG("[Colliding] Pushing player down by %.2f", overlapY);
+				pos.y += overlapY; // Push down
+			}
+			// Stop vertical velocity
+			setVelocity(GVector2(getVelocity().x, 0));
+		}
+		setPosition(pos);
 	}
 }
 
 GVector2 CPlayer::getVelocity()
 {
-	Movement* movement = static_cast<Movement*>(getComponent("Movement"));
+	Movement *movement = static_cast<Movement *>(getComponent("Movement"));
 	return movement ? movement->getVelocity() : VECTOR2ZERO;
 }
 
 void CPlayer::setVelocity(GVector2 vel)
 {
-	Movement* movement = static_cast<Movement*>(getComponent("Movement"));
+	Movement *movement = static_cast<Movement *>(getComponent("Movement"));
 	if (movement)
 	{
 		movement->setVelocity(vel);
 	}
 }
 
-void CPlayer::OnCollisionWith(CCollisionEvent* e)
+void CPlayer::OnCollisionWith(CCollisionEvent *e)
 {
 	// Handle collision event
 	// For example, if colliding with wall
-	if (dynamic_cast<CWall*>(e->obj))
+	if (dynamic_cast<CWall *>(e->obj))
 	{
 		// Adjust position based on nx, ny
 		GVector2 pos = getPosition();
@@ -403,12 +438,14 @@ void CPlayer::OnCollisionWith(CCollisionEvent* e)
 		pos.y += e->ny * 0.01f;
 		setPosition(pos);
 		// Stop velocity if blocking
-		if (e->nx != 0) setVelocity(GVector2(0, getVelocity().y));
-		if (e->ny != 0) setVelocity(GVector2(getVelocity().x, 0));
+		if (e->nx != 0)
+			setVelocity(GVector2(0, getVelocity().y));
+		if (e->ny != 0)
+			setVelocity(GVector2(getVelocity().x, 0));
 	}
 }
 
-void CPlayer::GetSpeed(float& vx, float& vy)
+void CPlayer::GetSpeed(float &vx, float &vy)
 {
 	GVector2 vel = getVelocity();
 	vx = vel.x;

@@ -29,33 +29,6 @@ public:
 	void eventKeyUp(KeyEventArg* e) override;
 	void eventKeyDown(KeyEventArg* e) override;
 
-	void setInputController(InputController* input);
-	InputController* getInputController();
-
-	// Jump-related public API (exposed for states and other systems)
-	// Attempt to perform a jump (honors jump buffer, coyote time, and remaining jumps).
-	void tryJump();
-
-	// Query whether the player is currently allowed to jump (checks remaining jumps or coyote).
-	bool canJump() const;
-
-	// Called by collision/physics when player becomes grounded to reset jump counts and clear timers.
-	void notifyGrounded();
-
-	// Called by collision/physics when player leaves the ground (starts coyote timer).
-	void notifyLeftGround();
-
-	// Configuration accessors for tuning jump behavior at runtime
-	void setMaxJumps(int maxJumps);
-	int getMaxJumps() const;
-	int getRemainingJumps() const;
-
-	void setJumpBufferTime(float seconds);
-	float getJumpBufferTime() const;
-
-	void setCoyoteTime(float seconds);
-	float getCoyoteTime() const;
-
 private:
 	Sprite*						_sprite;
 	map<eStatus, Animation*>	_spriteAnimation;
