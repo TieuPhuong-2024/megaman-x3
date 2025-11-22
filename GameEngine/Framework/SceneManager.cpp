@@ -1,25 +1,5 @@
 #include "SceneManager.h"
 
-SceneManager* SceneManager::_instance = nullptr;
-
-SceneManager::~SceneManager()
-{
-}
-
-SceneManager::SceneManager()
-{
-}
-
-SceneManager* SceneManager::getInstance()
-{
-	if (_instance == nullptr)
-	{
-		_instance = new SceneManager();
-	}
-
-	return _instance;
-}
-
 bool SceneManager::init()
 {
 	if (!_scenes.empty())

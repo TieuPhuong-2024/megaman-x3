@@ -15,22 +15,22 @@ CMegaman::~CMegaman()
 void CMegaman::init()
 {
 	CGame::init();
-	DebugDraw::getInstance()->init(_pDeviceManager->getDevice());
-	SceneManager::getInstance()->addScene(new PlayScene());
+	DebugDraw::getInstance().init(_pDeviceManager->getDevice());
+	SceneManager::getInstance().addScene(new PlayScene());
 }
 
 void CMegaman::release()
 {
 	CGame::release();
 	DebugDraw::release();
-	SceneManager::getInstance()->getCurrentScene()->release();
-	SceneManager::getInstance()->clearScenes();
+	SceneManager::getInstance().getCurrentScene()->release();
+	SceneManager::getInstance().clearScenes();
 }
 
 void CMegaman::update(float deltaTime)
 {
 	// Update player
-	SceneManager::getInstance()->getCurrentScene()->update(deltaTime);
+	SceneManager::getInstance().getCurrentScene()->update(deltaTime);
 }
 
 void CMegaman::draw()
@@ -39,23 +39,24 @@ void CMegaman::draw()
 	_D3DXSprite->Begin(D3DXSPRITE_ALPHABLEND);
 
 	// Draw scene
-	SceneManager::getInstance()->getCurrentScene()->draw(_D3DXSprite);
+	SceneManager::getInstance().getCurrentScene()->draw(_D3DXSprite);
 
 	// End drawing
 	_D3DXSprite->End();
 
 	// Debug drawing
-	DebugDraw::getInstance()->begin();
+	DebugDraw::getInstance().begin();
 	// Add debug draw calls here if needed
-	DebugDraw::getInstance()->end();
+	DebugDraw::getInstance().end();
 }
 
 void CMegaman::loadResource()
 {
 	// Load resource here
-	AssetLoader::GetInstance()->loadResource(_D3DXSprite);
-	AssetLoader::GetInstance()->loadStage();
-	AssetLoader::GetInstance()->loadSound(s_hWindows->getWnd());
+	auto& assetLoader = AssetLoader::GetInstance();
+	assetLoader.loadResource(_D3DXSprite);
+	assetLoader.loadStage();
+	assetLoader.loadSound(s_hWindows->getWnd());
 }
 
 void CMegaman::updateInput(float deltaTime)
@@ -63,9 +64,9 @@ void CMegaman::updateInput(float deltaTime)
 	// Toggle debug draw with F1
 	if (_pInput->isKeyPressed(DIK_F1))
 	{
-		DebugDraw::getInstance()->toggle();
+		DebugDraw::getInstance().toggle();
 	}
 
 	// Update input for current scene
-	SceneManager::getInstance()->getCurrentScene()->updateInput(deltaTime);
+	SceneManager::getInstance().getCurrentScene()->updateInput(deltaTime);
 }

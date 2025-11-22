@@ -1,44 +1,32 @@
 #include "StageManager.h"
 
-StageManager* StageManager::_instance = nullptr;
-TileMap* StageManager::_tileMap = nullptr;
-
-StageManager::StageManager(void)
-{
-}
-
-StageManager::~StageManager(void)
-{
-}
-
-StageManager* StageManager::getInstance()
-{
-	if (_instance == nullptr)
-		_instance = new StageManager();
-	return _instance;
-}
-
-//list<BaseObject*>* StageManager::getListObject(eID id)
-//{
-//	return GetListObjectFromFile(_resourcePath[id]);
-//}
-
-map<eID, string>* StageManager::getListStage()
-{
-	return &_resourcePath;
-}
-
 TileMap* StageManager::getTileMap(eID id)
 {
-	_tileMap = TileMap::LoadFromFile(_resourcePath[id], id);
-	return _tileMap;
+	// Check if the TileMap is already loaded
+    auto it = _tileMaps.find(id);
+    if (it != _tileMaps.end()) {
+        return it->second.get();
+    }
+    
+    // Load the TileMap if not found
+    auto tileMap = unique_ptr<TileMap>(TileMap::LoadFromFile(_resourcePath[id], id));
+    TileMap* result = tileMap.get();
+    _tileMaps[id] = std::move(tileMap);
+    return result;
 }
 
-void StageManager::release()
+void StageManager::addStage(eID id, const string &path)
 {
+	_resourcePath.insert(make_pair(id, path));
 }
 
-TileMap* StageManager::getCurrentTileMap()
+std::string StageManager::getStagePath(eID id)
 {
-	return  _tileMap;
+    auto it = _resourcePath.find(id);
+    return (it != _resourcePath.end()) ? it->second : "";
+}
+
+void StageManager::clearCache()
+{
+	_tileMaps.clear();
 }

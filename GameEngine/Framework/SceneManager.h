@@ -9,8 +9,11 @@
 class SceneManager
 {
 public:
-	~SceneManager();
-	static SceneManager* getInstance();
+	~SceneManager() = default;
+	static SceneManager& getInstance() {
+		static SceneManager instance;
+		return instance;
+	}
 
 	bool init();
 	void updateInput(float dt);
@@ -25,8 +28,9 @@ public:
 	Scene* getCurrentScene();
 
 private:
-	SceneManager();
-	static SceneManager* _instance;
+	SceneManager() = default;
+	SceneManager(const SceneManager&) = delete;
+	void operator=(const SceneManager&) = delete;
 
 	std::vector<Scene*> _scenes;
 };

@@ -2,16 +2,6 @@
 #include "Framework/SpriteManager.h"
 #include "Framework/StageManager.h"
 
-AssetLoader* AssetLoader::_instance = nullptr;
-
-AssetLoader* AssetLoader::GetInstance()
-{
-	if (_instance == nullptr) {
-		_instance = new AssetLoader();
-	}
-	return _instance;
-}
-
 void AssetLoader::loadResource(ID3DXSprite* sprite)
 {
 	SpriteManager* spriteManager = SpriteManager::getInstance();
@@ -34,6 +24,6 @@ void AssetLoader::loadSound(HWND hWnd)
 
 void AssetLoader::loadStage()
 {
-	StageManager* stage = StageManager::getInstance();
-	stage->getListStage()->insert(make_pair(eID::MAP_STAGE_MEGAMAN, "Resource/MAP_1.tmx"));
+	StageManager& stage = StageManager::getInstance();
+	stage.addStage(eID::MAP_STAGE_MEGAMAN, "Resource/MAP_1.tmx");
 }

@@ -6,32 +6,29 @@
 #include "define.h"
 #include "Sprite.h"
 #include "TileMap.h"
+#include <memory>
+#include <string>
 
 class StageManager
 {
 public:
-	static StageManager* getInstance();
-
-	static void release();
+	~StageManager() = default;
+	static StageManager& getInstance()
+	{
+		static StageManager instance;
+		return instance;
+	}
 
 	TileMap* getTileMap(eID id);
+	void addStage(eID id, const string& path);
+	std::string getStagePath(eID id);
 
-	static TileMap* getCurrentTileMap();
-
-	//list<BaseObject*>* getListObject(eID id);
-
-	map<eID, string>* getListStage();
-
-	~StageManager(void);
+    void clearCache();
 
 private:
-	StageManager(void);
-	
-	static StageManager* _instance;
-	static TileMap* _tileMap;
-
-	map<eID, string> _resourcePath;
-
+	StageManager() = default;
+	std::map<eID, std::unique_ptr<TileMap>> _tileMaps;
+	std::map<eID, string> _resourcePath;
 };
 
 

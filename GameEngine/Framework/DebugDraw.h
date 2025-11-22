@@ -3,12 +3,15 @@
 
 #include "define.h"
 #include <string>
-#include <vector>
+#include <memory>
 
 class DebugDraw
 {
 public:
-    static DebugDraw* getInstance();
+    static DebugDraw& getInstance() {
+        static DebugDraw instance;
+        return instance;
+    }
     static void release();
 
     void init(LPDIRECT3DDEVICE9 device);
@@ -38,8 +41,9 @@ public:
 private:
     DebugDraw();
     ~DebugDraw();
+    DebugDraw(const DebugDraw&) = delete;
+	void operator=(const DebugDraw&) = delete;
 
-    static DebugDraw* _instance;
     LPDIRECT3DDEVICE9 _device;
     ID3DXLine* _line;
     ID3DXFont* _font;

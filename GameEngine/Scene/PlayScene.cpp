@@ -20,7 +20,7 @@ bool PlayScene::init()
 	_player = new CPlayer;
 	_player->setPosition(GVector2(100.f, 200.f));
 	_player->setScale(2.0f);
-	_tileMap = StageManager::getInstance()->getTileMap(eID::MAP_STAGE_MEGAMAN);
+	_tileMap = StageManager::getInstance().getTileMap(eID::MAP_STAGE_MEGAMAN);
 
 	// Add walls from tilemap
 	_walls = _tileMap->GetWalls();
@@ -73,19 +73,19 @@ void PlayScene::draw(LPD3DXSPRITE spriteHandle)
 	_player->draw(spriteHandle, _viewport);
 
 	// Debug drawing
-	DebugDraw* debugDraw = DebugDraw::getInstance();
-	if (debugDraw->isEnabled())
+	auto& debugDraw = DebugDraw::getInstance();
+	if (debugDraw.isEnabled())
 	{
 		// Draw collision boxes with viewport transform
-		debugDraw->DrawCollisionBoxInWorld(_player, _viewport, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f)); // Green for player
+		debugDraw.DrawCollisionBoxInWorld(_player, _viewport, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f)); // Green for player
 		
 		for (auto wall : _walls)
 		{
-			debugDraw->DrawBBoxInWorld(wall->getBoundingBox(), _viewport, D3DXCOLOR(1.0f, 0.0f, 1.0f, 1.0f)); // Magenta for walls
+			debugDraw.DrawBBoxInWorld(wall->getBoundingBox(), _viewport, D3DXCOLOR(1.0f, 0.0f, 1.0f, 1.0f)); // Magenta for walls
 		}
 
 		// Draw some sample primitives
-		debugDraw->drawText("Debug Mode: ON (F1 to toggle)", GVector2(10, 10), D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f));
+		debugDraw.drawText("Debug Mode: ON (F1 to toggle)", GVector2(10, 10), D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f));
 	}
 }
 
@@ -94,7 +94,6 @@ void PlayScene::release()
 	SAFE_DELETE(_viewport);
 	SAFE_DELETE(_player);
 	_tileMap->release();
-	SAFE_DELETE(_tileMap);
 
 	// Clean up test walls
 	for (auto wall : _walls) {

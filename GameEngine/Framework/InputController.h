@@ -5,7 +5,6 @@
 
 #include "define.h"
 #include "Graphics.h"
-#include "Event.h"
 #include <vector>
 #include <list>
 

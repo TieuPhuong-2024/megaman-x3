@@ -6,8 +6,6 @@
 // Only compile in debug builds
 #ifdef _DEBUG
 
-DebugDraw* DebugDraw::_instance = nullptr;
-
 DebugDraw::DebugDraw()
     : _device(nullptr), _line(nullptr), _font(nullptr), _enabled(true), _vertexBuffer(nullptr)
 {
@@ -20,18 +18,8 @@ DebugDraw::~DebugDraw()
     if (_vertexBuffer) _vertexBuffer->Release();
 }
 
-DebugDraw* DebugDraw::getInstance()
-{
-    if (_instance == nullptr)
-    {
-        _instance = new DebugDraw();
-    }
-    return _instance;
-}
-
 void DebugDraw::release()
 {
-    SAFE_DELETE(_instance);
 }
 
 void DebugDraw::init(LPDIRECT3DDEVICE9 device)
