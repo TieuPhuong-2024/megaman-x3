@@ -154,7 +154,6 @@
     <ClCompile Include="Framework\Animation.cpp" />
     <ClCompile Include="Framework\DeviceManager.cpp" />
     <ClCompile Include="Framework\dxaudio.cpp" />
-    <ClCompile Include="Framework\Event.cpp" />
     <ClCompile Include="Framework\GameTime.cpp" />
     <ClCompile Include="Framework\Graphics.cpp" />
     <ClCompile Include="Framework\IComponent.cpp" />
@@ -200,7 +199,6 @@
     <ClInclude Include="Framework\Animation.h" />
     <ClInclude Include="Framework\DeviceManager.h" />
     <ClInclude Include="Framework\dxaudio.h" />
-    <ClInclude Include="Framework\Event.h" />
     <ClInclude Include="Framework\GameTime.h" />
     <ClInclude Include="Framework\Graphics.h" />
     <ClInclude Include="Framework\IComponent.h" />
