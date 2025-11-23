@@ -33,7 +33,7 @@ protected:
 	DeviceManager *_pDeviceManager;
 	GameTime *_pGameTime;
 	ID3DXSprite *_D3DXSprite;
-	InputController _pInput;
+	InputController &_pInput;
 	static std::unique_ptr<Graphics> s_hWindows;
 
 	static bool s_bIsExited;

@@ -3,7 +3,8 @@
 
 QuadtreeNode::QuadtreeNode(RECT b, int maxObj) : bounds(b), isLeaf(true), maxObjects(maxObj)
 {
-    for (int i = 0; i < 4; ++i) children[i] = nullptr;
+    for (int i = 0; i < 4; ++i)
+        children[i] = nullptr;
 }
 
 QuadtreeNode::~QuadtreeNode()
@@ -13,15 +14,16 @@ QuadtreeNode::~QuadtreeNode()
 
 void QuadtreeNode::subdivide()
 {
-    if (!isLeaf) return;
+    if (!isLeaf)
+        return;
 
     int midX = (bounds.left + bounds.right) / 2;
     int midY = (bounds.top + bounds.bottom) / 2;
 
-    RECT nw = { bounds.left, bounds.top, midX, midY };
-    RECT ne = { midX, bounds.top, bounds.right, midY };
-    RECT sw = { bounds.left, midY, midX, bounds.bottom };
-    RECT se = { midX, midY, bounds.right, bounds.bottom };
+    RECT nw = {bounds.left, bounds.top, midX, midY};
+    RECT ne = {midX, bounds.top, bounds.right, midY};
+    RECT sw = {bounds.left, midY, midX, bounds.bottom};
+    RECT se = {midX, midY, bounds.right, bounds.bottom};
 
     children[0] = new QuadtreeNode(nw, maxObjects);
     children[1] = new QuadtreeNode(ne, maxObjects);
@@ -31,12 +33,13 @@ void QuadtreeNode::subdivide()
     isLeaf = false;
 }
 
-void QuadtreeNode::insert(ICollidable* obj)
+void QuadtreeNode::insert(ICollidable *obj)
 {
     RECT bbox = obj->getBoundingBox();
 
     // Handle edge cases: invalid bbox
-    if (bbox.left >= bbox.right || bbox.top >= bbox.bottom) return;
+    if (bbox.left >= bbox.right || bbox.top >= bbox.bottom)
+        return;
 
     // Check if object overlaps this node
     if (bbox.right < bounds.left || bbox.left > bounds.right ||
@@ -69,7 +72,7 @@ void QuadtreeNode::insert(ICollidable* obj)
     }
 }
 
-void QuadtreeNode::remove(ICollidable* obj)
+void QuadtreeNode::remove(ICollidable *obj)
 {
     if (isLeaf)
     {
@@ -84,7 +87,7 @@ void QuadtreeNode::remove(ICollidable* obj)
     }
 }
 
-void QuadtreeNode::query(const RECT& region, std::vector<ICollidable*>& result)
+void QuadtreeNode::query(const RECT &region, std::vector<ICollidable *> &result)
 {
     if (region.right < bounds.left || region.left > bounds.right ||
         region.bottom < bounds.top || region.top > bounds.bottom)
@@ -125,16 +128,10 @@ void QuadtreeNode::clear()
     }
 }
 
-CollisionManager* CollisionManager::getInstance()
-{
-    static CollisionManager instance;
-    return &instance;
-}
-
 CollisionManager::CollisionManager()
 {
     // Initialize quadtree with world bounds, e.g., 0 to 1024x768
-    RECT worldBounds = { 0, 0, 1024, 768 };
+    RECT worldBounds = {0, 0, 1024, 768};
     _quadtree = new QuadtreeNode(worldBounds);
 }
 
@@ -144,7 +141,7 @@ CollisionManager::~CollisionManager()
     // Objects are managed elsewhere
 }
 
-void CollisionManager::addObject(ICollidable* obj)
+void CollisionManager::addObject(ICollidable *obj)
 {
     if (std::find(_objects.begin(), _objects.end(), obj) == _objects.end())
     {
@@ -152,7 +149,7 @@ void CollisionManager::addObject(ICollidable* obj)
     }
 }
 
-void CollisionManager::removeObject(ICollidable* obj)
+void CollisionManager::removeObject(ICollidable *obj)
 {
     _objects.erase(std::remove(_objects.begin(), _objects.end(), obj), _objects.end());
     _quadtree->remove(obj);
@@ -167,16 +164,18 @@ void CollisionManager::update()
     }
     for (auto obj : _objects)
     {
-        if (obj->IsBlocking()) continue; // Only process moving objects? Wait, in GitHub, Process is called for collidable objects.
+        if (obj->IsBlocking())
+            continue; // Only process moving objects? Wait, in GitHub, Process is called for collidable objects.
         Process(obj, _objects);
     }
 }
 
-void CollisionManager::Scan(ICollidable* objSrc, std::vector<ICollidable*>& objDests, std::vector<CCollisionEvent*>& coEvents)
+void CollisionManager::Scan(ICollidable *objSrc, std::vector<ICollidable *> &objDests, std::vector<CCollisionEvent *> &coEvents)
 {
     for (auto objDest : objDests)
     {
-        if (objSrc == objDest) continue;
+        if (objSrc == objDest)
+            continue;
 
         RECT b1 = objSrc->getBoundingBox();
         RECT b2 = objDest->getBoundingBox();
@@ -191,7 +190,7 @@ void CollisionManager::Scan(ICollidable* objSrc, std::vector<ICollidable*>& objD
         SweptAABB(b1.left, b1.top, b1.right, b1.bottom, dx, dy,
                   b2.left, b2.top, b2.right, b2.bottom, t, nx, ny);
 
-        CCollisionEvent* e = new CCollisionEvent(t, nx, ny, dx, dy, objDest);
+        CCollisionEvent *e = new CCollisionEvent(t, nx, ny, dx, dy, objDest);
         if (e->WasCollided())
             coEvents.push_back(e);
         else
@@ -199,7 +198,13 @@ void CollisionManager::Scan(ICollidable* objSrc, std::vector<ICollidable*>& objD
     }
 }
 
-void CollisionManager::Filter(ICollidable* objSrc, std::vector<CCollisionEvent*>& coEvents, CCollisionEvent*& colX, CCollisionEvent*& colY, int filterBlock, int filterX, int filterY)
+void CollisionManager::Filter(ICollidable *objSrc,
+                              std::vector<CCollisionEvent *> &coEvents,
+                              CCollisionEvent *&colX,
+                              CCollisionEvent *&colY,
+                              int filterBlock,
+                              int filterX,
+                              int filterY)
 {
     float min_tx = 1.0f;
     float min_ty = 1.0f;
@@ -211,10 +216,12 @@ void CollisionManager::Filter(ICollidable* objSrc, std::vector<CCollisionEvent*>
 
     for (size_t i = 0; i < coEvents.size(); ++i)
     {
-        CCollisionEvent* c = coEvents[i];
-        if (c->isDeleted) continue;
+        CCollisionEvent *c = coEvents[i];
+        if (c->isDeleted)
+            continue;
 
-        if (filterBlock == 1 && !c->obj->IsBlocking()) continue;
+        if (filterBlock == 1 && !c->obj->IsBlocking())
+            continue;
 
         if (c->t < min_tx && c->nx != 0 && filterX == 1)
         {
@@ -228,15 +235,17 @@ void CollisionManager::Filter(ICollidable* objSrc, std::vector<CCollisionEvent*>
         }
     }
 
-    if (min_ix >= 0) colX = coEvents[min_ix];
-    if (min_iy >= 0) colY = coEvents[min_iy];
+    if (min_ix >= 0)
+        colX = coEvents[min_ix];
+    if (min_iy >= 0)
+        colY = coEvents[min_iy];
 }
 
-void CollisionManager::Process(ICollidable* objSrc, std::vector<ICollidable*>& coObjects)
+void CollisionManager::Process(ICollidable *objSrc, std::vector<ICollidable *> &coObjects)
 {
-    std::vector<CCollisionEvent*> coEvents;
-    CCollisionEvent* colX = nullptr;
-    CCollisionEvent* colY = nullptr;
+    std::vector<CCollisionEvent *> coEvents;
+    CCollisionEvent *colX = nullptr;
+    CCollisionEvent *colY = nullptr;
 
     coEvents.clear();
 
@@ -327,16 +336,23 @@ void CollisionManager::Process(ICollidable* objSrc, std::vector<ICollidable*>& c
     // Handle non-blocking collisions
     for (auto e : coEvents)
     {
-        if (e->isDeleted) continue;
-        if (e->obj->IsBlocking()) continue;
+        if (e->isDeleted)
+            continue;
+        if (e->obj->IsBlocking())
+            continue;
         objSrc->OnCollisionWith(e);
     }
 
     // Clean up
-    for (auto e : coEvents) delete e;
+    for (auto e : coEvents)
+        delete e;
 }
 
-void CollisionManager::SweptAABB(float ml, float mt, float mr, float mb, float dx, float dy, float sl, float st, float sr, float sb, float& t, float& nx, float& ny)
+void CollisionManager::SweptAABB(float ml, float mt, float mr, float mb,
+                                 float dx, float dy,
+                                 float sl, float st, float sr, float sb,
+                                 float &t,
+                                 float &nx, float &ny)
 {
     float dx_entry, dx_exit, tx_entry, tx_exit;
     float dy_entry, dy_exit, ty_entry, ty_exit;
@@ -350,67 +366,90 @@ void CollisionManager::SweptAABB(float ml, float mt, float mr, float mb, float d
     float bt = dy > 0 ? mt : mt + dy;
     float br = dx > 0 ? mr + dx : mr;
     float bb = dy > 0 ? mb + dy : mb;
-    if (br < sl || bl > sr || bb < st || bt > sb) return;
+    if (br < sl || bl > sr || bb < st || bt > sb)
+        return;
 
-    if (dx == 0 && dy == 0) return; // not moving
+    if (dx == 0 && dy == 0)
+        return; // not moving
 
-    if (dx > 0) {
+    if (dx > 0)
+    {
         dx_entry = sl - mr;
         dx_exit = sr - ml;
-    } else if (dx < 0) {
+    }
+    else if (dx < 0)
+    {
         dx_entry = sr - ml;
         dx_exit = sl - mr;
-    } else {
+    }
+    else
+    {
         dx_entry = -9999999.0f;
         dx_exit = 99999999.0f;
     }
 
-    if (dy > 0) {
+    if (dy > 0)
+    {
         dy_entry = st - mb;
         dy_exit = sb - mt;
-    } else if (dy < 0) {
+    }
+    else if (dy < 0)
+    {
         dy_entry = sb - mt;
         dy_exit = st - mb;
-    } else {
+    }
+    else
+    {
         dy_entry = -99999999999.0f;
         dy_exit = 99999999999.0f;
     }
 
-    if (dx == 0) {
+    if (dx == 0)
+    {
         tx_entry = -9999999.0f;
         tx_exit = 99999999.0f;
-    } else {
+    }
+    else
+    {
         tx_entry = dx_entry / dx;
         tx_exit = dx_exit / dx;
     }
 
-    if (dy == 0) {
+    if (dy == 0)
+    {
         ty_entry = -99999999999.0f;
         ty_exit = 99999999999.0f;
-    } else {
+    }
+    else
+    {
         ty_entry = dy_entry / dy;
         ty_exit = dy_exit / dy;
     }
 
-    if ((tx_entry < 0.0f && ty_entry < 0.0f) || tx_entry > 1.0f || ty_entry > 1.0f) return;
+    if ((tx_entry < 0.0f && ty_entry < 0.0f) || tx_entry > 1.0f || ty_entry > 1.0f)
+        return;
 
     t_entry = tx_entry > ty_entry ? tx_entry : ty_entry;
     t_exit = tx_exit < ty_exit ? tx_exit : ty_exit;
 
-    if (t_entry > t_exit) return;
+    if (t_entry > t_exit)
+        return;
 
     t = t_entry;
 
-    if (tx_entry > ty_entry) {
+    if (tx_entry > ty_entry)
+    {
         ny = 0.0f;
         nx = (dx > 0) ? -1.0f : 1.0f;
-    } else {
+    }
+    else
+    {
         nx = 0.0f;
         ny = (dy > 0) ? -1.0f : 1.0f;
     }
 }
 
-bool CollisionManager::aabbOverlap(const RECT& a, const RECT& b) const
+bool CollisionManager::aabbOverlap(const RECT &a, const RECT &b) const
 {
     return !(a.right < b.left || a.left > b.right || a.bottom < b.top || a.top > b.bottom);
 }

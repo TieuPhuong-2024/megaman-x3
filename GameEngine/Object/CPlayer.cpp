@@ -21,7 +21,7 @@ CPlayer::CPlayer()
 	auto movement = std::make_unique<Movement>(VECTOR2ZERO, VECTOR2ZERO, _sprite.get());
 	_component.insert(make_pair("Movement", std::move(movement)));
 
-	auto gravity = std::make_unique<Gravity>(VECTOR2ZERO, movement.get());
+	auto gravity = std::make_unique<Gravity>(VECTOR2ZERO, (Movement *)_component["Movement"].get());
 	_component.insert(make_pair("Gravity", std::move(gravity)));
 
 	_spriteAnimation[eStatus::STAND] = std::make_unique<Animation>(_sprite.get(), 0.15f);
