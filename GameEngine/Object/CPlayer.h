@@ -78,6 +78,9 @@ private:
 	// Collision
 	RECT _boundingBox;
 
+	bool _isBlockingLeft = false;
+	bool _isBlockingRight = false;
+
 public:
 	void setPosition(GVector2 position);
 	GVector2 getPosition();
@@ -103,4 +106,6 @@ public:
 	void GetSpeed(float &vx, float &vy) override;
 	void SetPosition(float x, float y) override;
 	bool IsBlocking() override;
+	bool IsBlockingLeft() { return _isBlockingLeft; };
+	bool IsBlockingRight() { return _isBlockingRight; };
 };

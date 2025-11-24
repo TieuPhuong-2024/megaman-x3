@@ -46,22 +46,23 @@ void Standing::updateInput(float deltaTime)
 	getMovement()->setAccelerate(VECTOR2ZERO);
 	getPlayer()->setMoveDirection(eMoveDirection::NONE);
 
+	auto &input = InputController::getInstance();
+
 	// Horizontal movement: transition to Running and apply velocity/acceleration
-	if (InputController::getInstance().isKeyDown(DIK_LEFTARROW))
+
+	if (input.isKeyDown(DIK_RIGHTARROW) && getPlayer()->IsBlockingRight() == false)
 	{
-		getPlayer()->setFlipX(true);
-		getPlayer()->setMoveDirection(eMoveDirection::MOVE_LEFT);
-		getMovement()->setVx(-VELOCITY_X);
-		getMovement()->setAccelx(-ACCELERATE_X);
+		getMovement()->setVelocity(GVector2(VELOCITY_X, 0));
+		getMovement()->setAccelerate(GVector2(ACCELERATE_X, 0));
+		getPlayer()->setMoveDirection(eMoveDirection::MOVE_RIGHT);
 		this->setState(std::make_unique<Running>(getPlayer()));
 		return;
 	}
-	else if (InputController::getInstance().isKeyDown(DIK_RIGHTARROW))
+	else if (input.isKeyDown(DIK_LEFTARROW) && getPlayer()->IsBlockingLeft() == false)
 	{
-		getPlayer()->setFlipX(false);
-		getPlayer()->setMoveDirection(eMoveDirection::MOVE_RIGHT);
-		getMovement()->setVx(VELOCITY_X);
-		getMovement()->setAccelx(ACCELERATE_X);
+		getMovement()->setVelocity(GVector2(-VELOCITY_X, 0));
+		getMovement()->setAccelerate(GVector2(-ACCELERATE_X, 0));
+		getPlayer()->setMoveDirection(eMoveDirection::MOVE_LEFT);
 		this->setState(std::make_unique<Running>(getPlayer()));
 		return;
 	}

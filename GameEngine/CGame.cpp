@@ -87,8 +87,14 @@ void CGame::run()
 		if (_deltaTime >= _frameRate)
 		{
 			_oldTime += _frameRate;
+			auto time = _pGameTime->getElapsedGameTime();
+			if (time > _frameRate * 2)
+				time = _frameRate;
+			
 			_pInput.update();
-			this->render();
+			updateInput(time);
+			update(time);
+			render();
 		}
 		else
 			Sleep(_frameRate - _deltaTime); // sleep every frame for high performance
@@ -100,20 +106,10 @@ void CGame::render()
 	if (GetActiveWindow() != s_hWindows->getWnd())
 		return;
 
-	auto time = _pGameTime->getElapsedGameTime();
-
-	if (time > _frameRate * 2)
-	{
-		time = _frameRate;
-	}
-
 	if (_pDeviceManager->getDevice()->BeginScene() != DI_OK)
 		return;
 
 	_pDeviceManager->clearScreen();
-
-	updateInput(time);
-	update(time);
 	draw();
 
 	_pDeviceManager->getDevice()->EndScene();

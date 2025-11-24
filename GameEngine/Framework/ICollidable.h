@@ -1,7 +1,7 @@
 #pragma once
 #include "define.h"
 
-class CCollisionEvent;
+struct CCollisionEvent;
 
 class ICollidable
 {

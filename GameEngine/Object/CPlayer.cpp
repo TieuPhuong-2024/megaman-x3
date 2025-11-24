@@ -256,7 +256,7 @@ void CPlayer::eventKeyDown(KeyEventArg *e)
 		}
 	}
 
-	if ((e->_key == DIK_C))
+	if (e->_key == DIK_C)
 	{
 		if ((_currentIndexState == eStatus::STAND) ||
 			(_currentIndexState == eStatus::RUN) ||
@@ -276,7 +276,6 @@ void CPlayer::eventKeyDown(KeyEventArg *e)
 		this->setState(_currentIndexState);
 	}
 
-	// (Thêm / chèn vào trong CPlayer::eventKeyDown)
 	if ((e->_key == DIK_V))
 	{
 		if ((_currentIndexState == eStatus::STAND) ||
@@ -361,11 +360,15 @@ void CPlayer::onCollision(ICollidable *other)
 			{
 				GAMELOG("[Colliding] Pushing player left by %.2f", overlapX);
 				pos.x -= overlapX; // Push left
+				_isBlockingRight = true;
+				_isBlockingLeft = false;
 			}
 			else
 			{
 				GAMELOG("[Colliding] Pushing player right by %.2f", overlapX);
 				pos.x += overlapX; // Push right
+				_isBlockingLeft = true;
+				_isBlockingRight = false;
 			}
 			// Stop horizontal velocity
 			setVelocity(GVector2(0, getVelocity().y));
@@ -439,5 +442,5 @@ void CPlayer::SetPosition(float x, float y)
 
 bool CPlayer::IsBlocking()
 {
-	return false; // Player is not blocking
+	return false;
 }

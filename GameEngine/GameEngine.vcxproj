@@ -82,8 +82,8 @@
     <LinkIncremental>true</LinkIncremental>
     <LibraryPath>$(DXSDK_DIR)Lib\x64;$(LibraryPath)</LibraryPath>
     <IncludePath>$(DXSDK_DIR)Include;$(IncludePath)</IncludePath>
-    <OutDir>$(SolutionDir)$(Configuration)</OutDir>
-    <IntDir>$(Configuration)</IntDir>
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
