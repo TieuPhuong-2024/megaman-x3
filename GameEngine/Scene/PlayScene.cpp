@@ -12,6 +12,7 @@ PlayScene::PlayScene() : _tileMap(nullptr)
 
 PlayScene::~PlayScene()
 {
+	GAMELOG("~PlayScene");
 }
 
 bool PlayScene::init()
@@ -93,10 +94,15 @@ void PlayScene::draw(LPD3DXSPRITE spriteHandle)
 
 void PlayScene::release()
 {
+	GAMELOG("PlayScene::release() starting");
 	_tileMap->release();
+	GAMELOG("TileMap released");
 
 	// Clean up walls
+	GAMELOG("Clearing walls");
 	_walls.clear();
+	GAMELOG("Walls cleared");
+	GAMELOG("PlayScene::release() finished");
 }
 
 void PlayScene::updateViewport(float dt)

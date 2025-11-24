@@ -2,6 +2,8 @@
 #include "ICollidable.h"
 #include <vector>
 #include <set>
+#include <array>
+#include <memory>
 
 struct CCollisionEvent
 {
@@ -20,7 +22,7 @@ struct QuadtreeNode
 {
     RECT bounds;
     std::vector<ICollidable *> objects;
-    QuadtreeNode *children[4]; // 0: NW, 1: NE, 2: SW, 3: SE
+    std::array<std::unique_ptr<QuadtreeNode>, 4> children; // 0: NW, 1: NE, 2: SW, 3: SE
     bool isLeaf;
     int maxObjects;
 
@@ -52,9 +54,9 @@ private:
 
     void Scan(ICollidable *objSrc,
               std::vector<ICollidable *> &objDests,
-              std::vector<CCollisionEvent *> &coEvents);
+              std::vector<std::unique_ptr<CCollisionEvent>> &coEvents);
     void Filter(ICollidable *objSrc,
-                std::vector<CCollisionEvent *> &coEvents,
+                std::vector<std::unique_ptr<CCollisionEvent>> &coEvents,
                 CCollisionEvent *&colX,
                 CCollisionEvent *&colY,
                 int filterBlock = 1,
@@ -69,6 +71,6 @@ private:
     bool aabbOverlap(const RECT &a, const RECT &b) const;
 
     std::vector<ICollidable *> _objects;
-    QuadtreeNode *_quadtree;
+    std::unique_ptr<QuadtreeNode> _quadtree;
     std::set<std::pair<ICollidable *, ICollidable *>> _collisionPairs; // to avoid duplicate checks
 };

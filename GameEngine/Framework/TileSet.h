@@ -23,6 +23,7 @@ private:
 
 public:
 	TileSet(eID spriteId);
+	~TileSet();
 
 	int getWidthtile() const;
 	void setWidthtile(const int &value);

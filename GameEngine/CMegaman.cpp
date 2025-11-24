@@ -3,6 +3,7 @@
 #include "Framework/define.h"
 #include "Framework/DebugDraw.h"
 #include "AssetLoader.h"
+#include "trace.h"
 #include <memory>
 
 CMegaman::CMegaman(HINSTANCE hInstance, LPCWSTR title) : CGame(hInstance, title, WINDOW_WIDTH, WINDOW_HEIGHT)
@@ -11,6 +12,7 @@ CMegaman::CMegaman(HINSTANCE hInstance, LPCWSTR title) : CGame(hInstance, title,
 
 CMegaman::~CMegaman()
 {
+	GAMELOG("~CMegaman");
 }
 
 void CMegaman::init()
@@ -22,10 +24,13 @@ void CMegaman::init()
 
 void CMegaman::release()
 {
+	GAMELOG("CMegaman::release() starting");
 	CGame::release();
 	DebugDraw::release();
-	SceneManager::getInstance().getCurrentScene()->release();
+	GAMELOG("About to call clearScenes()");
 	SceneManager::getInstance().clearScenes();
+	GAMELOG("clearScenes() done");
+	GAMELOG("CMegaman::release() finished");
 }
 
 void CMegaman::update(float deltaTime)

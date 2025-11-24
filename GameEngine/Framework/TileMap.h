@@ -1,4 +1,4 @@
-﻿#ifndef __MAP_H__
+#ifndef __MAP_H__
 #define __MAP_H__
 #include "TileSet.h"
 #include <vector>
@@ -12,7 +12,7 @@ public:
 	void draw(LPD3DXSPRITE, Viewport *);
 	void release();
 
-	static TileMap *LoadFromFile(const string &path, eID spriteId);
+	static std::unique_ptr<TileMap> LoadFromFile(const string &path, eID spriteId);
 
 	GVector2 getWorldSize();
 

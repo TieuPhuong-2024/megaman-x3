@@ -1,13 +1,13 @@
 #include "CGame.h"
 #include <memory>
-
+#include "trace.h"
 #include "Scene/PlayScene.h"
 
 std::unique_ptr<Graphics> CGame::s_hWindows = nullptr;
 bool CGame::s_bIsExited = false;
 
 CGame::CGame(HINSTANCE hInstance, LPCWSTR strName, int width, int height, int fps, int isFullScreen)
-: _pInput(InputController::getInstance())
+	: _pInput(InputController::getInstance())
 {
 	s_hWindows = std::make_unique<Graphics>(hInstance, strName, width, height, fps, isFullScreen);
 	_pDeviceManager = DeviceManager::getInstance();
@@ -40,10 +40,18 @@ void CGame::init()
 	_deltaTime = 0;
 }
 
+CGame::~CGame()
+{
+	GAMELOG("~CGame");
+}
+
 void CGame::release()
 {
 	DeviceManager::release();
 	GameTime::release();
+	if (_D3DXSprite)
+		_D3DXSprite->Release();
+	_D3DXSprite = nullptr;
 }
 
 void CGame::updateInput(float deltaTime)

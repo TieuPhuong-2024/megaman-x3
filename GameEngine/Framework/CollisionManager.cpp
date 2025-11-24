@@ -3,13 +3,10 @@
 
 QuadtreeNode::QuadtreeNode(RECT b, int maxObj) : bounds(b), isLeaf(true), maxObjects(maxObj)
 {
-    for (int i = 0; i < 4; ++i)
-        children[i] = nullptr;
 }
 
 QuadtreeNode::~QuadtreeNode()
 {
-    clear();
 }
 
 void QuadtreeNode::subdivide()
@@ -25,10 +22,10 @@ void QuadtreeNode::subdivide()
     RECT sw = {bounds.left, midY, midX, bounds.bottom};
     RECT se = {midX, midY, bounds.right, bounds.bottom};
 
-    children[0] = new QuadtreeNode(nw, maxObjects);
-    children[1] = new QuadtreeNode(ne, maxObjects);
-    children[2] = new QuadtreeNode(sw, maxObjects);
-    children[3] = new QuadtreeNode(se, maxObjects);
+    children[0] = std::make_unique<QuadtreeNode>(nw, maxObjects);
+    children[1] = std::make_unique<QuadtreeNode>(ne, maxObjects);
+    children[2] = std::make_unique<QuadtreeNode>(sw, maxObjects);
+    children[3] = std::make_unique<QuadtreeNode>(se, maxObjects);
 
     isLeaf = false;
 }
@@ -121,8 +118,7 @@ void QuadtreeNode::clear()
     {
         for (int i = 0; i < 4; ++i)
         {
-            delete children[i];
-            children[i] = nullptr;
+            children[i].reset();
         }
         isLeaf = true;
     }
@@ -132,12 +128,11 @@ CollisionManager::CollisionManager()
 {
     // Initialize quadtree with world bounds, e.g., 0 to 1024x768
     RECT worldBounds = {0, 0, 1024, 768};
-    _quadtree = new QuadtreeNode(worldBounds);
+    _quadtree = std::make_unique<QuadtreeNode>(worldBounds);
 }
 
 CollisionManager::~CollisionManager()
 {
-    delete _quadtree;
     // Objects are managed elsewhere
 }
 
@@ -170,7 +165,7 @@ void CollisionManager::update()
     }
 }
 
-void CollisionManager::Scan(ICollidable *objSrc, std::vector<ICollidable *> &objDests, std::vector<CCollisionEvent *> &coEvents)
+void CollisionManager::Scan(ICollidable *objSrc, std::vector<ICollidable *> &objDests, std::vector<std::unique_ptr<CCollisionEvent>> &coEvents)
 {
     for (auto objDest : objDests)
     {
@@ -190,21 +185,19 @@ void CollisionManager::Scan(ICollidable *objSrc, std::vector<ICollidable *> &obj
         SweptAABB(b1.left, b1.top, b1.right, b1.bottom, dx, dy,
                   b2.left, b2.top, b2.right, b2.bottom, t, nx, ny);
 
-        CCollisionEvent *e = new CCollisionEvent(t, nx, ny, dx, dy, objDest);
+        auto e = std::make_unique<CCollisionEvent>(t, nx, ny, dx, dy, objDest);
         if (e->WasCollided())
-            coEvents.push_back(e);
-        else
-            delete e;
+            coEvents.push_back(std::move(e));
     }
 }
 
 void CollisionManager::Filter(ICollidable *objSrc,
-                              std::vector<CCollisionEvent *> &coEvents,
-                              CCollisionEvent *&colX,
-                              CCollisionEvent *&colY,
-                              int filterBlock,
-                              int filterX,
-                              int filterY)
+                               std::vector<std::unique_ptr<CCollisionEvent>> &coEvents,
+                               CCollisionEvent *&colX,
+                               CCollisionEvent *&colY,
+                               int filterBlock,
+                               int filterX,
+                               int filterY)
 {
     float min_tx = 1.0f;
     float min_ty = 1.0f;
@@ -216,7 +209,7 @@ void CollisionManager::Filter(ICollidable *objSrc,
 
     for (size_t i = 0; i < coEvents.size(); ++i)
     {
-        CCollisionEvent *c = coEvents[i];
+        CCollisionEvent *c = coEvents[i].get();
         if (c->isDeleted)
             continue;
 
@@ -236,14 +229,14 @@ void CollisionManager::Filter(ICollidable *objSrc,
     }
 
     if (min_ix >= 0)
-        colX = coEvents[min_ix];
+        colX = coEvents[min_ix].get();
     if (min_iy >= 0)
-        colY = coEvents[min_iy];
+        colY = coEvents[min_iy].get();
 }
 
 void CollisionManager::Process(ICollidable *objSrc, std::vector<ICollidable *> &coObjects)
 {
-    std::vector<CCollisionEvent *> coEvents;
+    std::vector<std::unique_ptr<CCollisionEvent>> coEvents;
     CCollisionEvent *colX = nullptr;
     CCollisionEvent *colY = nullptr;
 
@@ -280,7 +273,7 @@ void CollisionManager::Process(ICollidable *objSrc, std::vector<ICollidable *> &
 
             // Re-check X
             colX->isDeleted = true;
-            coEvents.push_back(new CCollisionEvent(0, 0, 0, 0, 0, nullptr)); // Placeholder, need to re-scan
+            coEvents.push_back(std::make_unique<CCollisionEvent>(0, 0, 0, 0, 0, nullptr)); // Placeholder, need to re-scan
             // Simplified, assume no re-check
             if (colX)
             {
@@ -334,18 +327,16 @@ void CollisionManager::Process(ICollidable *objSrc, std::vector<ICollidable *> &
     objSrc->SetPosition(x, y);
 
     // Handle non-blocking collisions
-    for (auto e : coEvents)
+    for (auto &e : coEvents)
     {
         if (e->isDeleted)
             continue;
         if (e->obj->IsBlocking())
             continue;
-        objSrc->OnCollisionWith(e);
+        objSrc->OnCollisionWith(e.get());
     }
 
-    // Clean up
-    for (auto e : coEvents)
-        delete e;
+    // Clean up (automatic with unique_ptr)
 }
 
 void CollisionManager::SweptAABB(float ml, float mt, float mr, float mb,

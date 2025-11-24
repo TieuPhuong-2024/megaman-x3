@@ -10,6 +10,7 @@ TileMap::TileMap()
 
 TileMap::~TileMap()
 {
+	GAMELOG("~TileMap");
 }
 
 void TileMap::release()
@@ -61,7 +62,7 @@ void TileMap::setColor(D3DXCOLOR color)
 	_tileSet->setColor(color);
 }
 
-TileMap *TileMap::LoadFromFile(const string &path, eID spriteId)
+std::unique_ptr<TileMap> TileMap::LoadFromFile(const string &path, eID spriteId)
 {
 	xml_document doc;
 
@@ -70,7 +71,7 @@ TileMap *TileMap::LoadFromFile(const string &path, eID spriteId)
 	{
 		return nullptr;
 	}
-	TileMap *tileMap = new TileMap();
+	auto tileMap = std::make_unique<TileMap>();
 
 	xml_node map = doc.child("map");
 	if (map == NULL)

@@ -2,6 +2,7 @@
 #include "TileSet.h"
 #include "Tile.h"
 #include "SpriteManager.h"
+#include "../trace.h"
 
 TileSet::TileSet(eID spriteId)
 {
@@ -11,6 +12,11 @@ TileSet::TileSet(eID spriteId)
 	this->_widthtile = sp->getFrameWidth();
 	_columns = 0;
 	_rows = 0;
+}
+
+TileSet::~TileSet()
+{
+	GAMELOG("~TileSet");
 }
 
 void TileSet::draw(LPD3DXSPRITE spriteHandle, int id, GVector2 position, Viewport *viewport)

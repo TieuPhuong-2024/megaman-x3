@@ -9,7 +9,7 @@ TileMap* StageManager::getTileMap(eID id)
     }
     
     // Load the TileMap if not found
-    auto tileMap = unique_ptr<TileMap>(TileMap::LoadFromFile(_resourcePath[id], id));
+    auto tileMap = TileMap::LoadFromFile(_resourcePath[id], id);
     TileMap* result = tileMap.get();
     _tileMaps[id] = std::move(tileMap);
     return result;

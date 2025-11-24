@@ -1,7 +1,8 @@
 #include "DeviceManager.h"
 #include <stdexcept>
+#include "../trace.h"
 
-DeviceManager* DeviceManager::_instance = nullptr;
+DeviceManager *DeviceManager::_instance = nullptr;
 
 DeviceManager::DeviceManager(void)
 {
@@ -35,10 +36,10 @@ void DeviceManager::Init(Graphics windows)
 	if (_pDevice == NULL)
 		throw std::runtime_error("Can not create device");
 
-	_pDevice->GetBackBuffer(NULL, NULL, D3DBACKBUFFER_TYPE_MONO, & _surface);
+	_pDevice->GetBackBuffer(NULL, NULL, D3DBACKBUFFER_TYPE_MONO, &_surface);
 }
 
-DeviceManager* DeviceManager::getInstance()
+DeviceManager *DeviceManager::getInstance()
 {
 	if (_instance == NULL)
 		_instance = new DeviceManager();
@@ -57,8 +58,10 @@ DeviceManager::~DeviceManager(void)
 
 void DeviceManager::release()
 {
+	GAMELOG("DeviceManager::release() starting");
 	delete _instance;
 	_instance = NULL;
+	GAMELOG("DeviceManager::release() finished");
 }
 
 void DeviceManager::present()
@@ -66,10 +69,9 @@ void DeviceManager::present()
 	this->_pDevice->Present(0, 0, 0, 0);
 }
 
-
 void DeviceManager::clearScreen()
 {
-	this->_pDevice->ColorFill(_surface, NULL, D3DCOLOR_XRGB(0,0,0));
+	this->_pDevice->ColorFill(_surface, NULL, D3DCOLOR_XRGB(0, 0, 0));
 }
 
 LPDIRECT3DDEVICE9 DeviceManager::getDevice()

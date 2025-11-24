@@ -9,7 +9,7 @@
 class CGame
 {
 public:
-	virtual ~CGame() = default;
+	virtual ~CGame();
 	explicit CGame(HINSTANCE hInstance, LPCWSTR = L"Window Game", int width = 800, int height = 600, int fps = 60, int isFullScreen = 0);
 	virtual void init();
 	virtual void release();
