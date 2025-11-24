@@ -165,7 +165,9 @@ void CollisionManager::update()
     }
 }
 
-void CollisionManager::Scan(ICollidable *objSrc, std::vector<ICollidable *> &objDests, std::vector<std::unique_ptr<CCollisionEvent>> &coEvents)
+void CollisionManager::Scan(ICollidable *objSrc,
+                            std::vector<ICollidable *> &objDests,
+                            std::vector<CCollisionEvent *> &coEvents)
 {
     for (auto objDest : objDests)
     {
@@ -185,19 +187,19 @@ void CollisionManager::Scan(ICollidable *objSrc, std::vector<ICollidable *> &obj
         SweptAABB(b1.left, b1.top, b1.right, b1.bottom, dx, dy,
                   b2.left, b2.top, b2.right, b2.bottom, t, nx, ny);
 
-        auto e = std::make_unique<CCollisionEvent>(t, nx, ny, dx, dy, objDest);
+        auto e = new CCollisionEvent(t, nx, ny, dx, dy, objDest);
         if (e->WasCollided())
-            coEvents.push_back(std::move(e));
+            coEvents.push_back(e);
     }
 }
 
 void CollisionManager::Filter(ICollidable *objSrc,
-                               std::vector<std::unique_ptr<CCollisionEvent>> &coEvents,
-                               CCollisionEvent *&colX,
-                               CCollisionEvent *&colY,
-                               int filterBlock,
-                               int filterX,
-                               int filterY)
+                              std::vector<CCollisionEvent *> &coEvents,
+                              CCollisionEvent *&colX,
+                              CCollisionEvent *&colY,
+                              int filterBlock,
+                              int filterX,
+                              int filterY)
 {
     float min_tx = 1.0f;
     float min_ty = 1.0f;
@@ -209,7 +211,7 @@ void CollisionManager::Filter(ICollidable *objSrc,
 
     for (size_t i = 0; i < coEvents.size(); ++i)
     {
-        CCollisionEvent *c = coEvents[i].get();
+        CCollisionEvent *c = coEvents[i];
         if (c->isDeleted)
             continue;
 
@@ -229,14 +231,14 @@ void CollisionManager::Filter(ICollidable *objSrc,
     }
 
     if (min_ix >= 0)
-        colX = coEvents[min_ix].get();
+        colX = coEvents[min_ix];
     if (min_iy >= 0)
-        colY = coEvents[min_iy].get();
+        colY = coEvents[min_iy];
 }
 
 void CollisionManager::Process(ICollidable *objSrc, std::vector<ICollidable *> &coObjects)
 {
-    std::vector<std::unique_ptr<CCollisionEvent>> coEvents;
+    std::vector<CCollisionEvent *> coEvents;
     CCollisionEvent *colX = nullptr;
     CCollisionEvent *colY = nullptr;
 
@@ -273,7 +275,7 @@ void CollisionManager::Process(ICollidable *objSrc, std::vector<ICollidable *> &
 
             // Re-check X
             colX->isDeleted = true;
-            coEvents.push_back(std::make_unique<CCollisionEvent>(0, 0, 0, 0, 0, nullptr)); // Placeholder, need to re-scan
+            coEvents.push_back(new CCollisionEvent(0, 0, 0, 0, 0, nullptr)); // Placeholder, need to re-scan
             // Simplified, assume no re-check
             if (colX)
             {
@@ -333,7 +335,7 @@ void CollisionManager::Process(ICollidable *objSrc, std::vector<ICollidable *> &
             continue;
         if (e->obj->IsBlocking())
             continue;
-        objSrc->OnCollisionWith(e.get());
+        objSrc->OnCollisionWith(e);
     }
 
     // Clean up (automatic with unique_ptr)

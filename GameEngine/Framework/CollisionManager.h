@@ -39,7 +39,8 @@ struct QuadtreeNode
 class CollisionManager
 {
 public:
-    static CollisionManager& getInstance() {
+    static CollisionManager &getInstance()
+    {
         static CollisionManager instance;
         return instance;
     }
@@ -54,9 +55,9 @@ private:
 
     void Scan(ICollidable *objSrc,
               std::vector<ICollidable *> &objDests,
-              std::vector<std::unique_ptr<CCollisionEvent>> &coEvents);
+              std::vector<CCollisionEvent *> &coEvents);
     void Filter(ICollidable *objSrc,
-                std::vector<std::unique_ptr<CCollisionEvent>> &coEvents,
+                std::vector<CCollisionEvent *> &coEvents,
                 CCollisionEvent *&colX,
                 CCollisionEvent *&colY,
                 int filterBlock = 1,
