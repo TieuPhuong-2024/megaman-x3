@@ -4,6 +4,7 @@
 #include "Kicking.h"
 #include "../trace.h"
 #include <memory>
+#include "../Framework/InputController.h"
 
 #define MAX_VELOCITY_LEFT -350.0f
 #define MAX_VELOCITY_RIGHT 350.0f

@@ -1,5 +1,5 @@
 ﻿#include "InputController.h"
-#include "../Observer.h"
+#include "Event.h"
 
 InputController::InputController()
 {
@@ -87,15 +87,15 @@ void InputController::update()
 		int keyState = _keyEvents[i].dwData;
 		if ((keyState & 0x80) > 0)
 		{
-			KeyEventArg *arg = new KeyEventArg(keycode);
-			NotifyKeyPress(arg);
-			delete arg;
+			// Dispatch new Event system - KeyDown
+			auto keyEvent = std::make_shared<Framework::KeyEvent>(Framework::KeyEvent::Type::KeyDown, keycode);
+			Framework::Events::dispatch(keyEvent);
 		}
 		else
 		{
-			KeyEventArg *arg = new KeyEventArg(keycode);
-			NotifyKeyRelease(arg);
-			delete arg;
+			// Dispatch new Event system - KeyUp
+			auto keyEvent = std::make_shared<Framework::KeyEvent>(Framework::KeyEvent::Type::KeyUp, keycode);
+			Framework::Events::dispatch(keyEvent);
 		}
 	}
 }
@@ -120,37 +120,4 @@ bool InputController::isKeyRelease(int keycode)
 {
 	// Don't use
 	return !isKeyDown(keycode) && (_previousKeyBuffer[keycode]);
-}
-
-void InputController::Attach(IObserver *observer)
-{
-	auto it = std::find(_observers.begin(), _observers.end(), observer);
-	if (it == _observers.end())
-		_observers.push_back(observer);
-}
-
-void InputController::Detach(IObserver *observer)
-{
-	// Remove observer
-	auto it = std::find(_observers.begin(), _observers.end(), observer);
-	if (it == _observers.end())
-		return;
-	_observers.erase(it);
-}
-
-void InputController::NotifyKeyPress(KeyEventArg *e)
-{
-	for (auto ob : _observers)
-	{
-		ob->eventKeyDown(e);
-	}
-}
-
-void InputController::NotifyKeyRelease(KeyEventArg *e)
-{
-	for (auto ob : _observers)
-	{
-		auto keyRelease = (IObserverKeyUp *)ob;
-		keyRelease->eventKeyUp(e);
-	}
 }

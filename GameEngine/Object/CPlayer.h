@@ -1,5 +1,5 @@
 #pragma once
-#include "../Observer.h"
+#include "../Framework/Event.h"
 #include "../Framework/Viewport.h"
 #include "../Framework/Sprite.h"
 #include "../Framework/Animation.h"
@@ -15,7 +15,7 @@ enum class eMoveDirection
 	MOVE_RIGHT
 };
 
-class CPlayer : public IObserverKeyUp, public ICollidable
+class CPlayer : public ICollidable
 {
 public:
 	CPlayer();
@@ -27,15 +27,14 @@ public:
 	void setState(std::unique_ptr<PlayerState> newState);
 	void setState(eStatus status);
 
-	void eventKeyUp(KeyEventArg *e) override;
-	void eventKeyDown(KeyEventArg *e) override;
+private:
+	void handleKeyEvent(std::shared_ptr<Framework::Event> event);
 
 private:
 	std::shared_ptr<Sprite> _sprite;
 	map<eStatus, std::unique_ptr<Animation>> _spriteAnimation;
 	eStatus _currentIndexState;
 	map<string, std::unique_ptr<IComponent>> _component;
-	InputController &_input;
 
 	std::unique_ptr<PlayerState> _playerState;
 
@@ -80,6 +79,9 @@ private:
 
 	bool _isBlockingLeft = false;
 	bool _isBlockingRight = false;
+
+	// RAII Event listener for automatic cleanup
+	std::unique_ptr<Framework::EventListenerScope<Framework::KeyEvent>> _keyEventListener;
 
 public:
 	void setPosition(GVector2 position);

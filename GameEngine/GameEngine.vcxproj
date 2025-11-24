@@ -177,7 +177,6 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Object\BaseObject.cpp" />
     <ClCompile Include="Object\CPlayer.cpp" />
-    <ClCompile Include="Observer.cpp" />
     <ClCompile Include="Scene\PlayScene.cpp" />
     <ClCompile Include="States\Clinging.cpp" />
     <ClCompile Include="States\Dashing.cpp" />
@@ -223,7 +222,6 @@
     <ClInclude Include="Framework\define.h" />
     <ClInclude Include="Object\BaseObject.h" />
     <ClInclude Include="Object\CPlayer.h" />
-    <ClInclude Include="Observer.h" />
     <ClInclude Include="Scene\PlayScene.h" />
     <ClInclude Include="States\Clinging.h" />
     <ClInclude Include="States\Dashing.h" />
@@ -239,6 +237,7 @@
     <ClInclude Include="Framework\DebugDraw.h" />
     <ClInclude Include="Framework\ICollidable.h" />
     <ClInclude Include="Object\CWall.h" />
+    <ClInclude Include="Framework\Event.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -2,6 +2,7 @@
 #include "Falling.h"
 #include "../trace.h"
 #include <memory>
+#include "../Framework/InputController.h"
 
 #define VELOCITY_X 250.f
 #define ACCELERATE_X 78.48f

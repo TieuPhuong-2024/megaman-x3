@@ -3,6 +3,7 @@
 #include "Falling.h"
 #include "../trace.h"
 #include <memory>
+#include "../Framework/InputController.h"
 
 #define CLING_HORIZONTAL_VELOCITY 0.0f
 #define CLING_GRAVITY_Y -2.0f

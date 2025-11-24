@@ -33,19 +33,6 @@ void PlayScene::updateInput(float dt)
 {
 	// Update input for player
 	_player->updateInput(dt);
-
-	// Handle zoom
-	InputController &input = InputController::getInstance();
-	if (input.isKeyPressed(DIK_EQUALS) || input.isKeyPressed(DIK_ADD)) // + key
-	{
-		float currentZoom = _viewport->getZoom();
-		_viewport->setZoom(currentZoom * 1.1f);
-	}
-	if (input.isKeyPressed(DIK_MINUS)) // - key
-	{
-		float currentZoom = _viewport->getZoom();
-		_viewport->setZoom(currentZoom / 1.1f);
-	}
 }
 
 void PlayScene::update(float dt)

@@ -2,6 +2,7 @@
 #include "Standing.h"
 #include "Clinging.h"
 #include <memory>
+#include "../Framework/InputController.h"
 
 #define GRAVITY -150.f
 #define VELOCITY_X 200.f

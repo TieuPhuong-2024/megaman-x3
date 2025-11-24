@@ -3,6 +3,7 @@
 #include "Jumping.h"
 #include "Falling.h"
 #include <memory>
+#include "../Framework/InputController.h"
 
 #define VELOCITY_X 250.f
 #define ACCELERATE_X 9.81f

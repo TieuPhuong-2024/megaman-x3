@@ -3,6 +3,7 @@
 #include "Standing.h"
 #include "../trace.h"
 #include <memory>
+#include "../Framework/InputController.h"
 
 Dashing::Dashing(CPlayer *player) : PlayerState(player)
 {

@@ -10,9 +10,14 @@
 #include <algorithm>
 
 CPlayer::CPlayer()
-	: _input(InputController::getInstance())
 {
-	_input.Attach(this);
+	// Setup new Event system listener with RAII automatic cleanup
+	_keyEventListener = std::make_unique<Framework::EventListenerScope<Framework::KeyEvent>>(
+		[this](std::shared_ptr<Framework::Event> event)
+		{
+			handleKeyEvent(event);
+		},
+		"cplayer_key_handler");
 
 	_sprite = SpriteManager::getInstance().getSprite(eID::XMAN);
 	_sprite->setFrameRect(SpriteManager::getInstance().getSourceRect(eID::XMAN, "stand_1"));
@@ -90,7 +95,7 @@ CPlayer::CPlayer()
 	// Remaining jumps available right after spawn/landing
 	_remainingJumps = _maxJumps;
 
-	// Jump buffering: if player presses jump slightly before landing, remember it (seconds)
+	// Jump buffering: if player pressed jump slightly before landing, remember it (seconds)
 	_jumpBufferTime = 0.12f;
 	_jumpBufferTimer = 0.0f;
 
@@ -111,7 +116,7 @@ CPlayer::CPlayer()
 
 CPlayer::~CPlayer()
 {
-	_input.Detach(this);
+	// EventListenerScope will automatically clean up in destructor
 }
 
 void CPlayer::update(float deltaTime)
@@ -215,75 +220,82 @@ void CPlayer::setState(eStatus status)
 	_spriteAnimation[status]->restart(index);
 }
 
-void CPlayer::eventKeyUp(KeyEventArg *e)
+void CPlayer::handleKeyEvent(std::shared_ptr<Framework::Event> event)
 {
-	if ((_isJumping) && (e->_key == DIK_X))
-	{
-		_isJumping = false;
-		this->setState(std::make_unique<Falling>(this));
-	}
+	auto keyEvent = std::static_pointer_cast<Framework::KeyEvent>(event);
+	int keyCode = keyEvent->getKeyCode();
+	auto eventType = keyEvent->getEventType();
 
-	if ((e->_key == DIK_C) && (_currentIndexState == eStatus::DASH))
+	if (eventType == Framework::KeyEvent::Type::KeyUp)
 	{
-		this->setState(std::make_unique<Standing>(this));
-	}
-}
-
-void CPlayer::eventKeyDown(KeyEventArg *e)
-{
-	// Handle jump (DIK_X) with buffering and coyote time:
-	if (e->_key == DIK_X)
-	{
-		// If we can jump right now (have remaining jumps or within coyote window) -> perform jump
-		if ((_remainingJumps > 0) || (_coyoteTimer > 0.0f))
+		// Handle key release events
+		if ((_isJumping) && (keyCode == DIK_X))
 		{
-			_isJumping = true;
-			// consume one jump (ensure non-negative)
-			_remainingJumps = (_remainingJumps > 0) ? (_remainingJumps - 1) : 0;
-			// consume coyote
-			_coyoteTimer = 0.0f;
-			_isGrounded = false;
-			// clear any buffered jump
-			_jumpBufferTimer = 0.0f;
-
-			// Transition into Jumping to (re)apply vertical velocity
-			this->setState(std::make_unique<Jumping>(this));
+			_isJumping = false;
+			this->setState(std::make_unique<Falling>(this));
 		}
-		else
+
+		if ((keyCode == DIK_C) && (_currentIndexState == eStatus::DASH))
 		{
-			// Can't jump now -> buffer the jump for a short time so it triggers on landing
-			_jumpBufferTimer = _jumpBufferTime;
+			this->setState(std::make_unique<Standing>(this));
 		}
 	}
-
-	if (e->_key == DIK_C)
+	else if (eventType == Framework::KeyEvent::Type::KeyDown)
 	{
-		if ((_currentIndexState == eStatus::STAND) ||
-			(_currentIndexState == eStatus::RUN) ||
-			(_currentIndexState == eStatus::STAND_SHOOT) ||
-			(_currentIndexState == eStatus::RUN_SHOOT))
+		// Handle jump (DIK_X) with buffering and coyote time:
+		if (keyCode == DIK_X)
 		{
-			GAMELOG("Dashing state triggered by key down C");
-			this->setState(std::make_unique<Dashing>(this));
+			// If we can jump right now (have remaining jumps or within coyote window) -> perform jump
+			if ((_remainingJumps > 0) || (_coyoteTimer > 0.0f))
+			{
+				_isJumping = true;
+				// consume one jump (ensure non-negative)
+				_remainingJumps = (_remainingJumps > 0) ? (_remainingJumps - 1) : 0;
+				// consume coyote
+				_coyoteTimer = 0.0f;
+				_isGrounded = false;
+				// clear any buffered jump
+				_jumpBufferTimer = 0.0f;
+
+				// Transition into Jumping to (re)apply vertical velocity
+				this->setState(std::make_unique<Jumping>(this));
+			}
+			else
+			{
+				// Can't jump now -> buffer the jump for a short time so it triggers on landing
+				_jumpBufferTimer = _jumpBufferTime;
+			}
 		}
-	}
 
-	if ((e->_key == DIK_Z) && (_allowShoot))
-	{
-		_timeShoot = 0.f;
-		_allowShoot = false;
-		_currentIndexState = eStatus(static_cast<int>(_currentIndexState) | static_cast<int>(eStatus::SHOOT));
-		this->setState(_currentIndexState);
-	}
-
-	if ((e->_key == DIK_V))
-	{
-		if ((_currentIndexState == eStatus::STAND) ||
-			(_currentIndexState == eStatus::RUN) ||
-			(_currentIndexState == eStatus::STAND_SHOOT) ||
-			(_currentIndexState == eStatus::RUN_SHOOT))
+		if (keyCode == DIK_C)
 		{
-			this->setState(std::make_unique<Kicking>(this));
+			if ((_currentIndexState == eStatus::STAND) ||
+				(_currentIndexState == eStatus::RUN) ||
+				(_currentIndexState == eStatus::STAND_SHOOT) ||
+				(_currentIndexState == eStatus::RUN_SHOOT))
+			{
+				GAMELOG("Dashing state triggered by key down C");
+				this->setState(std::make_unique<Dashing>(this));
+			}
+		}
+
+		if ((keyCode == DIK_Z) && (_allowShoot))
+		{
+			_timeShoot = 0.f;
+			_allowShoot = false;
+			_currentIndexState = eStatus(static_cast<int>(_currentIndexState) | static_cast<int>(eStatus::SHOOT));
+			this->setState(_currentIndexState);
+		}
+
+		if ((keyCode == DIK_V))
+		{
+			if ((_currentIndexState == eStatus::STAND) ||
+				(_currentIndexState == eStatus::RUN) ||
+				(_currentIndexState == eStatus::STAND_SHOOT) ||
+				(_currentIndexState == eStatus::RUN_SHOOT))
+			{
+				this->setState(std::make_unique<Kicking>(this));
+			}
 		}
 	}
 }

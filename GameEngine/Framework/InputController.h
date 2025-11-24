@@ -5,6 +5,7 @@
 
 #include "define.h"
 #include "Graphics.h"
+#include "Event.h"
 #include <vector>
 #include <list>
 
@@ -12,19 +13,6 @@
 
 using pGInput = LPDIRECTINPUT;
 using pGKeyboard = LPDIRECTINPUTDEVICE8;
-
-class IObserver;
-
-class KeyEventArg
-{
-	// Don't need any private or protected.
-public:
-	explicit KeyEventArg(int keycode)
-	{
-		_key = keycode;
-	}
-	int _key;
-};
 
 class InputController
 {
@@ -45,11 +33,6 @@ public:
 	bool isKeyPressed(int keycode);
 	bool isKeyRelease(int keycode);
 
-	void Attach(IObserver *observer);
-	void Detach(IObserver *observer);
-	void NotifyKeyPress(KeyEventArg *e);
-	void NotifyKeyRelease(KeyEventArg *e);
-
 private:
 	InputController();
 
@@ -60,8 +43,6 @@ private:
 	DIDEVICEOBJECTDATA _keyEvents[KEYBOARD_BUFFER_SIZE];
 
 	bool _previousKeyBuffer[256];
-
-	std::vector<IObserver *> _observers;
 };
 
 using pInputController = InputController *;
