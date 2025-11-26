@@ -24,14 +24,14 @@ void Standing::update(float deltaTime)
 	// If gravity indicates we're falling (walked off an edge or similar), transition
 	if (getGravity()->getStatus() == eGravityStatus::FALLING__DOWN)
 	{
-		this->setState(std::make_unique<Falling>(getPlayer()));
+		this->ChangeState(std::make_unique<Falling>(getPlayer()));
 		return;
 	}
 
 	// If horizontal velocity is significant (external forces), transition to Running
 	if (fabs(getMovement()->getVelocity().x) > EPSILON)
 	{
-		this->setState(std::make_unique<Running>(getPlayer()));
+		this->ChangeState(std::make_unique<Running>(getPlayer()));
 		return;
 	}
 
@@ -45,7 +45,7 @@ void Standing::updateInput(float deltaTime)
 	// Default: no horizontal move
 	getMovement()->setVelocity(VECTOR2ZERO);
 	getMovement()->setAccelerate(VECTOR2ZERO);
-	getPlayer()->setMoveDirection(eMoveDirection::NONE);
+	getPlayer()->SetMoveDirection(eMoveDirection::NONE);
 
 	auto &input = InputController::getInstance();
 
@@ -55,23 +55,23 @@ void Standing::updateInput(float deltaTime)
 	{
 		getMovement()->setVelocity(GVector2(VELOCITY_X, 0));
 		getMovement()->setAccelerate(GVector2(ACCELERATE_X, 0));
-		getPlayer()->setMoveDirection(eMoveDirection::MOVE_RIGHT);
-		this->setState(std::make_unique<Running>(getPlayer()));
+		getPlayer()->SetMoveDirection(eMoveDirection::MOVE_RIGHT);
+		this->ChangeState(std::make_unique<Running>(getPlayer()));
 		return;
 	}
 	else if (input.isKeyDown(DIK_LEFTARROW) && getPlayer()->IsBlockingLeft() == false)
 	{
 		getMovement()->setVelocity(GVector2(-VELOCITY_X, 0));
 		getMovement()->setAccelerate(GVector2(-ACCELERATE_X, 0));
-		getPlayer()->setMoveDirection(eMoveDirection::MOVE_LEFT);
-		this->setState(std::make_unique<Running>(getPlayer()));
+		getPlayer()->SetMoveDirection(eMoveDirection::MOVE_LEFT);
+		this->ChangeState(std::make_unique<Running>(getPlayer()));
 		return;
 	}
 
 	// If gravity indicates falling (e.g., stepped off a platform), transition
 	if (getGravity()->getStatus() == eGravityStatus::FALLING__DOWN)
 	{
-		this->setState(std::make_unique<Falling>(getPlayer()));
+		this->ChangeState(std::make_unique<Falling>(getPlayer()));
 		return;
 	}
 

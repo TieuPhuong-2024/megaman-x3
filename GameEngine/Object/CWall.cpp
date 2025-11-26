@@ -23,7 +23,7 @@ CWall::~CWall()
 }
 
 // ICollidable implementation
-RECT CWall::getBoundingBox() const
+RECT CWall::GetBoundingBox() const
 {
 	RECT bound;
 	bound.left = _x;
@@ -33,12 +33,12 @@ RECT CWall::getBoundingBox() const
 	return bound;
 }
 
-GVector2 CWall::getPosition()
+GVector2 CWall::GetPosition()
 {
 	return { _x, _y };
 }
 
-void CWall::setPosition(GVector2 pos)
+void CWall::SetPosition(GVector2 pos)
 {
 	_x = pos.x;
 	_y = pos.y;
@@ -46,7 +46,7 @@ void CWall::setPosition(GVector2 pos)
 
 void CWall::SetPosition(float x, float y)
 {
-	setPosition(GVector2(x, y));
+	SetPosition(GVector2(x, y));
 }
 
 bool CWall::IsBlocking()
@@ -54,7 +54,7 @@ bool CWall::IsBlocking()
 	return true;
 }
 
-void CWall::onCollision(ICollidable* other)
+void CWall::OnCollision(ICollidable* other)
 {
 	// Wall doesn't react to collision
 }
@@ -70,12 +70,12 @@ void CWall::GetSpeed(float& vx, float& vy)
 	vy = 0.0f;
 }
 
-GVector2 CWall::getVelocity()
+GVector2 CWall::GetVelocity()
 {
 	return GVector2(0.0f, 0.0f);
 }
 
-void CWall::setVelocity(GVector2 vel)
+void CWall::SetVelocity(GVector2 vel)
 {
 	// Wall doesn't move
 }

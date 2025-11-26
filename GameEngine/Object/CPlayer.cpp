@@ -6,7 +6,7 @@
 #include "../States/Falling.h"
 #include "../States/Jumping.h"
 #include "CWall.h"
-#include "../Framework/CollisionManager.h"
+#include "../Framework/Collision.h"
 #include <algorithm>
 
 CPlayer::CPlayer()
@@ -78,7 +78,7 @@ CPlayer::CPlayer()
 
 	// Setting status for player
 	_playerState = std::make_unique<Standing>(this);
-	setState(std::make_unique<Standing>(this));
+	ChangeState(std::make_unique<Standing>(this));
 
 	// Don't reverse
 	_isFlipX = false;
@@ -144,7 +144,7 @@ void CPlayer::updateInput(float deltaTime)
 		_allowShoot = true;
 		_timeShoot = 0.f;
 		_currentIndexState = eStatus(static_cast<int>(_currentIndexState) & ~static_cast<int>(eStatus::SHOOT));
-		this->setState(_currentIndexState);
+		this->SetStatus(_currentIndexState);
 	}
 
 	// Update jump-related timers (deltaTime is milliseconds in this project)
@@ -179,7 +179,7 @@ void CPlayer::updateInput(float deltaTime)
 		_remainingJumps = (_remainingJumps > 0) ? (_remainingJumps - 1) : 0;
 		_jumpBufferTimer = 0.0f;
 		_coyoteTimer = 0.0f;
-		this->setState(std::make_unique<Jumping>(this));
+		this->ChangeState(std::make_unique<Jumping>(this));
 	}
 
 	// Update input for the current state (e.g., Running, Jumping, etc.)
@@ -194,7 +194,7 @@ void CPlayer::draw(ID3DXSprite *spriteHandler, Viewport *viewport)
 	_spriteAnimation[_currentIndexState]->draw(spriteHandler, viewport);
 }
 
-void CPlayer::setState(std::unique_ptr<PlayerState> newState)
+void CPlayer::ChangeState(std::unique_ptr<PlayerState> newState)
 {
 	// Set new state
 	_playerState = std::move(newState);
@@ -202,10 +202,10 @@ void CPlayer::setState(std::unique_ptr<PlayerState> newState)
 	_currentIndexState = _playerState->getState();
 	GAMELOG("Player state changed to: %d", static_cast<int>(_currentIndexState));
 	// Restart animation
-	setState(_currentIndexState);
+	SetStatus(_currentIndexState);
 }
 
-void CPlayer::setState(eStatus status)
+void CPlayer::SetStatus(eStatus status)
 {
 	// Get index of previous state
 	auto index = _spriteAnimation[_currentIndexState]->getIndex();
@@ -220,6 +220,72 @@ void CPlayer::setState(eStatus status)
 	_spriteAnimation[status]->restart(index);
 }
 
+RECT CPlayer::GetBoundingBox() const
+{
+	return _sprite->getBounding();
+}
+
+void CPlayer::OnCollision(ICollidable* other)
+{
+}
+
+void CPlayer::OnCollisionWith(CCollisionEvent* e)
+{
+	// e->nx, e->ny = collision normal (direction of collision)
+	// e->obj = the object you collided with
+	// e->t = collision time (0.0 to 1.0)
+
+	if (e->ny != 0)  // collision on Y axis (vertical)
+	{
+		if (e->ny < 0)  // collision from above (jumping into ceiling)
+		{
+			// Handle ceiling collision - stop upward velocity
+			GVector2 vel = this->GetVelocity();
+			vel.y = 0;  // Stop upward movement
+			this->SetVelocity(vel);
+			GAMELOG("Player hit ceiling");
+		}
+		else if (e->ny > 0)  // collision from below (landing on ground)
+		{
+			// Handle ground collision - player is grounded
+			_isGrounded = true;
+			_remainingJumps = _maxJumps;  // Reset jump count on landing
+			
+			// Transition to Standing state if not already in a ground state
+			if (_currentIndexState == eStatus::FALL || _currentIndexState == eStatus::FALL_SHOOT)
+			{
+				this->ChangeState(std::make_unique<Standing>(this));
+			}
+			GAMELOG("Player landed on ground");
+		}
+	}
+
+	if (e->nx != 0)  // collision on X axis (left/right walls)
+	{
+		if (e->nx < 0)  // collision from right side (hitting wall on right)
+		{
+			_isBlockingRight = true;
+			GAMELOG("Player blocked on right");
+		}
+		else if (e->nx > 0)  // collision from left side (hitting wall on left)
+		{
+			_isBlockingLeft = true;
+			GAMELOG("Player blocked on left");
+		}
+	}
+}
+
+bool CPlayer::IsBlocking()
+{
+	return false;
+}
+
+void CPlayer::GetSpeed(float& vx, float& vy)
+{
+	vx = this->GetVelocity().x;
+	vy = this->GetVelocity().y;
+}
+
 void CPlayer::handleKeyEvent(std::shared_ptr<Framework::Event> event)
 {
 	auto keyEvent = std::static_pointer_cast<Framework::KeyEvent>(event);
@@ -232,12 +298,12 @@ void CPlayer::handleKeyEvent(std::shared_ptr<Framework::Event> event)
 		if ((_isJumping) && (keyCode == DIK_X))
 		{
 			_isJumping = false;
-			this->setState(std::make_unique<Falling>(this));
+			this->ChangeState(std::make_unique<Falling>(this));
 		}
 
 		if ((keyCode == DIK_C) && (_currentIndexState == eStatus::DASH))
 		{
-			this->setState(std::make_unique<Standing>(this));
+			this->ChangeState(std::make_unique<Standing>(this));
 		}
 	}
 	else if (eventType == Framework::KeyEvent::Type::KeyDown)
@@ -258,7 +324,7 @@ void CPlayer::handleKeyEvent(std::shared_ptr<Framework::Event> event)
 				_jumpBufferTimer = 0.0f;
 
 				// Transition into Jumping to (re)apply vertical velocity
-				this->setState(std::make_unique<Jumping>(this));
+				this->ChangeState(std::make_unique<Jumping>(this));
 			}
 			else
 			{
@@ -275,7 +341,7 @@ void CPlayer::handleKeyEvent(std::shared_ptr<Framework::Event> event)
 				(_currentIndexState == eStatus::RUN_SHOOT))
 			{
 				GAMELOG("Dashing state triggered by key down C");
-				this->setState(std::make_unique<Dashing>(this));
+				this->ChangeState(std::make_unique<Dashing>(this));
 			}
 		}
 
@@ -284,7 +350,7 @@ void CPlayer::handleKeyEvent(std::shared_ptr<Framework::Event> event)
 			_timeShoot = 0.f;
 			_allowShoot = false;
 			_currentIndexState = eStatus(static_cast<int>(_currentIndexState) | static_cast<int>(eStatus::SHOOT));
-			this->setState(_currentIndexState);
+			this->SetStatus(_currentIndexState);
 		}
 
 		if ((keyCode == DIK_V))
@@ -294,28 +360,33 @@ void CPlayer::handleKeyEvent(std::shared_ptr<Framework::Event> event)
 				(_currentIndexState == eStatus::STAND_SHOOT) ||
 				(_currentIndexState == eStatus::RUN_SHOOT))
 			{
-				this->setState(std::make_unique<Kicking>(this));
+				this->ChangeState(std::make_unique<Kicking>(this));
 			}
 		}
 	}
 }
 
-void CPlayer::setPosition(GVector2 position)
+void CPlayer::SetPosition(GVector2 position)
 {
 	_sprite->setPosition(position);
 }
 
-GVector2 CPlayer::getPosition()
+void CPlayer::SetPosition(float x, float y)
+{
+	this->SetPosition(GVector2(x, y));
+}
+
+GVector2 CPlayer::GetPosition()
 {
 	return _sprite->getPosition();
 }
 
-void CPlayer::setScale(float scale)
+void CPlayer::SetScale(float scale)
 {
 	_sprite->setScale(scale);
 }
 
-IComponent *CPlayer::getComponent(string name)
+IComponent *CPlayer::GetComponent(string name)
 {
 	return _component[name].get();
 }
@@ -331,128 +402,27 @@ bool CPlayer::getFlipX()
 	return _isFlipX;
 }
 
-void CPlayer::setMoveDirection(eMoveDirection moveDirection)
+void CPlayer::SetMoveDirection(eMoveDirection moveDirection)
 {
 	_MoveDirection = moveDirection;
 }
 
-eMoveDirection CPlayer::getMoveDirection()
+eMoveDirection CPlayer::GetMoveDirection()
 {
 	return _MoveDirection;
 }
 
-// ICollidable implementation
-RECT CPlayer::getBoundingBox() const
+GVector2 CPlayer::GetVelocity()
 {
-	// Use sprite's bounding box which accounts for scale, rotation, and origin
-	return _sprite->getBounding();
-}
-
-void CPlayer::onCollision(ICollidable *other)
-{
-	// Handle collision with wall or other
-	// Assume other is CWall
-	if (dynamic_cast<CWall *>(other))
-	{
-		// Get bounding boxes
-		RECT playerBox = getBoundingBox();
-		RECT wallBox = other->getBoundingBox();
-
-		// Calculate overlaps
-		float overlapX = min(playerBox.right - wallBox.left, wallBox.right - playerBox.left);
-		float overlapY = min(playerBox.top - wallBox.bottom, wallBox.top - playerBox.bottom);
-		GAMELOG("[Colliding] Overlap X: %.2f, Overlap Y: %.2f", overlapX, overlapY);
-
-		// Adjust position to resolve overlap
-		GVector2 pos = getPosition();
-		if (overlapX < overlapY)
-		{
-			// Push horizontally to resolve overlap
-			if (playerBox.left < wallBox.left)
-			{
-				GAMELOG("[Colliding] Pushing player left by %.2f", overlapX);
-				pos.x -= overlapX; // Push left
-				_isBlockingRight = true;
-				_isBlockingLeft = false;
-			}
-			else
-			{
-				GAMELOG("[Colliding] Pushing player right by %.2f", overlapX);
-				pos.x += overlapX; // Push right
-				_isBlockingLeft = true;
-				_isBlockingRight = false;
-			}
-			// Stop horizontal velocity
-			setVelocity(GVector2(0, getVelocity().y));
-			this->setState(std::make_unique<Standing>(this));
-		}
-		else
-		{
-			// Push vertically to resolve overlap
-			if (playerBox.top < wallBox.top)
-			{
-				GAMELOG("[Colliding] Pushing player up by %.2f", overlapY);
-				pos.y -= overlapY; // Push up
-			}
-			else
-			{
-				GAMELOG("[Colliding] Pushing player down by %.2f", overlapY);
-				pos.y += overlapY; // Push down
-			}
-			// Stop vertical velocity
-			setVelocity(GVector2(getVelocity().x, 0));
-		}
-		setPosition(pos);
-	}
-}
-
-GVector2 CPlayer::getVelocity()
-{
-	Movement *movement = static_cast<Movement *>(getComponent("Movement"));
+	Movement *movement = static_cast<Movement *>(GetComponent("Movement"));
 	return movement ? movement->getVelocity() : VECTOR2ZERO;
 }
 
-void CPlayer::setVelocity(GVector2 vel)
+void CPlayer::SetVelocity(GVector2 vel)
 {
-	Movement *movement = static_cast<Movement *>(getComponent("Movement"));
+	Movement *movement = static_cast<Movement *>(GetComponent("Movement"));
 	if (movement)
 	{
 		movement->setVelocity(vel);
 	}
-}
-
-void CPlayer::OnCollisionWith(CCollisionEvent *e)
-{
-	// Handle collision event
-	// For example, if colliding with wall
-	if (dynamic_cast<CWall *>(e->obj))
-	{
-		// Adjust position based on nx, ny
-		GVector2 pos = getPosition();
-		pos.x += e->nx * 0.01f; // Push factor
-		pos.y += e->ny * 0.01f;
-		setPosition(pos);
-		// Stop velocity if blocking
-		if (e->nx != 0)
-			setVelocity(GVector2(0, getVelocity().y));
-		if (e->ny != 0)
-			setVelocity(GVector2(getVelocity().x, 0));
-	}
-}
-
-void CPlayer::GetSpeed(float &vx, float &vy)
-{
-	GVector2 vel = getVelocity();
-	vx = vel.x;
-	vy = vel.y;
-}
-
-void CPlayer::SetPosition(float x, float y)
-{
-	setPosition(GVector2(x, y));
-}
-
-bool CPlayer::IsBlocking()
-{
-	return false;
 }

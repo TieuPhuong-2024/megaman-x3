@@ -23,12 +23,12 @@ void Running::update(float deltaTime)
 	float vx = getMovement()->getVelocity().x;
 
 	// If player is actively moving left/right, ensure velocity is within allowed range
-	if (getPlayer()->getMoveDirection() == eMoveDirection::MOVE_LEFT)
+	if (getPlayer()->GetMoveDirection() == eMoveDirection::MOVE_LEFT)
 	{
 		if (vx < MAX_VELOCITY_LEFT)
 			getMovement()->setVx(MAX_VELOCITY_LEFT);
 	}
-	else if (getPlayer()->getMoveDirection() == eMoveDirection::MOVE_RIGHT)
+	else if (getPlayer()->GetMoveDirection() == eMoveDirection::MOVE_RIGHT)
 	{
 		if (vx > MAX_VELOCITY_RIGHT)
 			getMovement()->setVx(MAX_VELOCITY_RIGHT);
@@ -58,7 +58,7 @@ void Running::update(float deltaTime)
 			if (fabs(vx) <= EPSILON)
 			{
 				getMovement()->setVx(0.0f);
-				this->setState(std::make_unique<Standing>(getPlayer()));
+				this->ChangeState(std::make_unique<Standing>(getPlayer()));
 				return;
 			}
 		}
@@ -66,7 +66,7 @@ void Running::update(float deltaTime)
 		{
 			// Already nearly stopped: go to standing
 			getMovement()->setVx(0.0f);
-			this->setState(std::make_unique<Standing>(getPlayer()));
+			this->ChangeState(std::make_unique<Standing>(getPlayer()));
 			return;
 		}
 	}
@@ -78,21 +78,21 @@ void Running::updateInput(float deltaTime)
 	if (InputController::getInstance().isKeyDown(DIK_LEFTARROW))
 	{
 		getPlayer()->setFlipX(true);
-		getPlayer()->setMoveDirection(eMoveDirection::MOVE_LEFT);
+		getPlayer()->SetMoveDirection(eMoveDirection::MOVE_LEFT);
 		getMovement()->setVx(-VELOCITY_X);
 		getMovement()->setAccelx(-ACCELERATE_X);
 	}
 	else if (InputController::getInstance().isKeyDown(DIK_RIGHTARROW))
 	{
 		getPlayer()->setFlipX(false);
-		getPlayer()->setMoveDirection(eMoveDirection::MOVE_RIGHT);
+		getPlayer()->SetMoveDirection(eMoveDirection::MOVE_RIGHT);
 		getMovement()->setVx(VELOCITY_X);
 		getMovement()->setAccelx(ACCELERATE_X);
 	}
 	else
 	{
 		// No horizontal input: set move direction to NONE and let update() handle smooth decel
-		getPlayer()->setMoveDirection(eMoveDirection::NONE);
+		getPlayer()->SetMoveDirection(eMoveDirection::NONE);
 	}
 }
 

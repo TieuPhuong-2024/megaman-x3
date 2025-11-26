@@ -39,7 +39,7 @@ void Jumping::update(float deltaTime)
 	if (vy <= 0.0f)
 	{
 		printLog("Transitioning to Falling\n");
-		this->setState(std::make_unique<Falling>(getPlayer()), 0.1f); // Smooth transition
+		this->ChangeState(std::make_unique<Falling>(getPlayer()), 0.1f); // Smooth transition
 		return;
 	}
 
@@ -58,7 +58,7 @@ void Jumping::updateInput(float deltaTime)
 	if (InputController::getInstance().isKeyDown(DIK_LEFTARROW))
 	{
 		getPlayer()->setFlipX(true);
-		getPlayer()->setMoveDirection(eMoveDirection::MOVE_LEFT);
+		getPlayer()->SetMoveDirection(eMoveDirection::MOVE_LEFT);
 		getMovement()->setAccelx(-ACCELERATE_X);
 		// Provide immediate control by nudging velocity, but do not override vertical velocity.
 		getMovement()->setVx(max(-MAX_AIR_VX, getMovement()->getVelocity().x - VELOCITY_X * 0.1f));
@@ -66,14 +66,14 @@ void Jumping::updateInput(float deltaTime)
 	else if (InputController::getInstance().isKeyDown(DIK_RIGHTARROW))
 	{
 		getPlayer()->setFlipX(false);
-		getPlayer()->setMoveDirection(eMoveDirection::MOVE_RIGHT);
+		getPlayer()->SetMoveDirection(eMoveDirection::MOVE_RIGHT);
 		getMovement()->setAccelx(ACCELERATE_X);
 		getMovement()->setVx(min(MAX_AIR_VX, getMovement()->getVelocity().x + VELOCITY_X * 0.1f));
 	}
 	else
 	{
 		// No horizontal input: apply air friction to slowly reduce horizontal speed
-		getPlayer()->setMoveDirection(eMoveDirection::NONE);
+		getPlayer()->SetMoveDirection(eMoveDirection::NONE);
 		auto vx = getMovement()->getVelocity().x;
 		float decel = AIR_FRICTION * (deltaTime / 1000.0f);
 		if (vx > 0.0f)

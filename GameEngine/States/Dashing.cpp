@@ -29,7 +29,7 @@ void Dashing::update(float deltaTime)
 
 	// Determine dash direction:
 	// Prefer explicit move direction; otherwise infer from current velocity
-	auto moveDir = getPlayer()->getMoveDirection();
+	auto moveDir = getPlayer()->GetMoveDirection();
 	auto currentVel = getMovement()->getVelocity();
 
 	if (moveDir == eMoveDirection::MOVE_LEFT)
@@ -67,7 +67,7 @@ void Dashing::update(float deltaTime)
 		GAMELOG("Dashing ended after %.2f seconds", _timeDash);
 		_timeDash = 0.0f;
 		// After dashing, go to standing to give player control back.
-		this->setState(std::make_unique<Standing>(getPlayer()));
+		this->ChangeState(std::make_unique<Standing>(getPlayer()));
 	}
 }
 
@@ -83,7 +83,7 @@ void Dashing::updateInput(float deltaTime)
 	if (InputController::getInstance().isKeyDown(DIK_X))
 	{
 		_timeDash = 0.0f; // reset dash timer
-		this->setState(std::make_unique<Jumping>(getPlayer()));
+		this->ChangeState(std::make_unique<Jumping>(getPlayer()));
 		return;
 	}
 

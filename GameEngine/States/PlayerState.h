@@ -20,7 +20,7 @@ public:
 	virtual eStatus getState() = 0;
 
 	// Request a state change on the player
-	void setState(std::unique_ptr<PlayerState> newState, float transitionTime = 0.0f);
+	void ChangeState(std::unique_ptr<PlayerState> newState, float transitionTime = 0.0f);
 
 	// Provide read access to the player for states and other systems
 	CPlayer *getPlayer();

@@ -37,7 +37,7 @@ void Falling::update(float deltaTime)
 	// If gravity is shallowed (from collision), transition to standing
 	if (getGravity()->getStatus() == eGravityStatus::SHALLOWED)
 	{
-		this->setState(std::make_unique<Standing>(getPlayer()), 0.1f); // Smooth landing transition
+		this->ChangeState(std::make_unique<Standing>(getPlayer()), 0.1f); // Smooth landing transition
 		return;
 	}
 
@@ -56,21 +56,21 @@ void Falling::updateInput(float deltaTime)
 	if (InputController::getInstance().isKeyDown(DIK_LEFTARROW))
 	{
 		getPlayer()->setFlipX(true);
-		getPlayer()->setMoveDirection(eMoveDirection::MOVE_LEFT);
+		getPlayer()->SetMoveDirection(eMoveDirection::MOVE_LEFT);
 		getMovement()->setAccelx(-ACCELERATE_X);
 		getMovement()->setVx(-VELOCITY_X);
 	}
 	else if (InputController::getInstance().isKeyDown(DIK_RIGHTARROW))
 	{
 		getPlayer()->setFlipX(false);
-		getPlayer()->setMoveDirection(eMoveDirection::MOVE_RIGHT);
+		getPlayer()->SetMoveDirection(eMoveDirection::MOVE_RIGHT);
 		getMovement()->setAccelx(ACCELERATE_X);
 		getMovement()->setVx(VELOCITY_X);
 	}
 	else
 	{
 		// No horizontal input: give limited air friction (handled inside Movement update)
-		getPlayer()->setMoveDirection(eMoveDirection::NONE);
+		getPlayer()->SetMoveDirection(eMoveDirection::NONE);
 		getMovement()->setAccelx(0.0f);
 	}
 

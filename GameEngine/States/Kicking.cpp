@@ -42,7 +42,7 @@ void Kicking::update(float deltaTime)
 		_impulseApplied = true;
 
 		// Prefer explicit player move direction if available
-		auto dir = getPlayer()->getMoveDirection();
+		auto dir = getPlayer()->GetMoveDirection();
 		if (dir == eMoveDirection::MOVE_LEFT)
 		{
 			getMovement()->setVx(-_kickImpulseVx);
@@ -70,7 +70,7 @@ void Kicking::update(float deltaTime)
 	{
 		_timeKick = 0.0f;
 		_impulseApplied = false;
-		this->setState(std::make_unique<Standing>(getPlayer()));
+		this->ChangeState(std::make_unique<Standing>(getPlayer()));
 	}
 }
 
@@ -82,7 +82,7 @@ void Kicking::updateInput(float deltaTime)
 	{
 		_timeKick = 0.0f;
 		_impulseApplied = false;
-		this->setState(std::make_unique<Jumping>(getPlayer()));
+		this->ChangeState(std::make_unique<Jumping>(getPlayer()));
 		return;
 	}
 

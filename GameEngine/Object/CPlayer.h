@@ -4,6 +4,7 @@
 #include "../Framework/Sprite.h"
 #include "../Framework/Animation.h"
 #include "../Framework/ICollidable.h"
+#include "../Framework/Collision.h"
 #include <memory>
 
 class PlayerState;
@@ -24,13 +25,33 @@ public:
 	void update(float deltaTime);
 	void updateInput(float deltaTime);
 	void draw(ID3DXSprite *spriteHandler, Viewport *viewport);
-	void setState(std::unique_ptr<PlayerState> newState);
-	void setState(eStatus status);
+	void ChangeState(std::unique_ptr<PlayerState> newState);
+	void SetStatus(eStatus status);
+
+	RECT GetBoundingBox() const override;
+	void OnCollision(ICollidable *other) override;
+	void OnCollisionWith(CCollisionEvent *e) override;
+	GVector2 GetPosition() override;
+	void SetPosition(GVector2 pos) override;
+	void GetSpeed(float &vx, float &vy) override;
+	void SetPosition(float x, float y) override;
+	GVector2 GetVelocity() override;
+	void SetVelocity(GVector2 vel) override;
+	bool IsBlocking() override;
+
+	void SetScale(float scale);
+	IComponent *GetComponent(string name);
+	void setFlipX(bool isFlip);
+	bool getFlipX();
+	void SetMoveDirection(eMoveDirection moveDirection);
+	eMoveDirection GetMoveDirection();
+	bool IsBlockingLeft() { return _isBlockingLeft; }
+	bool IsBlockingRight() { return _isBlockingRight; }
+	bool IsGrounded() const { return _isGrounded; }
+	void ResetBlockingFlags() { _isBlockingLeft = false; _isBlockingRight = false; }
 
 private:
 	void handleKeyEvent(std::shared_ptr<Framework::Event> event);
-
-private:
 	std::shared_ptr<Sprite> _sprite;
 	map<eStatus, std::unique_ptr<Animation>> _spriteAnimation;
 	eStatus _currentIndexState;
@@ -74,40 +95,9 @@ private:
 
 	// --- End jump / air control extended state ---
 
-	// Collision
-	RECT _boundingBox;
-
 	bool _isBlockingLeft = false;
 	bool _isBlockingRight = false;
 
 	// RAII Event listener for automatic cleanup
 	std::unique_ptr<Framework::EventListenerScope<Framework::KeyEvent>> _keyEventListener;
-
-public:
-	void setPosition(GVector2 position);
-	GVector2 getPosition();
-
-	void setScale(float scale);
-
-	IComponent *getComponent(string name);
-
-	GVector2 getVelocity();
-
-	void setVelocity(GVector2 vel);
-
-	void setFlipX(bool isFlip);
-	bool getFlipX();
-
-	void setMoveDirection(eMoveDirection moveDirection);
-	eMoveDirection getMoveDirection();
-
-	// ICollidable
-	RECT getBoundingBox() const override;
-	void onCollision(ICollidable *other) override;
-	void OnCollisionWith(CCollisionEvent *e) override;
-	void GetSpeed(float &vx, float &vy) override;
-	void SetPosition(float x, float y) override;
-	bool IsBlocking() override;
-	bool IsBlockingLeft() { return _isBlockingLeft; };
-	bool IsBlockingRight() { return _isBlockingRight; };
 };

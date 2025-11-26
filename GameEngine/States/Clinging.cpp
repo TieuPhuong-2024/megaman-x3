@@ -50,7 +50,7 @@ void Clinging::update(float deltaTime)
 	{
 		_clingTime = 0.0f;
 		// restore gravity behavior will be handled by Falling constructor
-		this->setState(std::make_unique<Falling>(getPlayer()));
+		this->ChangeState(std::make_unique<Falling>(getPlayer()));
 	}
 }
 
@@ -67,23 +67,23 @@ void Clinging::updateInput(float deltaTime)
 		// Determine the direction to push the player horizontally.
 		// If player is flipped (facing left), we assume they were clinging on left wall
 		// and need to jump to the right; otherwise jump to the left.
-		if (getPlayer()->getMoveDirection() == eMoveDirection::MOVE_LEFT || getPlayer()->getFlipX())
+		if (getPlayer()->GetMoveDirection() == eMoveDirection::MOVE_LEFT || getPlayer()->getFlipX())
 		{
 			// push to the right
 			getPlayer()->setFlipX(false);
 			getMovement()->setVx(WALL_JUMP_VX);
-			getPlayer()->setMoveDirection(eMoveDirection::MOVE_RIGHT);
+			getPlayer()->SetMoveDirection(eMoveDirection::MOVE_RIGHT);
 		}
 		else
 		{
 			// push to the left
 			getPlayer()->setFlipX(true);
 			getMovement()->setVx(-WALL_JUMP_VX);
-			getPlayer()->setMoveDirection(eMoveDirection::MOVE_LEFT);
+			getPlayer()->SetMoveDirection(eMoveDirection::MOVE_LEFT);
 		}
 
 		// Transition into Jumping which will set vertical velocity/acceleration.
-		this->setState(std::make_unique<Jumping>(getPlayer()));
+		this->ChangeState(std::make_unique<Jumping>(getPlayer()));
 		return;
 	}
 
@@ -91,7 +91,7 @@ void Clinging::updateInput(float deltaTime)
 	if (InputController::getInstance().isKeyDown(DIK_DOWN))
 	{
 		_clingTime = 0.0f;
-		this->setState(std::make_unique<Falling>(getPlayer()));
+		this->ChangeState(std::make_unique<Falling>(getPlayer()));
 		return;
 	}
 
@@ -105,7 +105,7 @@ void Clinging::updateInput(float deltaTime)
 		// player regains normal mid-air control. More advanced behavior can transition
 		// to Running when grounded, etc.
 		_clingTime = 0.0f;
-		this->setState(std::make_unique<Falling>(getPlayer()));
+		this->ChangeState(std::make_unique<Falling>(getPlayer()));
 		return;
 	}
 

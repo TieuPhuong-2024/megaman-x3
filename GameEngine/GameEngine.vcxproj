@@ -188,7 +188,7 @@
     <ClCompile Include="States\Standing.cpp" />
     <ClCompile Include="trace.cpp" />
     <ClCompile Include="AssetLoader.cpp" />
-    <ClCompile Include="Framework\CollisionManager.cpp" />
+    <ClCompile Include="Framework\Collision.cpp" />
     <ClCompile Include="Framework\DebugDraw.cpp" />
     <ClCompile Include="Object\CWall.cpp" />
   </ItemGroup>
@@ -233,9 +233,9 @@
     <ClInclude Include="States\Standing.h" />
     <ClInclude Include="trace.h" />
     <ClInclude Include="AssetLoader.h" />
-    <ClInclude Include="Framework\CollisionManager.h" />
     <ClInclude Include="Framework\DebugDraw.h" />
     <ClInclude Include="Framework\ICollidable.h" />
+    <ClInclude Include="Framework\Collision.h" />
     <ClInclude Include="Object\CWall.h" />
     <ClInclude Include="Framework\Event.h" />
   </ItemGroup>

@@ -160,7 +160,7 @@ void DebugDraw::DrawBBoxInWorld(const RECT& bbox, Viewport* viewport, D3DXCOLOR 
 void DebugDraw::DrawCollisionBoxInSceen(ICollidable* obj, D3DXCOLOR color)
 {
     if (!obj) return;
-    RECT bbox = obj->getBoundingBox();
+    RECT bbox = obj->GetBoundingBox();
     drawRect(bbox, color);
 }
 
@@ -168,7 +168,7 @@ void DebugDraw::DrawCollisionBoxInWorld(ICollidable* obj, Viewport* viewport, D3
 {
     if (!obj || !viewport) return;
     
-    RECT bbox = obj->getBoundingBox();
+    RECT bbox = obj->GetBoundingBox();
     
     // Transform bounding box from world space to screen space
     GVector3 topLeft = viewport->getPositionInViewport(&GVector3((float)bbox.left, (float)bbox.top, 0));

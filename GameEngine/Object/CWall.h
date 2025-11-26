@@ -11,15 +11,15 @@ public:
 	~CWall();
 
 	// ICollidable
-	RECT getBoundingBox() const override;
-	void onCollision(ICollidable* other) override;
+	RECT GetBoundingBox() const override;
+	void OnCollision(ICollidable* other) override;
 	void OnCollisionWith(CCollisionEvent* e) override;
-	GVector2 getPosition() override;
-	void setPosition(GVector2 pos) override;
+	GVector2 GetPosition() override;
+	void SetPosition(GVector2 pos) override;
 	void GetSpeed(float& vx, float& vy) override;
 	void SetPosition(float x, float y) override;
-	GVector2 getVelocity() override;
-	void setVelocity(GVector2 vel) override;
+	GVector2 GetVelocity() override;
+	void SetVelocity(GVector2 vel) override;
 	bool IsBlocking() override;
 
 	float GetWidth() const { return _width; }
