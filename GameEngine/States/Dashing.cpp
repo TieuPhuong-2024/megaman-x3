@@ -64,7 +64,6 @@ void Dashing::update(float deltaTime)
 	// End dash after duration
 	if (_timeDash >= DASH_DURATION)
 	{
-		GAMELOG("Dashing ended after %.2f seconds", _timeDash);
 		_timeDash = 0.0f;
 		// After dashing, go to standing to give player control back.
 		this->ChangeState(std::make_unique<Standing>(getPlayer()));

@@ -132,7 +132,7 @@ void TileMap::loadWalls(xml_node &mapNode)
 		for (xml_node object : objectgroup.children("object"))
 		{
 			auto wall = std::make_unique<CWall>();
-			wall->SetId(object.attribute("id").as_int());
+			wall->SetID(object.attribute("id").as_int());
 
 			// TMX uses screen coordinates (Y down from top-left)
 			float tmxX = object.attribute("x").as_float();
@@ -148,7 +148,7 @@ void TileMap::loadWalls(xml_node &mapNode)
 			float worldY = mapHeight - tmxY * 2 - height;
 
 			printLog("[TileMap] Wall ID=%d TMX(x=%.1f,y=%.1f,w=%.1f,h=%.1f) -> World(x=%.1f,y=%.1f) mapH=%.0f\n",
-					 wall->GetId(), tmxX, tmxY, width, height, worldX, worldY, mapHeight);
+					 wall->GetID(), tmxX, tmxY, width, height, worldX, worldY, mapHeight);
 
 			wall->SetX(worldX);
 			wall->SetY(worldY);

@@ -60,8 +60,6 @@ void Animation::setIndex(int index)
 
 	_currentRect = _frameRectList[_index];
 	_currentOrigin = _frameOriginList[_index];
-
-	GAMELOG("Animation frame set to: %d", _index);
 }
 
 void Animation::update(float dt)

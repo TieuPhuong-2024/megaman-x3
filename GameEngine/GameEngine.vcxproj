@@ -188,13 +188,9 @@
     <ClCompile Include="States\Standing.cpp" />
     <ClCompile Include="trace.cpp" />
     <ClCompile Include="AssetLoader.cpp" />
-    <ClCompile Include="Framework\Collision\Arbiter.cpp" />
-    <ClCompile Include="Framework\Collision\Body.cpp" />
-    <ClCompile Include="Framework\Collision\Collide.cpp" />
-    <ClCompile Include="Framework\Collision\Joint.cpp" />
-    <ClCompile Include="Framework\Collision\World.cpp" />
     <ClCompile Include="Framework\DebugDraw.cpp" />
     <ClCompile Include="Object\CWall.cpp" />
+    <ClCompile Include="Object\Collision.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CGame.h" />
@@ -238,16 +234,9 @@
     <ClInclude Include="trace.h" />
     <ClInclude Include="AssetLoader.h" />
     <ClInclude Include="Framework\DebugDraw.h" />
-    <ClInclude Include="Framework\ICollidable.h" />
-    <ClInclude Include="Framework\Collision.h" />
     <ClInclude Include="Object\CWall.h" />
+    <ClInclude Include="Object\Collision.h" />
     <ClInclude Include="Framework\Event.h" />
-    <ClInclude Include="Framework\Collision\Arbiter.h" />
-    <ClInclude Include="Framework\Collision\Body.h" />
-    <ClInclude Include="Framework\Collision\World.h" />
-    <ClInclude Include="Framework\Collision\Joint.h" />
-    <ClInclude Include="Framework\Collision\MathUtils.h" />
-    <ClInclude Include="Framework\Collision\Collide.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

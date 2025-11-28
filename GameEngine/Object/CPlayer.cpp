@@ -7,6 +7,7 @@
 #include "../States/Jumping.h"
 #include "CWall.h"
 #include <algorithm>
+#include "Collision.h"
 
 CPlayer::CPlayer()
 {
@@ -129,8 +130,6 @@ void CPlayer::update(float deltaTime)
 	/* Update sprite animation */
 	_spriteAnimation[_currentIndexState]->update(deltaTime);
 
-	GAMELOG("Player update: state=%d, anim_index=%d", static_cast<int>(_currentIndexState), _spriteAnimation[_currentIndexState]->getIndex());
-
 	/* Update player state */
 	_playerState->update(deltaTime);
 }
@@ -199,7 +198,6 @@ void CPlayer::ChangeState(std::unique_ptr<PlayerState> newState)
 	_playerState = std::move(newState);
 	// Set current index of state for new index of state
 	_currentIndexState = _playerState->getState();
-	GAMELOG("Player state changed to: %d", static_cast<int>(_currentIndexState));
 	// Restart animation
 	SetStatus(_currentIndexState);
 }
@@ -212,11 +210,37 @@ void CPlayer::SetStatus(eStatus status)
 	auto timeAnimate = _spriteAnimation[_currentIndexState]->getTimeAnimate();
 	// Set current index of state for new index of state
 	_currentIndexState = status;
-	GAMELOG("Player animation state set to: %d", static_cast<int>(status));
 	// Set time animate
 	_spriteAnimation[status]->setTimeAnimate(timeAnimate);
 	// Restart animation
 	_spriteAnimation[status]->restart(index);
+}
+
+void CPlayer::OnCollision(BaseObject *otherObj, float deltaTime)
+{
+	float normalX = 0.0f;
+	float normalY = 0.0f;
+	float collisionTime = CCollision::GetInstance().SweptAABB((BaseObject *)(this), otherObj, normalX, normalY, deltaTime);
+	if (collisionTime < 1.0f)
+	{
+		if (normalY == -1.0f)
+		{
+			GAMELOG("OnCollision: Ground collision detected");
+			this->OnGroundCollision();
+		}
+		else if (normalY == 1.0f)
+		{
+			GAMELOG("OnCollision: Ceiling collision detected");
+			this->OnCeilingCollision();
+		}
+		else if (normalX != 0.0f)
+		{
+			GAMELOG("OnCollision: Wall collision detected");
+			// Collision from sides (walls)
+			bool isRight = (normalX == -1.0f);
+			this->OnWallCollision(isRight);
+		}
+	}
 }
 
 RECT CPlayer::GetBoundingBox() const
@@ -228,8 +252,8 @@ void CPlayer::OnGroundCollision()
 {
 	// Called when player lands on ground
 	_isGrounded = true;
-	_remainingJumps = _maxJumps;  // Reset jump count on landing
-	
+	_remainingJumps = _maxJumps; // Reset jump count on landing
+
 	// Transition to Standing state if not already in a ground state
 	if (_currentIndexState == eStatus::FALL || _currentIndexState == eStatus::FALL_SHOOT)
 	{
@@ -242,7 +266,7 @@ void CPlayer::OnCeilingCollision()
 {
 	// Called when player hits ceiling
 	GVector2 vel = this->GetVelocity();
-	vel.y = 0;  // Stop upward movement
+	vel.y = 0; // Stop upward movement
 	this->SetVelocity(vel);
 	GAMELOG("Player hit ceiling");
 }
@@ -259,12 +283,6 @@ void CPlayer::OnWallCollision(bool isRight)
 		_isBlockingLeft = true;
 		GAMELOG("Player blocked on left");
 	}
-}
-
-void CPlayer::GetSpeed(float& vx, float& vy) const
-{
-	vx = this->GetVelocity().x;
-	vy = this->GetVelocity().y;
 }
 
 void CPlayer::handleKeyEvent(std::shared_ptr<Framework::Event> event)
@@ -321,7 +339,6 @@ void CPlayer::handleKeyEvent(std::shared_ptr<Framework::Event> event)
 				(_currentIndexState == eStatus::STAND_SHOOT) ||
 				(_currentIndexState == eStatus::RUN_SHOOT))
 			{
-				GAMELOG("Dashing state triggered by key down C");
 				this->ChangeState(std::make_unique<Dashing>(this));
 			}
 		}

@@ -3,7 +3,7 @@
 #include "../Framework/Viewport.h"
 #include "../Framework/Sprite.h"
 #include "../Framework/Animation.h"
-#include "../Framework/Collision/Body.h"
+#include "BaseObject.h"
 #include <memory>
 
 class PlayerState;
@@ -15,7 +15,7 @@ enum class eMoveDirection
 	MOVE_RIGHT
 };
 
-class CPlayer
+class CPlayer : public BaseObject
 {
 public:
 	CPlayer();
@@ -26,17 +26,14 @@ public:
 	void draw(ID3DXSprite *spriteHandler, Viewport *viewport);
 	void ChangeState(std::unique_ptr<PlayerState> newState);
 	void SetStatus(eStatus status);
+	void OnCollision(BaseObject *otherObj, float deltaTime);
 
-	RECT GetBoundingBox() const;
+	RECT GetBoundingBox() const override;
 	GVector2 GetPosition() const;
 	void SetPosition(GVector2 pos);
-	void GetSpeed(float &vx, float &vy) const;
 	void SetPosition(float x, float y);
-	GVector2 GetVelocity() const;
+	GVector2 GetVelocity() const override;
 	void SetVelocity(GVector2 vel);
-	
-	// Physics body for collision
-	Body* GetBody() { return &_body; }
 
 	void SetScale(float scale);
 	IComponent *GetComponent(string name) const;
@@ -47,8 +44,12 @@ public:
 	bool IsBlockingLeft() { return _isBlockingLeft; }
 	bool IsBlockingRight() { return _isBlockingRight; }
 	bool IsGrounded() const { return _isGrounded; }
-	void ResetBlockingFlags() { _isBlockingLeft = false; _isBlockingRight = false; }
-	
+	void ResetBlockingFlags()
+	{
+		_isBlockingLeft = false;
+		_isBlockingRight = false;
+	}
+
 	// Collision response methods
 	void OnGroundCollision();
 	void OnCeilingCollision();
@@ -66,9 +67,6 @@ private:
 	bool _isFlipX;
 
 	eMoveDirection _MoveDirection;
-
-	// Physics body for collision
-	Body _body;
 
 	// Legacy flag retained for compatibility with existing logic.
 	bool _isJumping;

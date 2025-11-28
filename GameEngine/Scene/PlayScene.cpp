@@ -2,9 +2,9 @@
 #include "../Framework/StageManager.h"
 #include "../Framework/DebugDraw.h"
 #include "../Framework/define.h"
-#include "../Framework/Collision/World.h"
 #include "../Object/CWall.h"
 #include "../trace.h"
+#include "../Object/Collision.h"
 
 PlayScene::PlayScene() : _tileMap(nullptr)
 {
@@ -25,7 +25,6 @@ bool PlayScene::init()
 
 	// Add walls from tilemap
 	_walls = _tileMap->GetWalls();
-
 	return true;
 }
 
@@ -43,33 +42,11 @@ void PlayScene::update(float dt)
 	// Update player
 	_player->update(dt);
 
-	// Build list of collidable objects (walls, platforms, etc.)
-	vector<CWall*> collidables;
-	for (const auto& wall : _walls)
+	// Handle collisions between player and walls
+	for (const auto &wall : _walls)
 	{
-		collidables.push_back(wall.get());
+		_player->OnCollision(wall.get(), dt);
 	}
-
-	// Process collisions with walls
-	// TODO: Implement collision detection using Framework\Collision system
-	for (const auto& wall : collidables)
-	{
-		// Collision detection will be implemented using the Box2D-style collision system
-		// Check if player collides with wall
-		RECT playerBBox = _player->GetBoundingBox();
-		RECT wallBBox = wall->GetBoundingBox();
-		
-		// Simple AABB collision check
-		if (!(playerBBox.right < wallBBox.left || playerBBox.left > wallBBox.right ||
-			  playerBBox.bottom < wallBBox.top || playerBBox.top > wallBBox.bottom))
-		{
-			// Collision detected
-			// TODO: Implement more sophisticated collision response
-		}
-	}
-
-	GAMELOG("Collision: IsGrounded=%d, BlockLeft=%d, BlockRight=%d", 
-		_player->IsGrounded(), _player->IsBlockingLeft(), _player->IsBlockingRight());
 }
 
 void PlayScene::draw(LPD3DXSPRITE spriteHandle)

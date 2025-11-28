@@ -90,7 +90,7 @@ void CGame::run()
 			auto time = _pGameTime->getElapsedGameTime();
 			if (time > _frameRate * 2)
 				time = _frameRate;
-			
+
 			_pInput.update();
 			updateInput(time);
 			update(time);
