@@ -1,4 +1,5 @@
 #include "Collision.h"
+#include "../trace.h"
 
 bool CCollision::IsColliding(const RECT &bbox1, const RECT &bbox2)
 {
@@ -12,14 +13,14 @@ bool CCollision::IsColliding(const RECT &bbox1, const RECT &bbox2)
 
 RECT CCollision::GetBroadphaseBox(BaseObject *object, float dt)
 {
-    auto velocity = GVector2(object->GetVelocity().x * dt / 1000.0f, object->GetVelocity().y * dt / 1000.0f);
+    auto velocity = object->GetVelocity() * dt / 1000.0f;
     auto myRect = object->GetBoundingBox();
 
     RECT rect;
     rect.top = velocity.y > 0 ? myRect.top + velocity.y : myRect.top;
     rect.bottom = velocity.y > 0 ? myRect.bottom : myRect.bottom + velocity.y;
     rect.left = velocity.x > 0 ? myRect.left : myRect.left + velocity.x;
-    rect.right = velocity.y > 0 ? myRect.right + velocity.x : myRect.right;
+    rect.right = velocity.x > 0 ? myRect.right + velocity.x : myRect.right;
 
     return rect;
 }
@@ -38,6 +39,7 @@ float CCollision::SweptAABB(BaseObject *obj, BaseObject *otherObj, float dt, flo
     RECT broadphaseBox = GetBroadphaseBox(obj, dt);
     if (!IsColliding(broadphaseBox, bbox2))
     {
+        GAMELOG("No broadphase collision detected");
         normalX = 0.0f;
         normalY = 0.0f;
         return 1.0f;
@@ -105,6 +107,7 @@ float CCollision::SweptAABB(BaseObject *obj, BaseObject *otherObj, float dt, flo
 
     if (entryTime > exitTime || (txEntry < 0.0f && tyEntry < 0.0f) || txEntry > 1.0f || tyEntry > 1.0f)
     {
+        GAMELOG("No collision detected after calculations");
         normalX = 0.0f;
         normalY = 0.0f;
         return 1.0f;

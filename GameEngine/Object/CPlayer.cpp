@@ -220,7 +220,7 @@ void CPlayer::OnCollision(BaseObject *otherObj, float deltaTime)
 {
 	float normalX = 0.0f;
 	float normalY = 0.0f;
-	float collisionTime = CCollision::GetInstance().SweptAABB((BaseObject *)(this), otherObj, normalX, normalY, deltaTime);
+	float collisionTime = CCollision::GetInstance().SweptAABB(this, otherObj, deltaTime, normalX, normalY);
 	if (collisionTime < 1.0f)
 	{
 		if (normalY == -1.0f)
@@ -283,6 +283,8 @@ void CPlayer::OnWallCollision(bool isRight)
 		_isBlockingLeft = true;
 		GAMELOG("Player blocked on left");
 	}
+
+	ChangeState(std::make_unique<Standing>(this));
 }
 
 void CPlayer::handleKeyEvent(std::shared_ptr<Framework::Event> event)

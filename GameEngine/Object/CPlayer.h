@@ -43,12 +43,6 @@ public:
 	eMoveDirection GetMoveDirection();
 	bool IsBlockingLeft() { return _isBlockingLeft; }
 	bool IsBlockingRight() { return _isBlockingRight; }
-	bool IsGrounded() const { return _isGrounded; }
-	void ResetBlockingFlags()
-	{
-		_isBlockingLeft = false;
-		_isBlockingRight = false;
-	}
 
 	// Collision response methods
 	void OnGroundCollision();
@@ -96,7 +90,7 @@ private:
 	float _coyoteTimer = 0.0f;
 
 	// Whether the player is considered grounded (set by collision system via notifyGrounded)
-	bool _isGrounded = true;
+	bool _isGrounded = false;
 
 	// --- End jump / air control extended state ---
 

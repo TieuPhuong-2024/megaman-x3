@@ -1,6 +1,5 @@
 #include "DebugDraw.h"
 #include "Viewport.h"
-#include "Collision/Body.h"
 #include <cmath>
 
 // Only compile in debug builds
