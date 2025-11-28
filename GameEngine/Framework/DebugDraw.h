@@ -30,8 +30,6 @@ public:
     // Convenience methods for game objects
     void DrawBBoxInScreen(const RECT& bbox, D3DXCOLOR color = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
     void DrawBBoxInWorld(const RECT &bbox, class Viewport *viewport, D3DXCOLOR color);
-    void DrawCollisionBoxInSceen(class ICollidable *obj, D3DXCOLOR color = D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
-    void DrawCollisionBoxInWorld(class ICollidable* obj, class Viewport* viewport, D3DXCOLOR color = D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
 
     // Toggle debug drawing
     void setEnabled(bool enabled) { _enabled = enabled; }

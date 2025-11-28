@@ -3,8 +3,7 @@
 #include "../Framework/Viewport.h"
 #include "../Framework/Sprite.h"
 #include "../Framework/Animation.h"
-#include "../Framework/ICollidable.h"
-#include "../Framework/Collision.h"
+#include "../Framework/Collision/Body.h"
 #include <memory>
 
 class PlayerState;
@@ -16,7 +15,7 @@ enum class eMoveDirection
 	MOVE_RIGHT
 };
 
-class CPlayer : public ICollidable
+class CPlayer
 {
 public:
 	CPlayer();
@@ -28,19 +27,19 @@ public:
 	void ChangeState(std::unique_ptr<PlayerState> newState);
 	void SetStatus(eStatus status);
 
-	RECT GetBoundingBox() const override;
-	void OnCollision(ICollidable *other) override;
-	void OnCollisionWith(CCollisionEvent *e) override;
-	GVector2 GetPosition() override;
-	void SetPosition(GVector2 pos) override;
-	void GetSpeed(float &vx, float &vy) override;
-	void SetPosition(float x, float y) override;
-	GVector2 GetVelocity() override;
-	void SetVelocity(GVector2 vel) override;
-	bool IsBlocking() override;
+	RECT GetBoundingBox() const;
+	GVector2 GetPosition() const;
+	void SetPosition(GVector2 pos);
+	void GetSpeed(float &vx, float &vy) const;
+	void SetPosition(float x, float y);
+	GVector2 GetVelocity() const;
+	void SetVelocity(GVector2 vel);
+	
+	// Physics body for collision
+	Body* GetBody() { return &_body; }
 
 	void SetScale(float scale);
-	IComponent *GetComponent(string name);
+	IComponent *GetComponent(string name) const;
 	void setFlipX(bool isFlip);
 	bool getFlipX();
 	void SetMoveDirection(eMoveDirection moveDirection);
@@ -49,6 +48,11 @@ public:
 	bool IsBlockingRight() { return _isBlockingRight; }
 	bool IsGrounded() const { return _isGrounded; }
 	void ResetBlockingFlags() { _isBlockingLeft = false; _isBlockingRight = false; }
+	
+	// Collision response methods
+	void OnGroundCollision();
+	void OnCeilingCollision();
+	void OnWallCollision(bool isRight);
 
 private:
 	void handleKeyEvent(std::shared_ptr<Framework::Event> event);
@@ -62,6 +66,9 @@ private:
 	bool _isFlipX;
 
 	eMoveDirection _MoveDirection;
+
+	// Physics body for collision
+	Body _body;
 
 	// Legacy flag retained for compatibility with existing logic.
 	bool _isJumping;

@@ -1,6 +1,6 @@
 #include "DebugDraw.h"
-#include "ICollidable.h"
 #include "Viewport.h"
+#include "Collision/Body.h"
 #include <cmath>
 
 // Only compile in debug builds
@@ -153,27 +153,6 @@ void DebugDraw::DrawBBoxInWorld(const RECT& bbox, Viewport* viewport, D3DXCOLOR 
     GVector3 topLeft = viewport->getPositionInViewport(&GVector3((float)bbox.left, (float)bbox.top, 0));
     GVector3 bottomRight = viewport->getPositionInViewport(&GVector3((float)bbox.right, (float)bbox.bottom, 0));
 
-    // Draw transformed rect
-    drawRect((float)topLeft.x, (float)topLeft.y, (float)bottomRight.x, (float)bottomRight.y, color);
-}
-
-void DebugDraw::DrawCollisionBoxInSceen(ICollidable* obj, D3DXCOLOR color)
-{
-    if (!obj) return;
-    RECT bbox = obj->GetBoundingBox();
-    drawRect(bbox, color);
-}
-
-void DebugDraw::DrawCollisionBoxInWorld(ICollidable* obj, Viewport* viewport, D3DXCOLOR color)
-{
-    if (!obj || !viewport) return;
-    
-    RECT bbox = obj->GetBoundingBox();
-    
-    // Transform bounding box from world space to screen space
-    GVector3 topLeft = viewport->getPositionInViewport(&GVector3((float)bbox.left, (float)bbox.top, 0));
-    GVector3 bottomRight = viewport->getPositionInViewport(&GVector3((float)bbox.right, (float)bbox.bottom, 0));
-    
     // Draw transformed rect
     drawRect((float)topLeft.x, (float)topLeft.y, (float)bottomRight.x, (float)bottomRight.y, color);
 }

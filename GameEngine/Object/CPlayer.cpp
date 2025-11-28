@@ -6,7 +6,6 @@
 #include "../States/Falling.h"
 #include "../States/Jumping.h"
 #include "CWall.h"
-#include "../Framework/Collision.h"
 #include <algorithm>
 
 CPlayer::CPlayer()
@@ -225,62 +224,44 @@ RECT CPlayer::GetBoundingBox() const
 	return _sprite->getBounding();
 }
 
-void CPlayer::OnCollision(ICollidable* other)
+void CPlayer::OnGroundCollision()
 {
+	// Called when player lands on ground
+	_isGrounded = true;
+	_remainingJumps = _maxJumps;  // Reset jump count on landing
+	
+	// Transition to Standing state if not already in a ground state
+	if (_currentIndexState == eStatus::FALL || _currentIndexState == eStatus::FALL_SHOOT)
+	{
+		this->ChangeState(std::make_unique<Standing>(this));
+	}
+	GAMELOG("Player landed on ground");
 }
 
-void CPlayer::OnCollisionWith(CCollisionEvent* e)
+void CPlayer::OnCeilingCollision()
 {
-	// e->nx, e->ny = collision normal (direction of collision)
-	// e->obj = the object you collided with
-	// e->t = collision time (0.0 to 1.0)
+	// Called when player hits ceiling
+	GVector2 vel = this->GetVelocity();
+	vel.y = 0;  // Stop upward movement
+	this->SetVelocity(vel);
+	GAMELOG("Player hit ceiling");
+}
 
-	if (e->ny != 0)  // collision on Y axis (vertical)
+void CPlayer::OnWallCollision(bool isRight)
+{
+	if (isRight)
 	{
-		if (e->ny < 0)  // collision from above (jumping into ceiling)
-		{
-			// Handle ceiling collision - stop upward velocity
-			GVector2 vel = this->GetVelocity();
-			vel.y = 0;  // Stop upward movement
-			this->SetVelocity(vel);
-			GAMELOG("Player hit ceiling");
-		}
-		else if (e->ny > 0)  // collision from below (landing on ground)
-		{
-			// Handle ground collision - player is grounded
-			_isGrounded = true;
-			_remainingJumps = _maxJumps;  // Reset jump count on landing
-			
-			// Transition to Standing state if not already in a ground state
-			if (_currentIndexState == eStatus::FALL || _currentIndexState == eStatus::FALL_SHOOT)
-			{
-				this->ChangeState(std::make_unique<Standing>(this));
-			}
-			GAMELOG("Player landed on ground");
-		}
+		_isBlockingRight = true;
+		GAMELOG("Player blocked on right");
 	}
-
-	if (e->nx != 0)  // collision on X axis (left/right walls)
+	else
 	{
-		if (e->nx < 0)  // collision from right side (hitting wall on right)
-		{
-			_isBlockingRight = true;
-			GAMELOG("Player blocked on right");
-		}
-		else if (e->nx > 0)  // collision from left side (hitting wall on left)
-		{
-			_isBlockingLeft = true;
-			GAMELOG("Player blocked on left");
-		}
+		_isBlockingLeft = true;
+		GAMELOG("Player blocked on left");
 	}
 }
 
-bool CPlayer::IsBlocking()
-{
-	return false;
-}
-
-void CPlayer::GetSpeed(float& vx, float& vy)
+void CPlayer::GetSpeed(float& vx, float& vy) const
 {
 	vx = this->GetVelocity().x;
 	vy = this->GetVelocity().y;
@@ -376,7 +357,7 @@ void CPlayer::SetPosition(float x, float y)
 	this->SetPosition(GVector2(x, y));
 }
 
-GVector2 CPlayer::GetPosition()
+GVector2 CPlayer::GetPosition() const
 {
 	return _sprite->getPosition();
 }
@@ -386,9 +367,9 @@ void CPlayer::SetScale(float scale)
 	_sprite->setScale(scale);
 }
 
-IComponent *CPlayer::GetComponent(string name)
+IComponent *CPlayer::GetComponent(string name) const
 {
-	return _component[name].get();
+	return _component.at(name).get();
 }
 
 void CPlayer::setFlipX(bool isFlip)
@@ -412,7 +393,7 @@ eMoveDirection CPlayer::GetMoveDirection()
 	return _MoveDirection;
 }
 
-GVector2 CPlayer::GetVelocity()
+GVector2 CPlayer::GetVelocity() const
 {
 	Movement *movement = static_cast<Movement *>(GetComponent("Movement"));
 	return movement ? movement->getVelocity() : VECTOR2ZERO;

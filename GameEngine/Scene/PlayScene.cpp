@@ -2,7 +2,7 @@
 #include "../Framework/StageManager.h"
 #include "../Framework/DebugDraw.h"
 #include "../Framework/define.h"
-#include "../Framework/Collision.h"
+#include "../Framework/Collision/World.h"
 #include "../Object/CWall.h"
 #include "../trace.h"
 
@@ -43,22 +43,29 @@ void PlayScene::update(float dt)
 	// Update player
 	_player->update(dt);
 
-	// Clear blocking flags from previous frame before processing collisions
-	_player->ResetBlockingFlags();
-
 	// Build list of collidable objects (walls, platforms, etc.)
-	vector<ICollidable*> collidables;
+	vector<CWall*> collidables;
 	for (const auto& wall : _walls)
 	{
 		collidables.push_back(wall.get());
 	}
 
-	// Process collisions using SweptAABB system
-	// dt is in milliseconds for the collision system
-	DWORD dtMilliseconds = (DWORD)(dt);
-	if (collidables.size() > 0)
+	// Process collisions with walls
+	// TODO: Implement collision detection using Framework\Collision system
+	for (const auto& wall : collidables)
 	{
-		CCollision::GetInstance()->Process(_player.get(), dtMilliseconds, &collidables);
+		// Collision detection will be implemented using the Box2D-style collision system
+		// Check if player collides with wall
+		RECT playerBBox = _player->GetBoundingBox();
+		RECT wallBBox = wall->GetBoundingBox();
+		
+		// Simple AABB collision check
+		if (!(playerBBox.right < wallBBox.left || playerBBox.left > wallBBox.right ||
+			  playerBBox.bottom < wallBBox.top || playerBBox.top > wallBBox.bottom))
+		{
+			// Collision detected
+			// TODO: Implement more sophisticated collision response
+		}
 	}
 
 	GAMELOG("Collision: IsGrounded=%d, BlockLeft=%d, BlockRight=%d", 
@@ -77,8 +84,8 @@ void PlayScene::draw(LPD3DXSPRITE spriteHandle)
 	auto &debugDraw = DebugDraw::getInstance();
 	if (debugDraw.isEnabled())
 	{
-		// Draw collision boxes with viewport transform
-		debugDraw.DrawCollisionBoxInWorld(_player.get(), _viewport.get(), D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f)); // Green for player
+		// Draw player bounding box
+		debugDraw.DrawBBoxInWorld(_player->GetBoundingBox(), _viewport.get(), D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f)); // Green for player
 
 		for (const auto &wall : _walls)
 		{

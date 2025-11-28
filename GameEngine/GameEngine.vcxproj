@@ -188,7 +188,11 @@
     <ClCompile Include="States\Standing.cpp" />
     <ClCompile Include="trace.cpp" />
     <ClCompile Include="AssetLoader.cpp" />
-    <ClCompile Include="Framework\Collision.cpp" />
+    <ClCompile Include="Framework\Collision\Arbiter.cpp" />
+    <ClCompile Include="Framework\Collision\Body.cpp" />
+    <ClCompile Include="Framework\Collision\Collide.cpp" />
+    <ClCompile Include="Framework\Collision\Joint.cpp" />
+    <ClCompile Include="Framework\Collision\World.cpp" />
     <ClCompile Include="Framework\DebugDraw.cpp" />
     <ClCompile Include="Object\CWall.cpp" />
   </ItemGroup>
@@ -238,6 +242,12 @@
     <ClInclude Include="Framework\Collision.h" />
     <ClInclude Include="Object\CWall.h" />
     <ClInclude Include="Framework\Event.h" />
+    <ClInclude Include="Framework\Collision\Arbiter.h" />
+    <ClInclude Include="Framework\Collision\Body.h" />
+    <ClInclude Include="Framework\Collision\World.h" />
+    <ClInclude Include="Framework\Collision\Joint.h" />
+    <ClInclude Include="Framework\Collision\MathUtils.h" />
+    <ClInclude Include="Framework\Collision\Collide.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

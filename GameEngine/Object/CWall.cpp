@@ -22,18 +22,18 @@ CWall::~CWall()
 {
 }
 
-// ICollidable implementation
+// Collision interface
 RECT CWall::GetBoundingBox() const
 {
 	RECT bound;
-	bound.left = _x;
-	bound.bottom = _y;  // Đáy wall
-	bound.right = _x + _width;
-	bound.top = _y + _height;  // Đỉnh wall
+	bound.left = (LONG)_x;
+	bound.bottom = (LONG)_y;  // Đáy wall
+	bound.right = (LONG)(_x + _width);
+	bound.top = (LONG)(_y + _height);  // Đỉnh wall
 	return bound;
 }
 
-GVector2 CWall::GetPosition()
+GVector2 CWall::GetPosition() const
 {
 	return { _x, _y };
 }
@@ -49,28 +49,13 @@ void CWall::SetPosition(float x, float y)
 	SetPosition(GVector2(x, y));
 }
 
-bool CWall::IsBlocking()
-{
-	return true;
-}
-
-void CWall::OnCollision(ICollidable* other)
-{
-	// Wall doesn't react to collision
-}
-
-void CWall::OnCollisionWith(CCollisionEvent* e)
-{
-	// Wall doesn't react to collision
-}
-
-void CWall::GetSpeed(float& vx, float& vy)
+void CWall::GetSpeed(float& vx, float& vy) const
 {
 	vx = 0.0f;
 	vy = 0.0f;
 }
 
-GVector2 CWall::GetVelocity()
+GVector2 CWall::GetVelocity() const
 {
 	return GVector2(0.0f, 0.0f);
 }

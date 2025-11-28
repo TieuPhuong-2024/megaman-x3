@@ -1,26 +1,27 @@
 #pragma once
 #include "BaseObject.h"
 #include <d3dx9.h>
-#include "../Framework/ICollidable.h"
+#include "../Framework/define.h"
+#include "../Framework/Collision/Body.h"
 
-class CWall : public BaseObject, public ICollidable
+class CWall : public BaseObject
 {
 public:
 	CWall(float x, float y, float width, float height, int id);
 	CWall();
 	~CWall();
 
-	// ICollidable
-	RECT GetBoundingBox() const override;
-	void OnCollision(ICollidable* other) override;
-	void OnCollisionWith(CCollisionEvent* e) override;
-	GVector2 GetPosition() override;
-	void SetPosition(GVector2 pos) override;
-	void GetSpeed(float& vx, float& vy) override;
-	void SetPosition(float x, float y) override;
-	GVector2 GetVelocity() override;
-	void SetVelocity(GVector2 vel) override;
-	bool IsBlocking() override;
+	// Collision interface
+	RECT GetBoundingBox() const;
+	GVector2 GetPosition() const;
+	void SetPosition(GVector2 pos);
+	void GetSpeed(float& vx, float& vy) const;
+	void SetPosition(float x, float y);
+	GVector2 GetVelocity() const;
+	void SetVelocity(GVector2 vel);
+	
+	// Physics body for collision
+	Body* GetBody() { return &_body; }
 
 	float GetWidth() const { return _width; }
 	void SetWidth(float width) { _width = width; }
@@ -40,4 +41,7 @@ private:
 	float       _x;
 	float       _y;
 	int         _id;
+	
+	// Physics body for collision
+	Body _body;
 };

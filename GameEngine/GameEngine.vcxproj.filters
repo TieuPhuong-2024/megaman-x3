@@ -51,9 +51,7 @@
     <ClCompile Include="AssetLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Observer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
+
     <ClCompile Include="CMegaman.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -129,6 +127,9 @@
     <ClCompile Include="Framework\Viewport.cpp">
       <Filter>Source Files\Framework</Filter>
     </ClCompile>
+    <ClCompile Include="Framework\DebugDraw.cpp">
+      <Filter>Source Files\Framework</Filter>
+    </ClCompile>
     <ClCompile Include="Object\BaseObject.cpp">
       <Filter>Source Files\Object</Filter>
     </ClCompile>
@@ -162,7 +163,19 @@
     <ClCompile Include="States\Standing.cpp">
       <Filter>Source Files\States</Filter>
     </ClCompile>
-    <ClCompile Include="Framework\Collision.cpp">
+    <ClCompile Include="Framework\Collision\Arbiter.cpp">
+      <Filter>Source Files\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\Collision\Body.cpp">
+      <Filter>Source Files\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\Collision\Collide.cpp">
+      <Filter>Source Files\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\Collision\Joint.cpp">
+      <Filter>Source Files\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\Collision\World.cpp">
       <Filter>Source Files\Framework</Filter>
     </ClCompile>
     <ClCompile Include="Object\CWall.cpp">
@@ -176,9 +189,7 @@
     <ClInclude Include="AssetLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Observer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+
     <ClInclude Include="CGame.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -260,6 +271,9 @@
     <ClInclude Include="Framework\Viewport.h">
       <Filter>Header Files\Framework</Filter>
     </ClInclude>
+    <ClInclude Include="Framework\DebugDraw.h">
+      <Filter>Header Files\Framework</Filter>
+    </ClInclude>
     <ClInclude Include="Framework\define.h">
       <Filter>Header Files\Framework</Filter>
     </ClInclude>
@@ -296,10 +310,19 @@
     <ClInclude Include="States\Standing.h">
       <Filter>Header Files\States</Filter>
     </ClInclude>
-    <ClInclude Include="Framework\Collision.h">
+    <ClInclude Include="Framework\Collision\Arbiter.h">
       <Filter>Header Files\Framework</Filter>
     </ClInclude>
-    <ClInclude Include="Framework\ICollidable.h">
+    <ClInclude Include="Framework\Collision\Body.h">
+      <Filter>Header Files\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\Collision\World.h">
+      <Filter>Header Files\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\Collision\Joint.h">
+      <Filter>Header Files\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\Collision\MathUtils.h">
       <Filter>Header Files\Framework</Filter>
     </ClInclude>
     <ClInclude Include="Object\CWall.h">
