@@ -1,40 +1,40 @@
 ﻿#ifndef DIRECTINPUT_VERSION
-#define DIRECTINPUT_VERSION 0x800 
+#define DIRECTINPUT_VERSION 0x800
 #endif
 
-#pragma warning(disable: 4018)
-#pragma warning(disable: 4066)
-#pragma warning(disable: 4244)
-#pragma warning(disable: 4305)
-#pragma warning(disable: 4715)
-#pragma warning(disable: 4800)
+#pragma warning(disable : 4018)
+#pragma warning(disable : 4066)
+#pragma warning(disable : 4244)
+#pragma warning(disable : 4305)
+#pragma warning(disable : 4715)
+#pragma warning(disable : 4800)
 
 #ifndef __GAMEUIT_FRAMEWORK__
 #define __GAMEUIT_FRAMEWORK__
 
 #define _USE_MATH_DEFINES
 
-#include <d3d9.h>		
-#include <d3dx9.h>	
-#include <dinput.h>		
-#include <dsound.h>		
+#include <d3d9.h>
+#include <d3dx9.h>
+#include <dinput.h>
+#include <dsound.h>
 #include <windows.h>
 #include <exception>
 #include <cmath>
 #include <string>
 #include <map>
 #include <vector>
-using std::string;
-using std::map;
-using std::vector;
 using std::make_pair;
+using std::map;
+using std::string;
+using std::vector;
 
 #define WINDOW_WIDTH 600
 #define WINDOW_HEIGHT 600
 #define SCALE_FACTOR 1.0f
 
 #define COLOR_WHITE D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f)
-#define COLOR_KEY D3DXCOLOR(1.0f, 0.0f, 1.0f, 1.0f)				
+#define COLOR_KEY D3DXCOLOR(1.0f, 0.0f, 1.0f, 1.0f)
 
 #define ITEM_DESTROY_TIME 3000
 
@@ -63,6 +63,7 @@ enum class eStatus
 	DASH = 1 << 6,
 	KICK = 1 << 7,
 	SHOOT = 1 << 8,
+	LAND = 1 << 9,
 	STAND_SHOOT = STAND | SHOOT,
 	RUN_SHOOT = RUN | SHOOT,
 	JUMP_SHOOT = JUMP | SHOOT,
@@ -70,6 +71,7 @@ enum class eStatus
 	CLING_SHOOT = CLING | SHOOT,
 	DASH_SHOOT = DASH | SHOOT,
 	KICK_SHOOT = KICK | SHOOT,
+	LAND_SHOOT = LAND | SHOOT,
 };
 
 enum class eDirection
@@ -94,7 +96,7 @@ enum class eSoundId
 using GVector3 = D3DXVECTOR3;
 using GVector2 = D3DXVECTOR2;
 #define VECTOR2ZERO GVector2(0.0f, 0.0f)
-#define VECTOR2ONE  GVector2(1.0f, 1.0f)
+#define VECTOR2ONE GVector2(1.0f, 1.0f)
 
 #define EVENT_SOURCE [event_source(native)]
 #define EVENT_RECEIVER [event_receiver(native)]
@@ -102,18 +104,18 @@ using GVector2 = D3DXVECTOR2;
 #ifndef SAFE_DELETE
 
 #define SAFE_DELETE(p) \
-if(p) \
-{\
-	delete (p); \
-	p = nullptr; \
-} \
+	if (p)             \
+	{                  \
+		delete (p);    \
+		p = nullptr;   \
+	}
 
 #endif // !SAFE_DELETE
 
 // Simple AABB collision check
-inline bool aabbOverlap(const RECT& a, const RECT& b)
+inline bool aabbOverlap(const RECT &a, const RECT &b)
 {
-    return (a.left < b.right &&
+	return (a.left < b.right &&
 			a.right > b.left &&
 			a.top > b.bottom &&
 			a.bottom < b.top);

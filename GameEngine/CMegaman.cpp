@@ -68,7 +68,7 @@ void CMegaman::loadResource()
 void CMegaman::updateInput(float deltaTime)
 {
 	// Toggle debug draw with F1
-	if (_pInput.isKeyPressed(DIK_F1))
+	if (_pInput.isKeyDown(DIK_F1))
 	{
 		DebugDraw::getInstance().toggle();
 	}

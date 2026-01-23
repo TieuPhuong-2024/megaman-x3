@@ -86,9 +86,6 @@ void Texture::render(LPD3DXSPRITE spriteHandle, RECT* srcRect, GVector2 position
 	//set matrix transformed
 	spriteHandle->SetTransform(&matFinal);
 
-	// BEGIN
-	spriteHandle->Begin(D3DXSPRITE_ALPHABLEND | D3DXSPRITE_DONOTSAVESTATE);
-
 	GVector3 pos(position.x, position.y, zIndex);
 	spriteHandle->Draw(
 		this->_texture,
@@ -98,9 +95,6 @@ void Texture::render(LPD3DXSPRITE spriteHandle, RECT* srcRect, GVector2 position
 		_color);
 
 	spriteHandle->SetTransform(&matOld);
-
-	// END
-	spriteHandle->End();
 }
 
 void Texture::render(LPD3DXSPRITE spriteHandle, RECT* srcRect, Viewport viewport, GVector2 position, GVector2 scale, float rotate, GVector2 origin, float zIndex)

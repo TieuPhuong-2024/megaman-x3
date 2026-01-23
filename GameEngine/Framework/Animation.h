@@ -1,4 +1,4 @@
-﻿#ifndef __ANIMATION_H__
+#ifndef __ANIMATION_H__
 #define __ANIMATION_H__
 
 #include <vector>
@@ -8,11 +8,22 @@
 #include "IComponent.h"
 #include "SpriteManager.h"
 
+struct AnimationFrame
+{
+	RECT rect;
+	GVector2 origin;
+	
+	AnimationFrame() = default;
+	AnimationFrame(const RECT& r, const GVector2& o) : rect(r), origin(o) {}
+};
+
 class Animation : public IComponent
 {
 public:
 	~Animation();
-	Animation(Sprite* spriteSheet, float timeAnimate = 0.0f, bool loop = true);
+	Animation(Sprite* spriteSheet, float timeAnimate = 0.0f, bool loop = true, int expectedFrames = 8);
+	
+	static constexpr float MS_TO_SECONDS = 1.0f / 1000.0f;
 
 	void nextFrame();
 
@@ -55,8 +66,8 @@ public:
 	D3DXCOLOR getColorFlash();
 	bool isLastAnimation();
 
-	RECT getCurrentRect() const { return _currentRect; }
-	GVector2 getCurrentOrigin() const { return _currentOrigin; }
+RECT getCurrentRect() const { return _currentFrame.rect; }
+	GVector2 getCurrentOrigin() const { return _currentFrame.origin; }
 	Sprite* getSpriteSheet() const { return _spriteSheet; }
 
 private:
@@ -73,15 +84,17 @@ private:
 	bool _isLoop;
 
 	Sprite* _spriteSheet;
-	vector<RECT> _frameRectList;
-	vector<GVector2> _frameOriginList;
+	vector<AnimationFrame> _frames;
 	string _nameAnimation;
-	RECT _currentRect;
-	GVector2 _currentOrigin;
+	AnimationFrame _currentFrame;
 
 	bool _canFlashes;
 	float _valueFlashes;
 	D3DXCOLOR _flashColor;
+	
+	// Optimization flags
+	bool _needsSpriteUpdate;
+	bool _lastFlashState;
 };
 
 #endif // !__ANIMATION_H__

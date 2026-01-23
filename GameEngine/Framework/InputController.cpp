@@ -66,37 +66,19 @@ bool InputController::init(HWND hWnd, HINSTANCE hInstance)
 
 void InputController::update()
 {
-	for (int i = 0; i < 256; i++)
-	{
-		_previousKeyBuffer[i] = ((_keyBuffer[i] & 0x80) > 0);
-	}
-
 	// collect state of all of keys.
 	_keyboard->GetDeviceState(sizeof(this->_keyBuffer), _keyBuffer);
+
+	// Update key states
+    updateKey(DIK_LEFT, isKeyDown(DIK_LEFT));
+    updateKey(DIK_RIGHT, isKeyDown(DIK_RIGHT));
+    updateKey(DIK_X, isKeyDown(DIK_X));
+    updateKey(DIK_C, isKeyDown(DIK_C));
+    updateKey(DIK_Z, isKeyDown(DIK_Z));
+
 	if (isKeyDown(DIK_ESCAPE))
 	{
 		PostMessage(_hWnd, WM_QUIT, 0, 0);
-	}
-
-	DWORD dw = KEYBOARD_BUFFER_SIZE;
-	HRESULT rs = _keyboard->GetDeviceData(sizeof(DIDEVICEOBJECTDATA), _keyEvents, &dw, 0);
-
-	for (DWORD i = 0; i < dw; i++) // not use for each statement.
-	{
-		int keycode = _keyEvents[i].dwOfs;
-		int keyState = _keyEvents[i].dwData;
-		if ((keyState & 0x80) > 0)
-		{
-			// Dispatch new Event system - KeyDown
-			auto keyEvent = std::make_shared<Framework::KeyEvent>(Framework::KeyEvent::Type::KeyDown, keycode);
-			Framework::Events::dispatch(keyEvent);
-		}
-		else
-		{
-			// Dispatch new Event system - KeyUp
-			auto keyEvent = std::make_shared<Framework::KeyEvent>(Framework::KeyEvent::Type::KeyUp, keycode);
-			Framework::Events::dispatch(keyEvent);
-		}
 	}
 }
 
@@ -105,19 +87,22 @@ int InputController::isKeyDown(int keycode)
 	return ((_keyBuffer[keycode] & 0x80) > 0);
 }
 
-int InputController::isKeyUp(int nKeyCode)
+InputData InputController::getInputData()
 {
-	return !isKeyDown(nKeyCode);
+	_inputData.left = _keyStates[DIK_LEFT];
+    _inputData.right = _keyStates[DIK_RIGHT];
+    _inputData.jump = _keyStates[DIK_X];
+    _inputData.dash = _keyStates[DIK_C];
+    _inputData.shoot = _keyStates[DIK_Z];
+    return _inputData;
 }
 
-bool InputController::isKeyPressed(int keycode)
+void InputController::updateKey(int keycode, bool isDown)
 {
-	// Don't use
-	return isKeyDown(keycode) && !(_previousKeyBuffer[keycode]);
-}
-
-bool InputController::isKeyRelease(int keycode)
-{
-	// Don't use
-	return !isKeyDown(keycode) && (_previousKeyBuffer[keycode]);
+	KeyState& state = _keyStates[keycode];
+    if (isDown) {
+        state = (state == NONE || state == RELEASED) ? PRESSED : HELD;
+    } else {
+        state = (state == PRESSED || state == HELD) ? RELEASED : NONE;
+    }
 }

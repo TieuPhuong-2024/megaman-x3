@@ -1,7 +1,7 @@
-﻿#include "Animation.h"
+#include "Animation.h"
 #include "../trace.h"
 
-Animation::Animation(Sprite *spriteSheet, float timeAnimate, bool loop)
+Animation::Animation(Sprite *spriteSheet, float timeAnimate, bool loop, int expectedFrames)
 {
 	_spriteSheet = spriteSheet;
 	_timeAnimate = timeAnimate;
@@ -14,6 +14,13 @@ Animation::Animation(Sprite *spriteSheet, float timeAnimate, bool loop)
 
 	_startFrame = 0;
 	_endFrame = _totalFrames - 1;
+
+	// Reserve capacity for better performance
+	_frames.reserve(expectedFrames);
+	
+	// Initialize optimization flags
+	_needsSpriteUpdate = true;
+	_lastFlashState = false;
 
 	this->setIndex(0);
 	this->setLoop(loop);
@@ -58,8 +65,9 @@ void Animation::setIndex(int index)
 		}
 	}
 
-	_currentRect = _frameRectList[_index];
-	_currentOrigin = _frameOriginList[_index];
+	// Update current frame and mark for sprite update
+	_currentFrame = _frames[_index];
+	_needsSpriteUpdate = true;
 }
 
 void Animation::update(float dt)
@@ -67,7 +75,8 @@ void Animation::update(float dt)
 	if (!_canFlashes && !_canAnimate)
 		return;
 
-	_timer += dt / 1000;
+	// Use precomputed time scale for better performance
+	_timer += dt * MS_TO_SECONDS;
 	if (_timer >= _timeAnimate)
 	{
 		if (_canAnimate)
@@ -77,15 +86,21 @@ void Animation::update(float dt)
 
 		if (_canFlashes)
 		{
-			if (_spriteSheet->getOpacity() != _valueFlashes)
+			// Cache flash state to reduce sprite updates
+			bool currentFlashState = (_spriteSheet->getOpacity() == _valueFlashes);
+			if (currentFlashState != _lastFlashState)
 			{
-				_spriteSheet->setOpacity(_valueFlashes);
-				_spriteSheet->setColor(D3DXCOLOR(_flashColor.r, _flashColor.g, _flashColor.b, _valueFlashes));
-			}
-			else
-			{
-				_spriteSheet->setOpacity(1.0f);
-				_spriteSheet->setColor(D3DXCOLOR(_flashColor.r, _flashColor.g, _flashColor.b, 1.0f));
+				_lastFlashState = currentFlashState;
+				if (currentFlashState)
+				{
+					_spriteSheet->setOpacity(_valueFlashes);
+					_spriteSheet->setColor(D3DXCOLOR(_flashColor.r, _flashColor.g, _flashColor.b, _valueFlashes));
+				}
+				else
+				{
+					_spriteSheet->setOpacity(1.0f);
+					_spriteSheet->setColor(D3DXCOLOR(_flashColor.r, _flashColor.g, _flashColor.b, 1.0f));
+				}
 			}
 		}
 	}
@@ -126,18 +141,20 @@ bool Animation::isAnimate()
 
 bool Animation::isLastAnimation()
 {
-	return false;
+	return !_isLoop && _index == _endFrame;
 }
 
 void Animation::addFrameRect(RECT rect)
 {
-	if (_frameRectList.empty())
+	if (_frames.empty())
 	{
-		_currentRect = rect;
+		_currentFrame.rect = rect;
+		_currentFrame.origin = VECTOR2ZERO;
+		_needsSpriteUpdate = true;
 	}
 
-	_frameRectList.push_back(rect);
-	_totalFrames = _frameRectList.size();
+	_frames.emplace_back(rect, VECTOR2ZERO);
+	_totalFrames = _frames.size();
 
 	_endFrame = _totalFrames - 1;
 }
@@ -153,8 +170,20 @@ void Animation::addFrameRect(eID id, const char *firstRectName, ...)
 
 	while (name != NULL)
 	{
-		this->addFrameRect(SpriteManager::getInstance().getSourceRect(id, name));
-		this->addFrameOrigin(SpriteManager::getInstance().getOrigin(id, name));
+		RECT rect = SpriteManager::getInstance().getSourceRect(id, name);
+		GVector2 origin = SpriteManager::getInstance().getOrigin(id, name);
+		
+		if (_frames.empty())
+		{
+			_currentFrame.rect = rect;
+			_currentFrame.origin = origin;
+			_needsSpriteUpdate = true;
+		}
+
+		_frames.emplace_back(rect, origin);
+		_totalFrames = _frames.size();
+		_endFrame = _totalFrames - 1;
+		
 		name = va_arg(vl, const char *);
 	}
 
@@ -163,12 +192,16 @@ void Animation::addFrameRect(eID id, const char *firstRectName, ...)
 
 void Animation::addFrameOrigin(GVector2 origin)
 {
-	if (_frameOriginList.empty())
+	if (_frames.empty())
 	{
-		_currentOrigin = origin;
+		_currentFrame.origin = origin;
+		_needsSpriteUpdate = true;
 	}
-
-	_frameOriginList.push_back(origin);
+	else
+	{
+		// Update the last frame's origin
+		_frames.back().origin = origin;
+	}
 }
 
 void Animation::setLoop(bool isLoop)
@@ -238,7 +271,11 @@ D3DXCOLOR Animation::getColorFlash()
 
 void Animation::draw(LPD3DXSPRITE spriteHandle, Viewport *viewport)
 {
-	_spriteSheet->setFrameRect(_currentRect);
-	_spriteSheet->setOrigin(_currentOrigin);
+	if (_needsSpriteUpdate)
+	{
+		_spriteSheet->setFrameRect(_currentFrame.rect);
+		_spriteSheet->setOrigin(_currentFrame.origin);
+		_needsSpriteUpdate = false;
+	}
 	_spriteSheet->render(spriteHandle, viewport);
 }

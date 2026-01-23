@@ -1,5 +1,4 @@
 #pragma once
-#include "../Object/CPlayer.h"
 #include "../Framework/Scene.h"
 #include <vector>
 #include <memory>
@@ -21,7 +20,6 @@ public:
 	void updateViewport(float dt);
 
 private:
-	std::unique_ptr<CPlayer> _player;
 	TileMap *_tileMap;
 	std::vector<std::unique_ptr<CWall>> _walls;
 };

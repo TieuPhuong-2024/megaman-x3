@@ -1,6 +1,5 @@
 #pragma once
 #include "CGame.h"
-#include "Object/CPlayer.h"
 #include "Scene/PlayScene.h"
 
 class CMegaman : public CGame

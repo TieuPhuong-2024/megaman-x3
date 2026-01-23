@@ -14,6 +14,12 @@
 using pGInput = LPDIRECTINPUT;
 using pGKeyboard = LPDIRECTINPUTDEVICE8;
 
+enum KeyState { NONE, PRESSED, HELD, RELEASED };
+
+struct InputData {
+    KeyState left, right, jump, dash, shoot;
+};
+
 class InputController
 {
 public:
@@ -29,20 +35,20 @@ public:
 	bool init(HWND, HINSTANCE); // should be called in game::init()
 	void update();				// should be called in main game loop
 	int isKeyDown(int keycode); // check if keycode is down.
-	int isKeyUp(int nKeyCode);
-	bool isKeyPressed(int keycode);
-	bool isKeyRelease(int keycode);
+
+	InputData getInputData();
+	void updateKey(int keycode, bool isDown);
 
 private:
 	InputController();
+
+	InputData _inputData;
+	KeyState _keyStates[256];
 
 	pGInput _input;
 	pGKeyboard _keyboard;
 	BYTE _keyBuffer[256]; // BYTE = unsigned char
 	HWND _hWnd;			  // reference to another place. Don't release!!!
-	DIDEVICEOBJECTDATA _keyEvents[KEYBOARD_BUFFER_SIZE];
-
-	bool _previousKeyBuffer[256];
 };
 
 using pInputController = InputController *;

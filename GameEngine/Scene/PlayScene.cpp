@@ -18,9 +18,6 @@ PlayScene::~PlayScene()
 bool PlayScene::init()
 {
 	_viewport = std::make_unique<Viewport>(0, WINDOW_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT);
-	_player = std::make_unique<CPlayer>();
-	_player->SetPosition(GVector2(100.f, 200.f));
-	_player->SetScale(2.0f);
 	_tileMap = StageManager::getInstance().getTileMap(eID::MAP_STAGE_MEGAMAN);
 
 	// Add walls from tilemap
@@ -31,7 +28,6 @@ bool PlayScene::init()
 void PlayScene::updateInput(float dt)
 {
 	// Update input for player
-	_player->updateInput(dt);
 }
 
 void PlayScene::update(float dt)
@@ -40,12 +36,10 @@ void PlayScene::update(float dt)
 	updateViewport(dt);
 
 	// Update player
-	_player->update(dt);
 
 	// Handle collisions between player and walls
 	for (const auto &wall : _walls)
 	{
-		_player->OnCollision(wall.get(), dt);
 	}
 }
 
@@ -55,14 +49,12 @@ void PlayScene::draw(LPD3DXSPRITE spriteHandle)
 	_tileMap->draw(spriteHandle, _viewport.get());
 
 	// Draw player
-	_player->draw(spriteHandle, _viewport.get());
 
 	// Debug drawing
 	auto &debugDraw = DebugDraw::getInstance();
 	if (debugDraw.isEnabled())
 	{
 		// Draw player bounding box
-		debugDraw.DrawBBoxInWorld(_player->GetBoundingBox(), _viewport.get(), D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f)); // Green for player
 
 		for (const auto &wall : _walls)
 		{
@@ -91,19 +83,4 @@ void PlayScene::updateViewport(float dt)
 {
 	GVector2 currentPosition = _viewport->getPositionWorld();
 	GVector2 worldSize = _tileMap->getWorldSize();
-	auto playerX = _player->GetPosition().x;
-
-	GVector2 new_position = GVector2(max(playerX - WINDOW_WIDTH / 2, 0), WINDOW_HEIGHT);
-
-	if (_player->GetVelocity().x == 0)
-	{
-		new_position = currentPosition;
-	}
-
-	if (new_position.x + WINDOW_WIDTH > worldSize.x)
-	{
-		new_position.x = worldSize.x - WINDOW_WIDTH;
-	}
-
-	_viewport->setPositionWorld(new_position);
 }
