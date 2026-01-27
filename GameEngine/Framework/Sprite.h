@@ -21,10 +21,9 @@ public:
 
 	void release();
 
-
 	void render(LPD3DXSPRITE spriteHandle);
 
-	void render(LPD3DXSPRITE spriteHandle, Viewport* viewport);
+	void render(LPD3DXSPRITE spriteHandle, Viewport *viewport);
 
 	void setPosition(float x, float y, float z = 1);
 	void setPosition(GVector3 vector);
@@ -43,33 +42,33 @@ public:
 
 	void setZIndex(float z);
 
-	RECT getBounding();
+	RECT getBounding() const;
 
 	void setFrameRect(RECT rect);
 	void setFrameRect(float top, float right, float bottom, float left);
 	void setFrameRect(float x, float y, int width, int height);
-	RECT getFrameRect();
-	RECT getFrameRectByIndex(int index);
+	RECT getFrameRect() const;
+	RECT getFrameRectByIndex(int index) const;
 
 	void nextFrame();
 
 	void setIndex(int index);
 
-	int getFrameWidth();
+	int getFrameWidth() const;
 
-	int getFrameHeight();
+	int getFrameHeight() const;
 
-	int getTextureWidth();
+	int getTextureWidth() const;
 
-	int getTextureHeight();
+	int getTextureHeight() const;
 
 	void drawBounding(bool draw);
 
 	void setOpacity(float opacity);
-	float getOpacity();
+	float getOpacity() const;
 
 	void setColor(D3DXCOLOR color);
-	D3DXCOLOR getColor();
+	D3DXCOLOR getColor() const;
 
 private:
 	Texture _texture;
@@ -98,6 +97,5 @@ private:
 	LPDIRECT3DSURFACE9 _surface;
 	bool _isDrawBounding;
 };
-
 
 #endif // !__SPRITE_H__

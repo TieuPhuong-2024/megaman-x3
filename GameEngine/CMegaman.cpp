@@ -18,7 +18,7 @@ CMegaman::~CMegaman()
 void CMegaman::init()
 {
 	CGame::init();
-	DebugDraw::getInstance().init(_pDeviceManager->getDevice());
+	DebugDraw::getInstance().init(DeviceManager::getInstance()->getDevice());
 	SceneManager::getInstance().addScene(std::make_unique<PlayScene>());
 }
 
@@ -63,16 +63,4 @@ void CMegaman::loadResource()
 	assetLoader.loadResource(_D3DXSprite);
 	assetLoader.loadStage();
 	assetLoader.loadSound(s_hWindows->getWnd());
-}
-
-void CMegaman::updateInput(float deltaTime)
-{
-	// Toggle debug draw with F1
-	if (_pInput.isKeyDown(DIK_F1))
-	{
-		DebugDraw::getInstance().toggle();
-	}
-
-	// Update input for current scene
-	SceneManager::getInstance().getCurrentScene()->updateInput(deltaTime);
 }

@@ -17,7 +17,6 @@ public:
 	}
 
 	bool init();
-	void updateInput(float dt);
 	void update(float dt);
 	void draw(LPD3DXSPRITE spriteHandle);
 	void release();

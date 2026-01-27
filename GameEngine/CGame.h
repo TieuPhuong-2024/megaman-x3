@@ -14,7 +14,6 @@ public:
 	virtual void init();
 	virtual void release();
 
-	virtual void updateInput(float deltaTime);
 	virtual void update(float deltaTime);
 	virtual void draw();
 
@@ -30,10 +29,7 @@ public:
 	static LRESULT CALLBACK wWinProc(HWND wnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 protected:
-	DeviceManager *_pDeviceManager;
-	GameTime *_pGameTime;
 	ID3DXSprite *_D3DXSprite;
-	InputController &_pInput;
 	static std::unique_ptr<Graphics> s_hWindows;
 
 	static bool s_bIsExited;

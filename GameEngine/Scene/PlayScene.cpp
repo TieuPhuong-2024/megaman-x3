@@ -17,17 +17,17 @@ PlayScene::~PlayScene()
 
 bool PlayScene::init()
 {
-	_viewport = std::make_unique<Viewport>(0, WINDOW_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT);
+	_viewport = std::unique_ptr<Viewport>(new Viewport(0, WINDOW_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT));
 	_tileMap = StageManager::getInstance().getTileMap(eID::MAP_STAGE_MEGAMAN);
 
 	// Add walls from tilemap
 	_walls = _tileMap->GetWalls();
+	
+	// Create player at starting position
+	_player = std::unique_ptr<Player>(new Player(GVector2(100.0f, 300.0f)));
+	_player->init();
+	
 	return true;
-}
-
-void PlayScene::updateInput(float dt)
-{
-	// Update input for player
 }
 
 void PlayScene::update(float dt)
@@ -36,6 +36,10 @@ void PlayScene::update(float dt)
 	updateViewport(dt);
 
 	// Update player
+	if (_player)
+	{
+		_player->update(dt);
+	}
 
 	// Handle collisions between player and walls
 	for (const auto &wall : _walls)
@@ -49,12 +53,20 @@ void PlayScene::draw(LPD3DXSPRITE spriteHandle)
 	_tileMap->draw(spriteHandle, _viewport.get());
 
 	// Draw player
+	if (_player)
+	{
+		_player->draw(spriteHandle, _viewport.get());
+	}
 
 	// Debug drawing
 	auto &debugDraw = DebugDraw::getInstance();
 	if (debugDraw.isEnabled())
 	{
 		// Draw player bounding box
+		if (_player)
+		{
+			debugDraw.DrawBBoxInWorld(_player->GetBoundingBox(), _viewport.get(), D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f)); // Green for player
+		}
 
 		for (const auto &wall : _walls)
 		{
@@ -71,6 +83,10 @@ void PlayScene::release()
 	GAMELOG("PlayScene::release() starting");
 	_tileMap->release();
 	GAMELOG("TileMap released");
+
+	// Clean up player
+	_player.reset();
+	GAMELOG("Player released");
 
 	// Clean up walls
 	GAMELOG("Clearing walls");

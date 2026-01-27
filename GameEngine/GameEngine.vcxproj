@@ -182,6 +182,8 @@
     <ClCompile Include="Framework\DebugDraw.cpp" />
     <ClCompile Include="Object\CWall.cpp" />
     <ClCompile Include="Object\Collision.cpp" />
+    <ClCompile Include="Object\Player.cpp" />
+    <ClCompile Include="States\PlayerState.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CGame.h" />
@@ -219,6 +221,8 @@
     <ClInclude Include="Object\CWall.h" />
     <ClInclude Include="Object\Collision.h" />
     <ClInclude Include="Framework\Event.h" />
+    <ClInclude Include="Object\Player.h" />
+    <ClInclude Include="States\PlayerState.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

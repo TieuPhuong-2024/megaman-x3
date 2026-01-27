@@ -8,7 +8,7 @@
             "program": "${workspaceFolder}/Debug/GameEngine.exe",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/Debug",
+            "cwd": "${workspaceFolder}/GameEngine",
             "environment": [],
             "console": "integratedTerminal",
             "preLaunchTask": "build"

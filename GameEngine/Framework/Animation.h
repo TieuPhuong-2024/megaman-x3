@@ -12,17 +12,17 @@ struct AnimationFrame
 {
 	RECT rect;
 	GVector2 origin;
-	
+
 	AnimationFrame() = default;
-	AnimationFrame(const RECT& r, const GVector2& o) : rect(r), origin(o) {}
+	AnimationFrame(const RECT &r, const GVector2 &o) : rect(r), origin(o) {}
 };
 
 class Animation : public IComponent
 {
 public:
 	~Animation();
-	Animation(Sprite* spriteSheet, float timeAnimate = 0.0f, bool loop = true, int expectedFrames = 8);
-	
+	Animation(Sprite *spriteSheet, float timeAnimate = 0.0f, bool loop = true, int expectedFrames = 8);
+
 	static constexpr float MS_TO_SECONDS = 1.0f / 1000.0f;
 
 	void nextFrame();
@@ -33,7 +33,7 @@ public:
 
 	void update(float dt);
 
-	void draw(LPD3DXSPRITE spriteHandle, Viewport* viewport);
+	void draw(LPD3DXSPRITE spriteHandle, Viewport *viewport);
 
 	void setTimeAnimate(float time);
 
@@ -47,7 +47,7 @@ public:
 	bool isAnimate();
 	void addFrameRect(RECT rect);
 
-	void addFrameRect(eID id, const char* firstRectName, ...);
+	void addFrameRect(eID id, const char *firstRectName, ...);
 
 	void addFrameOrigin(GVector2 origin);
 
@@ -66,9 +66,9 @@ public:
 	D3DXCOLOR getColorFlash();
 	bool isLastAnimation();
 
-RECT getCurrentRect() const { return _currentFrame.rect; }
+	RECT getCurrentRect() const { return _currentFrame.rect; }
 	GVector2 getCurrentOrigin() const { return _currentFrame.origin; }
-	Sprite* getSpriteSheet() const { return _spriteSheet; }
+	Sprite *getSpriteSheet() const { return _spriteSheet; }
 
 private:
 	bool _isAll;
@@ -83,7 +83,7 @@ private:
 	bool _canAnimate;
 	bool _isLoop;
 
-	Sprite* _spriteSheet;
+	Sprite *_spriteSheet;
 	vector<AnimationFrame> _frames;
 	string _nameAnimation;
 	AnimationFrame _currentFrame;
@@ -91,7 +91,7 @@ private:
 	bool _canFlashes;
 	float _valueFlashes;
 	D3DXCOLOR _flashColor;
-	
+
 	// Optimization flags
 	bool _needsSpriteUpdate;
 	bool _lastFlashState;

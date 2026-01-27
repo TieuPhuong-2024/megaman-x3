@@ -8,12 +8,6 @@ bool SceneManager::init()
 	return true;
 }
 
-void SceneManager::updateInput(float dt)
-{
-	if (!_scenes.empty())
-		_scenes.back()->updateInput(dt);
-}
-
 void SceneManager::update(float dt)
 {
 	if (!_scenes.empty())

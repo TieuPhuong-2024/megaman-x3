@@ -7,11 +7,8 @@ std::unique_ptr<Graphics> CGame::s_hWindows = nullptr;
 bool CGame::s_bIsExited = false;
 
 CGame::CGame(HINSTANCE hInstance, LPCWSTR strName, int width, int height, int fps, int isFullScreen)
-	: _pInput(InputController::getInstance())
 {
 	s_hWindows = std::make_unique<Graphics>(hInstance, strName, width, height, fps, isFullScreen);
-	_pDeviceManager = DeviceManager::getInstance();
-	_pGameTime = GameTime::getInstance();
 	_D3DXSprite = nullptr;
 	_deltaTime = 0;
 	_oldTime = 0;
@@ -27,16 +24,19 @@ void CGame::init()
 
 	s_hWindows->m_Wnd = static_cast<WNDPROC>(wWinProc);
 	s_hWindows->initWindow();
-	_pGameTime->init();
-	_pDeviceManager->Init(*s_hWindows);
-	_pInput.init(s_hWindows->getWnd(), s_hWindows->getHINSTANCE());
+	GameTime::getInstance()->init();
+	DeviceManager::getInstance()->Init(*s_hWindows);
+	if (!InputController::getInstance()->init(s_hWindows->getWnd(), s_hWindows->getHINSTANCE()))
+	{
+		throw std::runtime_error("Failed to initialize input controller");
+	}
 
 	this->_frameRate = 1000.0f / s_hWindows->getFrameRate(); // 1000/30 = 33 millisecond
 
-	D3DXCreateSprite(_pDeviceManager->getDevice(), &_D3DXSprite);
+	D3DXCreateSprite(DeviceManager::getInstance()->getDevice(), &_D3DXSprite);
 	this->loadResource();
 
-	_oldTime = _pGameTime->getTotalGameTime();
+	_oldTime = GameTime::getInstance()->getTotalGameTime();
 	_deltaTime = 0;
 }
 
@@ -52,10 +52,6 @@ void CGame::release()
 	if (_D3DXSprite)
 		_D3DXSprite->Release();
 	_D3DXSprite = nullptr;
-}
-
-void CGame::updateInput(float deltaTime)
-{
 }
 
 void CGame::update(float deltaTime)
@@ -81,18 +77,18 @@ void CGame::run()
 		} // don't mention it.  see e book if you want more info
 #pragma endregion
 
-		_pGameTime->updateGameTime(); // game time isn't run if don't call updateGameTime
-		_deltaTime = _pGameTime->getTotalGameTime() - _oldTime;
+		auto gameTime = GameTime::getInstance();
+		gameTime->updateGameTime(); // game time isn't run if don't call updateGameTime
+		_deltaTime = gameTime->getTotalGameTime() - _oldTime;
 
 		if (_deltaTime >= _frameRate)
 		{
 			_oldTime += _frameRate;
-			auto time = _pGameTime->getElapsedGameTime();
+			auto time = gameTime->getElapsedGameTime();
 			if (time > _frameRate * 2)
 				time = _frameRate;
 
-			_pInput.update();
-			updateInput(time);
+			InputController::getInstance()->update();
 			update(time);
 			render();
 		}
@@ -106,14 +102,15 @@ void CGame::render()
 	if (GetActiveWindow() != s_hWindows->getWnd())
 		return;
 
-	if (_pDeviceManager->getDevice()->BeginScene() != DI_OK)
+	auto deviceManager = DeviceManager::getInstance();
+	if (deviceManager->getDevice()->BeginScene() != DI_OK)
 		return;
 
-	_pDeviceManager->clearScreen();
+	deviceManager->clearScreen();
 	draw();
 
-	_pDeviceManager->getDevice()->EndScene();
-	_pDeviceManager->present();
+	deviceManager->getDevice()->EndScene();
+	deviceManager->present();
 }
 
 void CGame::loadResource()
