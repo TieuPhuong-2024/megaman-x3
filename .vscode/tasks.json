@@ -3,42 +3,43 @@
     "tasks": [
         {
             "label": "build",
-            "type": "process",
-            "command": "C:\\Program Files\\Microsoft Visual Studio\\18\\Enterprise\\MSBuild\\Current\\Bin\\MSBuild.exe",
+            "type": "shell",
+            "command": "powershell",
             "args": [
-                "GameEngine/GameEngine.vcxproj",
-                "/p:Configuration=Debug",
-                "/p:Platform=x64"
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}/scripts/cargo.ps1",
+                "build",
+                "-p",
+                "megaman_x3"
             ],
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
-            "presentation": {
-                "echo": true,
-                "reveal": "silent",
-                "focus": false,
-                "panel": "shared"
-            },
-            "problemMatcher": "$msCompile"
+            "problemMatcher": ["$rustc"]
         },
         {
             "label": "run",
-            "type": "process",
-            "command": "${workspaceFolder}/Debug/GameEngine.exe",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}/scripts/cargo.ps1",
+                "run",
+                "-p",
+                "megaman_x3"
+            ],
             "group": {
                 "kind": "test",
-                "isDefault": false
+                "isDefault": true
             },
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared"
-            },
-            "dependsOn": [
-                "build"
-            ]
+            "problemMatcher": ["$rustc"]
         }
     ]
 }

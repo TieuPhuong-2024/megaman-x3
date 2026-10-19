@@ -276,9 +276,17 @@ _ReSharper*/
 
 # VS Code
 .vscode/*
-!.vscode/c_cpp_properties.json
 !.vscode/launch.json
 !.vscode/tasks.json
+
+# Rust
+/target/
+
+# Local MinGW SDK used only to obtain as.exe. The small copy lives in third_party/as-bin.
+/third_party/w64devkit/
+/third_party/w64devkit.7z.exe
+/third_party/*.tar.gz
+/third_party/run-*.txt
 
 # Windows
 Thumbs.db

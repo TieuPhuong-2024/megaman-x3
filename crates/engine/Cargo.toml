@@ -1,0 +1,17 @@
+[package]
+name = "engine"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1"
+glam = "0.29"
+image = { version = "0.25", default-features = false, features = ["png"] }
+quick-xml = "0.37"
+rodio = "0.20"
+wgpu = "24"
+bytemuck = { version = "1", features = ["derive"] }
+pollster = "0.4"
+raw-window-handle = "0.6"
+
+[dev-dependencies]

@@ -2,16 +2,18 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug GameEngine",
-            "type": "cppvsdbg",
+            "name": "Debug megaman_x3",
+            "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/Debug/GameEngine.exe",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=megaman_x3",
+                    "--package=megaman_x3"
+                ]
+            },
             "args": [],
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/GameEngine",
-            "environment": [],
-            "console": "integratedTerminal",
-            "preLaunchTask": "build"
+            "cwd": "${workspaceFolder}"
         }
     ]
 }

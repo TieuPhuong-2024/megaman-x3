@@ -1,0 +1,11 @@
+[package]
+name = "megaman_x3"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1"
+engine = { path = "../engine" }
+pollster = "0.4"
+sdl2 = { version = "0.37", features = ["raw-window-handle"] }
+wgpu = "24"
