@@ -298,7 +298,6 @@ impl Player {
             let Some((time, nx, ny)) = earliest else {
                 if !logged_sweep {
                     log_integrate(sep_x, sep_y, false, 1.0, 0.0, self.pos.y);
-                    logged_sweep = true;
                 }
                 self.pos += self.vel * dt * time_left;
                 break;

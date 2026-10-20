@@ -128,10 +128,13 @@ pub struct Renderer {
     pipeline: wgpu::RenderPipeline,
     camera_buf: wgpu::Buffer,
     camera_bind: wgpu::BindGroup,
+    overlay_camera_buf: wgpu::Buffer,
+    overlay_camera_bind: wgpu::BindGroup,
     sampler: wgpu::Sampler,
     tex_layout: wgpu::BindGroupLayout,
     textures: Vec<GpuTexture>,
     instance_buf: wgpu::Buffer,
+    overlay_instance_buf: wgpu::Buffer,
 }
 
 impl Renderer {
@@ -280,6 +283,20 @@ impl Renderer {
                 resource: camera_buf.as_entire_binding(),
             }],
         });
+        let overlay_camera_buf = device.create_buffer(&wgpu::BufferDescriptor {
+            label: Some("overlay-camera"),
+            size: size_of::<CameraUniform>() as u64,
+            usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
+            mapped_at_creation: false,
+        });
+        let overlay_camera_bind = device.create_bind_group(&wgpu::BindGroupDescriptor {
+            label: Some("overlay-camera"),
+            layout: &camera_layout,
+            entries: &[wgpu::BindGroupEntry {
+                binding: 0,
+                resource: overlay_camera_buf.as_entire_binding(),
+            }],
+        });
         let sampler = device.create_sampler(&wgpu::SamplerDescriptor {
             label: Some("sprite"),
             mag_filter: wgpu::FilterMode::Nearest,
@@ -288,6 +305,12 @@ impl Renderer {
         });
         let instance_buf = device.create_buffer(&wgpu::BufferDescriptor {
             label: Some("instances"),
+            size: (size_of::<Instance>() * 4096) as u64,
+            usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
+            mapped_at_creation: false,
+        });
+        let overlay_instance_buf = device.create_buffer(&wgpu::BufferDescriptor {
+            label: Some("overlay-instances"),
             size: (size_of::<Instance>() * 4096) as u64,
             usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
             mapped_at_creation: false,
@@ -301,10 +324,13 @@ impl Renderer {
             pipeline,
             camera_buf,
             camera_bind,
+            overlay_camera_buf,
+            overlay_camera_bind,
             sampler,
             tex_layout,
             textures: Vec::new(),
             instance_buf,
+            overlay_instance_buf,
         };
         renderer.upload_rgba(1, 1, &[255, 255, 255, 255]);
         Ok(renderer)
@@ -415,8 +441,15 @@ impl Renderer {
                 timestamp_writes: None,
             });
             pass.set_pipeline(&self.pipeline);
-            pass.set_bind_group(0, &self.camera_bind, &[]);
-            self.draw_sprites(&mut pass, &list.sprites, list.cam_x, list.cam_top, list.view_w, list.view_h);
+            self.draw_sprites(
+                &mut pass,
+                &list.sprites,
+                list.cam_x,
+                list.cam_top,
+                list.view_w,
+                list.view_h,
+                false,
+            );
             if !list.overlay.is_empty() {
                 self.draw_sprites(
                     &mut pass,
@@ -425,6 +458,7 @@ impl Renderer {
                     list.view_h,
                     list.view_w,
                     list.view_h,
+                    true,
                 );
             }
         }
@@ -441,16 +475,55 @@ impl Renderer {
         cam_top: f32,
         view_w: f32,
         view_h: f32,
+        overlay: bool,
     ) {
+        if sprites.is_empty() {
+            return;
+        }
         let camera = CameraUniform {
             cam_x,
             cam_top,
             view_w,
             view_h,
         };
+        let (camera_buf, camera_bind) = if overlay {
+            (&self.overlay_camera_buf, &self.overlay_camera_bind)
+        } else {
+            (&self.camera_buf, &self.camera_bind)
+        };
         self.queue
-            .write_buffer(&self.camera_buf, 0, bytemuck::bytes_of(&camera));
+            .write_buffer(camera_buf, 0, bytemuck::bytes_of(&camera));
+        pass.set_bind_group(0, camera_bind, &[]);
 
+        let instances: Vec<Instance> = sprites
+            .iter()
+            .map(|sprite| Instance {
+                pos: [sprite.x, sprite.y],
+                size: [sprite.w, sprite.h],
+                uv_min: [sprite.u0, sprite.v0],
+                uv_max: [sprite.u1, sprite.v1],
+                color: sprite.color,
+                flip: if sprite.flip_x { -1.0 } else { 1.0 },
+                _pad: [0.0; 3],
+            })
+            .collect();
+        let bytes = bytemuck::cast_slice(&instances);
+        let instance_buf = if overlay {
+            &mut self.overlay_instance_buf
+        } else {
+            &mut self.instance_buf
+        };
+        if instance_buf.size() < bytes.len() as u64 {
+            *instance_buf = self.device.create_buffer(&wgpu::BufferDescriptor {
+                label: Some("instances"),
+                size: bytes.len() as u64,
+                usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
+                mapped_at_creation: false,
+            });
+        }
+        self.queue.write_buffer(instance_buf, 0, bytes);
+
+        let stride = size_of::<Instance>() as u64;
         let mut start = 0;
         while start < sprites.len() {
             let texture = sprites[start].texture;
@@ -458,29 +531,10 @@ impl Renderer {
             while end < sprites.len() && sprites[end].texture == texture {
                 end += 1;
             }
-            let mut batch_start = start;
-            while batch_start < end {
-                let count = (end - batch_start).min(4096);
-                let instances: Vec<Instance> = sprites[batch_start..batch_start + count]
-                    .iter()
-                    .map(|sprite| Instance {
-                        pos: [sprite.x, sprite.y],
-                        size: [sprite.w, sprite.h],
-                        uv_min: [sprite.u0, sprite.v0],
-                        uv_max: [sprite.u1, sprite.v1],
-                        color: sprite.color,
-                        flip: if sprite.flip_x { -1.0 } else { 1.0 },
-                        _pad: [0.0; 3],
-                    })
-                    .collect();
-                self.queue
-                    .write_buffer(&self.instance_buf, 0, bytemuck::cast_slice(&instances));
-                let index = texture.min(self.textures.len() as u32 - 1) as usize;
-                pass.set_bind_group(1, &self.textures[index].bind, &[]);
-                pass.set_vertex_buffer(0, self.instance_buf.slice(..));
-                pass.draw(0..6, 0..count as u32);
-                batch_start += count;
-            }
+            let index = texture.min(self.textures.len() as u32 - 1) as usize;
+            pass.set_bind_group(1, &self.textures[index].bind, &[]);
+            pass.set_vertex_buffer(0, instance_buf.slice(start as u64 * stride..));
+            pass.draw(0..6, 0..(end - start) as u32);
             start = end;
         }
     }
