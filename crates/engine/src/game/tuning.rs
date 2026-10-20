@@ -3,8 +3,9 @@
 //! while treating that axis as screen-down, so a literal port falls through the floor.
 //! Jump here is +Y (up). Gravity is negative.
 
-pub const WINDOW_W: u32 = 600;
-pub const WINDOW_H: u32 = 600;
+pub const WINDOW_W: u32 = 720;
+pub const WINDOW_H: u32 = 480;
+pub const CAMERA_PLAYER_SCREEN_Y: f32 = 0.1;
 pub const FPS: f32 = 60.0;
 pub const FRAME_MS: f32 = 1000.0 / FPS;
 
@@ -34,4 +35,4 @@ pub const HIT_W: f32 = 20.0;
 pub const HIT_H: f32 = 36.0;
 
 pub const SPAWN_X: f32 = 100.0;
-pub const SPAWN_Y: f32 = 420.0;
+pub const SPAWN_Y: f32 = 200.0;

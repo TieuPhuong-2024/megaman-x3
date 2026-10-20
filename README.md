@@ -41,7 +41,12 @@ In Cursor, the default build task runs `scripts/cargo.ps1 build`.
 | Shift | Dash |
 | Hold Left or Right into a wall while falling | Wall cling. Jump kicks off the wall |
 | F1 | Toggle collision boxes |
+| F2 | Toggle debug monitor panel (FPS, position, animation state) |
 | Escape | Quit |
+
+### Debug monitor (agents / automated checks)
+
+With the game running, set `MEGAMAN_DEBUG_DUMP=1` to write `.debug/state.json` every 200 ms (player, camera, animation, flags). Override path with `MEGAMAN_DEBUG_DUMP_PATH`.
 
 World coordinates use +Y up. Jump velocity is positive. The old C++ code stored a negative jump speed on a Y-up wall system, which disagreed with its own comment, so that sign was not copied.
 

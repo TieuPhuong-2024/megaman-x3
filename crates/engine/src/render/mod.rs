@@ -44,6 +44,8 @@ pub struct SpriteDraw {
 
 pub struct DrawList {
     pub sprites: Vec<SpriteDraw>,
+    /// Screen-space HUD (pixels, origin bottom-left). Drawn after `sprites` with a fixed camera.
+    pub overlay: Vec<SpriteDraw>,
     pub cam_x: f32,
     pub cam_top: f32,
     pub view_w: f32,
@@ -376,15 +378,6 @@ impl Renderer {
     }
 
     pub fn draw(&mut self, list: &DrawList) -> anyhow::Result<()> {
-        let camera = CameraUniform {
-            cam_x: list.cam_x,
-            cam_top: list.cam_top,
-            view_w: list.view_w,
-            view_h: list.view_h,
-        };
-        self.queue
-            .write_buffer(&self.camera_buf, 0, bytemuck::bytes_of(&camera));
-
         let frame = match self.surface.get_current_texture() {
             Ok(frame) => frame,
             Err(wgpu::SurfaceError::Lost) | Err(wgpu::SurfaceError::Outdated) => {
@@ -423,16 +416,52 @@ impl Renderer {
             });
             pass.set_pipeline(&self.pipeline);
             pass.set_bind_group(0, &self.camera_bind, &[]);
+            self.draw_sprites(&mut pass, &list.sprites, list.cam_x, list.cam_top, list.view_w, list.view_h);
+            if !list.overlay.is_empty() {
+                self.draw_sprites(
+                    &mut pass,
+                    &list.overlay,
+                    0.0,
+                    list.view_h,
+                    list.view_w,
+                    list.view_h,
+                );
+            }
+        }
+        self.queue.submit(std::iter::once(encoder.finish()));
+        frame.present();
+        Ok(())
+    }
 
-            let mut start = 0;
-            while start < list.sprites.len() {
-                let texture = list.sprites[start].texture;
-                let mut end = start + 1;
-                while end < list.sprites.len() && list.sprites[end].texture == texture {
-                    end += 1;
-                }
-                let count = (end - start).min(4096);
-                let instances: Vec<Instance> = list.sprites[start..start + count]
+    fn draw_sprites(
+        &mut self,
+        pass: &mut wgpu::RenderPass<'_>,
+        sprites: &[SpriteDraw],
+        cam_x: f32,
+        cam_top: f32,
+        view_w: f32,
+        view_h: f32,
+    ) {
+        let camera = CameraUniform {
+            cam_x,
+            cam_top,
+            view_w,
+            view_h,
+        };
+        self.queue
+            .write_buffer(&self.camera_buf, 0, bytemuck::bytes_of(&camera));
+
+        let mut start = 0;
+        while start < sprites.len() {
+            let texture = sprites[start].texture;
+            let mut end = start + 1;
+            while end < sprites.len() && sprites[end].texture == texture {
+                end += 1;
+            }
+            let mut batch_start = start;
+            while batch_start < end {
+                let count = (end - batch_start).min(4096);
+                let instances: Vec<Instance> = sprites[batch_start..batch_start + count]
                     .iter()
                     .map(|sprite| Instance {
                         pos: [sprite.x, sprite.y],
@@ -450,12 +479,10 @@ impl Renderer {
                 pass.set_bind_group(1, &self.textures[index].bind, &[]);
                 pass.set_vertex_buffer(0, self.instance_buf.slice(..));
                 pass.draw(0..6, 0..count as u32);
-                start += count;
+                batch_start += count;
             }
+            start = end;
         }
-        self.queue.submit(std::iter::once(encoder.finish()));
-        frame.present();
-        Ok(())
     }
 }
 

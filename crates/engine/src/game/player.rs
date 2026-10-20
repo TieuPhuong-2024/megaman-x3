@@ -5,6 +5,7 @@ use crate::physics::{overlaps, separate, swept_aabb, Aabb};
 use crate::render::SpriteDraw;
 
 use super::audio::{Audio, SoundId};
+use super::debug_session::{log_integrate, log_player_tick};
 use super::input::InputState;
 use super::tuning::*;
 
@@ -24,6 +25,21 @@ enum Body {
     Cling,
     Kick { left: f32 },
     Land { left: f32 },
+}
+
+impl Body {
+    fn label(self) -> &'static str {
+        match self {
+            Body::Stand => "stand",
+            Body::Run => "run",
+            Body::Jump => "jump",
+            Body::Fall => "fall",
+            Body::Dash { .. } => "dash",
+            Body::Cling => "cling",
+            Body::Kick { .. } => "kick",
+            Body::Land { .. } => "land",
+        }
+    }
 }
 
 pub struct Shot {
@@ -87,6 +103,8 @@ impl Player {
         atlas: &Atlas,
         land_frames: &[Frame],
         audio: &Audio,
+        cam_top: f32,
+        view_h: f32,
     ) {
         let dt = dt_ms / 1000.0;
         self.shot_cooldown = (self.shot_cooldown - dt).max(0.0);
@@ -108,6 +126,22 @@ impl Player {
         self.transitions(input, audio);
         self.advance_anim(dt, atlas, land_frames);
         self.update_shots(dt, walls);
+        let sprite_wh = self
+            .anim_frames
+            .get(self.frame)
+            .map(|f| (f.w as f32, f.h as f32));
+        log_player_tick(
+            self.debug_body_label(),
+            self.pos.x,
+            self.pos.y,
+            self.vel.x,
+            self.vel.y,
+            self.grounded,
+            self.anim_frames.len(),
+            sprite_wh,
+            cam_top,
+            cam_top - view_h,
+        );
     }
 
     fn steer(&mut self, dt: f32, input: &InputState, audio: &Audio) {
@@ -225,12 +259,17 @@ impl Player {
     }
 
     fn integrate(&mut self, dt: f32, walls: &[Aabb]) {
+        self.grounded = false;
         let mut box_now = self.bounds();
+        let mut sep_x = 0.0_f32;
+        let mut sep_y = 0.0_f32;
         for wall in walls {
             if let Some(push) = separate(box_now, *wall) {
+                sep_x += push.x;
+                sep_y += push.y;
                 self.pos += push;
                 box_now = self.bounds();
-                if push.y > 0.0 {
+                if push.y > 0.0 && self.vel.y <= 0.0 {
                     self.grounded = true;
                     self.vel.y = self.vel.y.max(0.0);
                 }
@@ -239,7 +278,11 @@ impl Player {
 
         let mut time_left = 1.0;
         let dt_ms = dt * 1000.0;
-        self.grounded = false;
+        if self.vel.y <= 0.0 {
+            let support_probe = self.bounds().translated(Vec2::new(0.0, -0.1));
+            self.grounded |= walls.iter().any(|wall| overlaps(support_probe, *wall));
+        }
+        let mut logged_sweep = false;
         for _ in 0..4 {
             if time_left <= 0.0001 {
                 break;
@@ -253,9 +296,17 @@ impl Player {
                 }
             }
             let Some((time, nx, ny)) = earliest else {
+                if !logged_sweep {
+                    log_integrate(sep_x, sep_y, false, 1.0, 0.0, self.pos.y);
+                    logged_sweep = true;
+                }
                 self.pos += self.vel * dt * time_left;
                 break;
             };
+            if !logged_sweep {
+                log_integrate(sep_x, sep_y, true, time, ny, self.pos.y);
+                logged_sweep = true;
+            }
             let travel = (time * time_left).max(0.0);
             self.pos += self.vel * dt * travel;
             self.pos += Vec2::new(nx, ny) * 0.05;
@@ -480,5 +531,33 @@ impl Player {
 
     pub fn debug_box(&self) -> Aabb {
         self.bounds()
+    }
+
+    pub fn debug_body_label(&self) -> &'static str {
+        self.body.label()
+    }
+
+    pub fn debug_anim_key(&self) -> &str {
+        &self.anim_key
+    }
+
+    pub fn debug_anim_frame(&self) -> usize {
+        self.frame
+    }
+
+    pub fn debug_anim_frame_count(&self) -> usize {
+        self.anim_frames.len()
+    }
+
+    pub fn debug_grounded(&self) -> bool {
+        self.grounded
+    }
+
+    pub fn debug_wall_normal_x(&self) -> f32 {
+        self.wall_normal_x
+    }
+
+    pub fn debug_shooting(&self) -> bool {
+        self.shooting
     }
 }

@@ -2,7 +2,7 @@ use std::time::Instant;
 
 use anyhow::Context;
 use engine::game::tuning::{FRAME_MS, WINDOW_H, WINDOW_W};
-use engine::game::InputState;
+use engine::game::{FrameStats, InputState};
 use engine::{PlayScene, Renderer};
 use sdl2::event::Event;
 use sdl2::keyboard::Scancode;
@@ -27,6 +27,10 @@ pub fn run() -> anyhow::Result<()> {
     let mut last = Instant::now();
     let mut accumulator = 0.0_f32;
     let mut debug_was_down = false;
+    let mut monitor_was_down = false;
+    let mut fps = 0.0_f32;
+    let mut fps_accum_ms = 0.0_f32;
+    let mut fps_frames = 0_u32;
     let mut running = true;
 
     while running {
@@ -46,6 +50,7 @@ pub fn run() -> anyhow::Result<()> {
 
         let keyboard = pump.keyboard_state();
         let debug_down = keyboard.is_scancode_pressed(Scancode::F1);
+        let monitor_down = keyboard.is_scancode_pressed(Scancode::F2);
         let input = InputState {
             left: keyboard.is_scancode_pressed(Scancode::Left),
             right: keyboard.is_scancode_pressed(Scancode::Right),
@@ -57,9 +62,11 @@ pub fn run() -> anyhow::Result<()> {
             dash: keyboard.is_scancode_pressed(Scancode::LShift)
                 || keyboard.is_scancode_pressed(Scancode::RShift),
             debug_toggle: debug_down && !debug_was_down,
+            monitor_toggle: monitor_down && !monitor_was_down,
             quit: keyboard.is_scancode_pressed(Scancode::Escape),
         };
         debug_was_down = debug_down;
+        monitor_was_down = monitor_down;
         if input.quit {
             running = false;
         }
@@ -71,10 +78,25 @@ pub fn run() -> anyhow::Result<()> {
             elapsed = FRAME_MS;
         }
         accumulator += elapsed;
+        let mut sim_steps = 0_u32;
         while accumulator >= FRAME_MS {
             scene.update(FRAME_MS, &input);
             accumulator -= FRAME_MS;
+            sim_steps += 1;
         }
+
+        fps_frames += 1;
+        fps_accum_ms += elapsed;
+        if fps_accum_ms >= 500.0 {
+            fps = fps_frames as f32 / (fps_accum_ms / 1000.0);
+            fps_frames = 0;
+            fps_accum_ms = 0.0;
+        }
+        scene.set_frame_stats(FrameStats {
+            fps,
+            frame_ms: elapsed,
+            sim_steps,
+        });
 
         renderer.draw(&scene.draw())?;
     }

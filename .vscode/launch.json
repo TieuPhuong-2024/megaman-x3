@@ -2,18 +2,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug megaman_x3",
+            "name": "megaman_x3: Launch",
             "type": "lldb",
             "request": "launch",
-            "cargo": {
-                "args": [
-                    "build",
-                    "--bin=megaman_x3",
-                    "--package=megaman_x3"
-                ]
-            },
+            "program": "${workspaceFolder}/target/debug/megaman_x3.exe",
             "args": [],
-            "cwd": "${workspaceFolder}"
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "build"
         }
     ]
 }

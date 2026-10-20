@@ -121,15 +121,9 @@ pub fn swept_aabb(mover: Aabb, velocity: Vec2, other: Aabb, dt_ms: f32) -> Sweep
     }
 
     let (normal_x, normal_y) = if tx_entry > ty_entry {
-        if dx_entry < 0.0 {
-            (1.0, 0.0)
-        } else {
-            (-1.0, 0.0)
-        }
-    } else if dy_entry < 0.0 {
-        (0.0, 1.0)
+        (if current.x > 0.0 { -1.0 } else { 1.0 }, 0.0)
     } else {
-        (0.0, -1.0)
+        (0.0, if current.y > 0.0 { -1.0 } else { 1.0 })
     };
 
     SweepHit {
@@ -142,6 +136,19 @@ pub fn swept_aabb(mover: Aabb, velocity: Vec2, other: Aabb, dt_ms: f32) -> Sweep
 /// Push `mover` out of `solid` along the smallest overlap. Used when a frame starts inside a wall.
 pub fn separate(mover: Aabb, solid: Aabb) -> Option<Vec2> {
     if !overlaps(mover, solid) {
+        return None;
+    }
+    // Wide floor slabs from TMX overlap the player horizontally while feet sit on the deck.
+    // Resolve only upward in that case; smallest-penetration would shove the player sideways.
+    const ON_TOP_EPS: f32 = 4.0;
+    if mover.bottom >= solid.top - ON_TOP_EPS
+        && mover.left < solid.right
+        && mover.right > solid.left
+    {
+        let pen_up = solid.top - mover.bottom;
+        if pen_up > 0.0 {
+            return Some(Vec2::new(0.0, pen_up));
+        }
         return None;
     }
     let pen_left = mover.right - solid.left;
@@ -183,6 +190,56 @@ mod tests {
         assert!(hit.time < 1.0, "expected a hit, time {}", hit.time);
         assert_eq!(hit.normal_y, 1.0);
         assert_eq!(hit.normal_x, 0.0);
+    }
+
+    #[test]
+    fn falling_while_touching_floor_reports_upward_normal() {
+        let player = Aabb {
+            left: 0.0,
+            right: 20.0,
+            bottom: 32.0,
+            top: 62.0,
+        };
+        let floor = Aabb {
+            left: -10.0,
+            right: 100.0,
+            bottom: 0.0,
+            top: 32.0,
+        };
+
+        let hit = swept_aabb(player, Vec2::new(0.0, -200.0), floor, 16.0);
+
+        assert_eq!(hit.time, 0.0);
+        assert_eq!(hit.normal_y, 1.0);
+    }
+
+    #[test]
+    fn rising_while_touching_ceiling_reports_downward_normal() {
+        let player = Aabb {
+            left: 0.0,
+            right: 20.0,
+            bottom: 32.0,
+            top: 62.0,
+        };
+        let ceiling = Aabb {
+            left: -10.0,
+            right: 100.0,
+            bottom: 62.0,
+            top: 100.0,
+        };
+
+        let hit = swept_aabb(player, Vec2::new(0.0, 200.0), ceiling, 16.0);
+
+        assert_eq!(hit.time, 0.0);
+        assert_eq!(hit.normal_y, -1.0);
+    }
+
+    #[test]
+    fn wide_floor_does_not_push_player_sideways_on_deck() {
+        let floor = Aabb::from_bottom_left(0.0, 300.0, 500.0, 148.0);
+        let player = Aabb::from_center(Vec2::new(100.0, 466.0), 20.0, 36.0);
+        let push = separate(player, floor).unwrap_or(Vec2::ZERO);
+        assert!(push.x.abs() < 0.01, "unexpected horizontal push {}", push.x);
     }
 
     #[test]

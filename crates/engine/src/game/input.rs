@@ -6,5 +6,6 @@ pub struct InputState {
     pub shoot: bool,
     pub dash: bool,
     pub debug_toggle: bool,
+    pub monitor_toggle: bool,
     pub quit: bool,
 }

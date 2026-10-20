@@ -281,6 +281,7 @@ _ReSharper*/
 
 # Rust
 /target/
+.debug/
 
 # Local MinGW SDK used only to obtain as.exe. The small copy lives in third_party/as-bin.
 /third_party/w64devkit/
